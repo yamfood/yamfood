@@ -6,4 +6,5 @@
   (migratus/migrate m/config))
 
 
-(migratus/create m/config "products")
+;(init)
+;(migratus/create m/config "products")
