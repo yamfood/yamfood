@@ -1,7 +1,7 @@
 (ns yamfood.handler-test
   (:require [clojure.test :refer :all]
             [ring.mock.request :as mock]
-            [yamfood.handler :refer :all]))
+            [yamfood.core :refer :all]))
 
 (deftest test-app
   (testing "main route"

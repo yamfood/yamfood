@@ -1,1 +1,1 @@
-web: java -jar target/yamfood.jar
+web: java $JVM_OPTS -cp target/yamfood.jar clojure.main -m yamfood.core
