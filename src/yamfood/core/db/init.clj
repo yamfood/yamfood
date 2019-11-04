@@ -7,4 +7,4 @@
 
 
 ;(init)
-;(migratus/create m/config "products")
+;(migratus/create m/config "users")

@@ -21,9 +21,9 @@
    :thumb_url             (:thumbnail product)})
 
 (defn handle-inline-query
-  [token query]
+  [ctx query]
   (t/answer-inline
-    token
+    (:token ctx)
     (:id query)
     {:cache_time 0}
     (map query-result-from-product (p/get-all-products!))))

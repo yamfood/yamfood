@@ -5,8 +5,8 @@
 
 
 (defn get-all-products-query []
-  (hs/format {:select [:id :name :price :photo :thumbnail :energy]
-              :from   [:products]
+  (hs/format {:select   [:id :name :price :photo :thumbnail :energy]
+              :from     [:products]
               :order-by [:id]}))
 
 
@@ -17,11 +17,11 @@
 
 (defn get-product-by-name-query
   [name]
-  (hs/format {:select [:id :name :price :photo :thumbnail :energy]
-              :from [:products]
-              :where [:= :name name]
+  (hs/format {:select   [:id :name :price :photo :thumbnail :energy]
+              :from     [:products]
+              :where    [:= :name name]
               :order-by [:id]
-              :limit 1}))
+              :limit    1}))
 
 
 (defn get-product-by-name!
