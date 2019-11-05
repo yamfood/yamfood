@@ -1,4 +1,4 @@
-(ns yamfood.telegram.start
+(ns yamfood.telegram.handlers.start
   (:require [morse.api :as t]
             [yamfood.core.users.core :as users]
             [environ.core :refer [env]]))
@@ -41,20 +41,22 @@
 
 
 (defn handle-contact
-  [ctx message]
-  (let [contact (:contact message)
+  [ctx update]
+  (let [message (:message update)
+        contact (:contact message)
         phone (parse-int (:phone_number contact))
         tid (:id (:from message))]
-    (create-user tid phone))
-  (t/send-text (:token ctx) (:id (:chat message))
-               {:reply_markup {:remove_keyboard true}}
-               "Принято!")
-  (send-menu ctx message))
+    (create-user tid phone)
+    (t/send-text (:token ctx) (:id (:chat message))
+                 {:reply_markup {:remove_keyboard true}}
+                 "Принято!")
+    (send-menu ctx message)))
 
 
 (defn handle-start
-  [ctx message]
-  (if (:user ctx)
-    (send-menu ctx message)
-    (init-registration ctx message)))
+  [ctx update]
+  (let [message (:message update)]
+    (if (:user ctx)
+      (send-menu ctx message)
+      (init-registration ctx message))))
 

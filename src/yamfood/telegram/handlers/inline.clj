@@ -1,6 +1,8 @@
-(ns yamfood.telegram.inline
+(ns yamfood.telegram.handlers.inline
   (:require [morse.api :as t]
-            [yamfood.core.products.core :as p]))
+            [environ.core :refer [env]]
+            [yamfood.core.products.core :as p]
+            [yamfood.telegram.dispatcher :as d]))
 
 (defn format-money
   [money]
@@ -21,10 +23,14 @@
    :thumb_url             (:thumbnail product)})
 
 (defn handle-inline-query
-  [ctx query]
-  (t/answer-inline
-    (:token ctx)
-    (:id query)
-    {:cache_time 0}
-    (map query-result-from-product (p/get-all-products!))))
+  [ctx update]
+  (println update)
+  (try
+    (t/answer-inline
+      (:token ctx)
+      (:id (:inline_query update))
+      {:cache_time 0}
+      (map query-result-from-product (p/get-all-products!)))
+    (catch Exception e (println e))))
+
 
