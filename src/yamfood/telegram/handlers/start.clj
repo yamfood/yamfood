@@ -5,30 +5,30 @@
 
 
 (def menu-markup
-  {:reply_markup {:inline_keyboard [[{:text                             "test"
-                                      :switch_inline_query_current_chat ""}]]}})
+  {:inline_keyboard
+   [[{:text                             "test"
+      :switch_inline_query_current_chat ""}]]})
 
-(defn send-menu
-  [ctx message]
+(defn menu-message
+  [message]
   (let [chat (:chat message)
         chat-id (:id chat)]
-    (t/send-text
-      (:token ctx)
-      chat-id
-      menu-markup
-      "Welcome")))
+    {:send-text
+     {:chat-id chat-id
+      :options {:reply_markup menu-markup}
+      :text    "Welcome"}}))
 
 
 (def registration-markup
   {:resize_keyboard true
-   :reply_markup    {:keyboard [[{:text            "Отправить контакт"
-                                  :request_contact true}]]}})
+   :keyboard        [[{:text            "Отправить контакт"
+                       :request_contact true}]]})
 
 (defn init-registration
-  [ctx message]
-  (t/send-text (:token ctx) (:id (:chat message))
-               registration-markup
-               "Отправьте свой контакт"))
+  [message]
+  {:send-text {:chat-id (:id (:chat message))
+               :options {:reply_markup registration-markup}
+               :text    "Отправьте свой контакт"}})
 
 
 (defn create-user
@@ -41,22 +41,22 @@
 
 
 (defn handle-contact
-  [ctx update]
+  [_ update]
   (let [message (:message update)
         contact (:contact message)
         phone (parse-int (:phone_number contact))
         tid (:id (:from message))]
     (create-user tid phone)
-    (t/send-text (:token ctx) (:id (:chat message))
-                 {:reply_markup {:remove_keyboard true}}
-                 "Принято!")
-    (send-menu ctx message)))
+    {:send-text [{:chat-id (:id (:chat message))
+                  :options {:reply_markup {:remove_keyboard true}}
+                  :text    "Принято!"}
+                 (:send-text (menu-message message))]}))
 
 
 (defn handle-start
   [ctx update]
   (let [message (:message update)]
     (if (:user ctx)
-      (send-menu ctx message)
-      (init-registration ctx message))))
+      (menu-message message)
+      (init-registration message))))
 

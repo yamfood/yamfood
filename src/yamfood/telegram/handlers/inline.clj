@@ -23,14 +23,8 @@
    :thumb_url             (:thumbnail product)})
 
 (defn handle-inline-query
-  [ctx update]
-  (println update)
-  (try
-    (t/answer-inline
-      (:token ctx)
-      (:id (:inline_query update))
-      {:cache_time 0}
-      (map query-result-from-product (p/get-all-products!)))
-    (catch Exception e (println e))))
-
-
+  [_ update]
+  {:answer-inline
+   {:inline-query-id (:id (:inline_query update))
+    :options         {:cache_time 0}
+    :results         (map query-result-from-product (p/get-all-products!))}})

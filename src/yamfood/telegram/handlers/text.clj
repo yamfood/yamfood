@@ -4,7 +4,6 @@
             [clojure.data.json :as json]))
 
 
-
 (defn get-product-caption
   [product]
   (format "*%s* \n\n *Цена:* %,d сум."
@@ -23,14 +22,16 @@
 
 
 (defn handle-text
-  [ctx message]
+  [_ message]
   (let [product (products/get-product-by-name! (:text message))
         chat (:chat message)
         chat-id (:id chat)]
     (if product
-      (t/send-photo (:token ctx) chat-id
-                    (get-product-detail-options product)
-                    (:photo product))
+      {:send-photo
+       {:chat-id chat-id
+        :options (get-product-detail-options product)
+        :photo   (:photo product)}}
 
-      (t/send-text (:token ctx) chat-id
-                   "Если у вас возникли какие-то вопросы обратитесь к @kensay."))))
+      {:send-text
+       {:chat-id chat-id
+        :text    "Если у вас возникли какие-то вопросы обратитесь к @kensay."}})))
