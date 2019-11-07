@@ -11,6 +11,11 @@
 
 
 (d/register-event-handler!
+  :callback
+  text/handle-callback)
+
+
+(d/register-event-handler!
   :products-done
   inline/return-products-to-inline-query)
 

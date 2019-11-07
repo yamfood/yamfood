@@ -12,20 +12,48 @@
           (:price product)))
 
 
+(defn get-product-markup
+  []
+  ; Because morse send photo by multipart and not convert it.
+  (json/write-str
+    {:inline_keyboard
+     [[{:text "Хочу" :callback_data "want"}]
+      [{:text                             "Еще!"
+        :switch_inline_query_current_chat ""}]]}))
+
+
 (defn get-product-detail-options
   [product]
   {:caption      (get-product-caption product)
    :parse_mode   "markdown"
-   :reply_markup (json/write-str                            ; Because morse send photo by multipart and not convert it.
-                   {:inline_keyboard
-                    [[{:text                             "Еще!"
-                       :switch_inline_query_current_chat ""}]]})})
+   :reply_markup (get-product-markup)})
 
 
 (defn handle-text
   [ctx message]
   {:core {:function    #(products/get-product-by-name! (:text message))
           :on-complete #(d/dispatch ctx [:product-done message %])}})
+
+
+(defn handle-want
+  [query]
+  {:edit-reply-markup {:chat_id      (:id (:from query))
+                       :message_id   (:message_id (:message query))
+                       :reply_markup {:inline_keyboard
+                                      [[{:text "-" :callback_data "-"}
+                                        {:text "1" :callback_data "1"}
+                                        {:text "+" :callback_data "+"}]
+                                       [{:text                             "Еще!"
+                                         :switch_inline_query_current_chat ""}]]}}
+   :answer-callback   {:callback_query_id (:id query)
+                       :text              "Добавлено в корзину"}})
+
+
+(defn handle-callback
+  [_ {:keys [callback_query]}]
+  ((when (= (:data callback_query) "want")
+     (handle-want callback_query))))
+
 
 
 (defn react-to-text

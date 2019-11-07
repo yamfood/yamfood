@@ -35,7 +35,7 @@
     (cond
       (= text "/start") (d/dispatch ctx [:start update])
       contact (d/dispatch ctx [:contact update])
-      text (d/dispatch ctx [:text message]))))
+              text (d/dispatch ctx [:text message]))))
 
 
 (defn process-updates
@@ -44,11 +44,14 @@
   (let [update (:body request)
         message (:message update)
         inline-query (:inline_query update)
+        callback-query (:callback_query update)
         ctx (build-ctx update)]
     (if message
       (process-message ctx update))
     (if inline-query
-      (d/dispatch ctx [:inline update])))
+      (d/dispatch ctx [:inline update]))
+    (if callback-query
+      (d/dispatch ctx [:callback update])))
   {:body "OK"})
 
 
