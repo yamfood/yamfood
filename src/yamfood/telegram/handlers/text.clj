@@ -51,9 +51,8 @@
 
 (defn handle-callback
   [_ {:keys [callback_query]}]
-  ((when (= (:data callback_query) "want")
-     (handle-want callback_query))))
-
+  (when (= (:data callback_query) "want")
+    (handle-want callback_query)))
 
 
 (defn react-to-text
