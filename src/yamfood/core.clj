@@ -22,10 +22,9 @@
 
 
 (defn -main []
-  (db/init)
+  ;(db/init)
   (let [port (Integer. (or (env :port) 666))]
     (run-jetty #'app {:port port :join? false})))
 
 ;(def server (-main))
-;
 ;(.stop server)
