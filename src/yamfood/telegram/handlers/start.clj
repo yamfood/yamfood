@@ -1,6 +1,5 @@
 (ns yamfood.telegram.handlers.start
-  (:require [morse.api :as t]
-            [yamfood.core.users.core :as users]
+  (:require [yamfood.core.users.core :as users]
             [environ.core :refer [env]]))
 
 
@@ -8,6 +7,7 @@
   {:inline_keyboard
    [[{:text                             "test"
       :switch_inline_query_current_chat ""}]]})
+
 
 (defn menu-message
   [message]
@@ -24,16 +24,12 @@
    :keyboard        [[{:text            "Отправить контакт"
                        :request_contact true}]]})
 
+
 (defn init-registration
   [message]
   {:send-text {:chat-id (:id (:chat message))
                :options {:reply_markup registration-markup}
                :text    "Отправьте свой контакт"}})
-
-
-(defn create-user
-  [tid phone]
-  (users/create-user! tid phone))
 
 
 (defn parse-int [s]
@@ -46,8 +42,8 @@
         contact (:contact message)
         phone (parse-int (:phone_number contact))
         tid (:id (:from message))]
-    (create-user tid phone)
-    {:send-text [{:chat-id (:id (:chat message))
+    {:core {:fn #(users/create-user! tid phone)}
+     :send-text [{:chat-id (:id (:chat message))
                   :options {:reply_markup {:remove_keyboard true}}
                   :text    "Принято!"}
                  (:send-text (menu-message message))]}))

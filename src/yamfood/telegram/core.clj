@@ -12,10 +12,10 @@
 
 (defn log
   [message]
-  (println (str "\n\n\n ### \n" message "\n\n\n")))
+  (println (str "\n\n ### " message "\n\n")))
 
 
-(defn get-tid-from-update ; Make it work with all updates!
+(defn get-tid-from-update ; TODO: Make it work with all updates!
   [update]
   (let [message (:message update)]
     (:id (:from message))))
@@ -51,6 +51,7 @@
       (d/dispatch ctx [:inline update])))
   {:body "OK"})
 
-;(t/set-webhook token "https://f7a8fb59.ngrok.io/updates")
+
+;(t/set-webhook token "https://93b7595a.ngrok.io/updates")
 
 

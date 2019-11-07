@@ -5,6 +5,16 @@
 
 
 (d/register-effect-handler!
+  :core
+  (fn [_ effect]
+    (let [core-func (:function effect)
+          on-complete (:on-complete effect)]
+      (if on-complete
+        (on-complete (core-func))
+        (core-func)))))
+
+
+(d/register-effect-handler!
   :answer-inline
   (fn [ctx effect]
     (t/answer-inline

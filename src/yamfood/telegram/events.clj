@@ -11,6 +11,16 @@
 
 
 (d/register-event-handler!
+  :products-done
+  inline/return-products-to-inline-query)
+
+
+(d/register-event-handler!
+  :product-done
+  text/react-to-text)
+
+
+(d/register-event-handler!
   :start
   start/handle-start)
 
