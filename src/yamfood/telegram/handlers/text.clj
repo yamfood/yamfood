@@ -18,6 +18,7 @@
   (json/write-str
     {:inline_keyboard
      [[{:text "Хочу" :callback_data "want"}]
+      [{:text "Корзина" :callback_data "basket"}]
       [{:text                             "Еще!"
         :switch_inline_query_current_chat ""}]]}))
 
@@ -43,6 +44,7 @@
                                       [[{:text "-" :callback_data "-"}
                                         {:text "1" :callback_data "1"}
                                         {:text "+" :callback_data "+"}]
+                                       [{:text "Корзина (1)" :callback_data "basket"}]
                                        [{:text                             "Еще!"
                                          :switch_inline_query_current_chat ""}]]}}
    :answer-callback   {:callback_query_id (:id query)
