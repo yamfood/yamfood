@@ -10,6 +10,7 @@
               :from     [:products]
               :order-by [:id]}))
 
+
 (defn get-all-products! []
   (->> (get-all-products-query)
        (jdbc/query db/db)))
@@ -17,7 +18,7 @@
 
 (def bucket-cost-query "
   (select
-    coalesce((products.price * bucket_products.count), 0)
+    coalesce(sum(products.price * bucket_products.count), 0)
   from bucket_products,
        products
   where bucket_products.bucket_id = %d and
@@ -37,6 +38,7 @@
                                  [:= :bucket_products.bucket_id bucket-id]
                                  [:= :products.id :bucket_products.product_id]]]
    :limit    1})
+
 
 (defn- get-product-by-name-query
   [bucket-id name]
