@@ -42,7 +42,7 @@
         contact (:contact message)
         phone (parse-int (:phone_number contact))
         tid (:id (:from message))]
-    {:core {:fn #(users/create-user! tid phone)}
+    {:core {:function #(users/create-user! tid phone)}
      :send-text [{:chat-id (:id (:chat message))
                   :options {:reply_markup {:remove_keyboard true}}
                   :text    "Принято!"}
@@ -55,4 +55,3 @@
     (if (:user ctx)
       (menu-message message)
       (init-registration message))))
-

@@ -2,6 +2,8 @@
   (:require [yamfood.telegram.dispatcher :as d]
             [yamfood.telegram.handlers.start :as start]
             [yamfood.telegram.handlers.text :as text]
+            [yamfood.telegram.handlers.callback :as callback]
+            [yamfood.telegram.handlers.bucket :as bucket]
             [yamfood.telegram.handlers.inline :as inline]))
 
 
@@ -12,7 +14,7 @@
 
 (d/register-event-handler!
   :callback
-  text/handle-callback)
+  callback/handle-callback)
 
 
 (d/register-event-handler!
@@ -23,6 +25,11 @@
 (d/register-event-handler!
   :product-done
   text/react-to-text)
+
+
+(d/register-event-handler!
+  :update-markup
+  bucket/update-markup)
 
 
 (d/register-event-handler!

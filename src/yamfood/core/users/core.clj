@@ -6,9 +6,11 @@
 
 (defn get-user-by-tid-query
   [tid]
-  (hs/format {:select [:id :phone :tid]
-              :from   [:users]
-              :where  [:= :tid tid]}))
+  (hs/format {:select [:users.id :users.phone :users.tid [:buckets.id :bucket_id]]
+              :from   [:users :buckets]
+              :where  [:and
+                       [:= :users.tid tid]
+                       [:= :buckets.user_id :users.id]]}))
 
 
 (defn get-user-by-tid!
@@ -17,7 +19,17 @@
        (jdbc/query db/db)
        (first)))
 
+(defn insert-user!
+  [tid phone]
+  (first (jdbc/insert! db/db "users" {:tid tid :phone phone})))
+
+
+(defn init-bucket!
+  [user-id]
+  (jdbc/insert! db/db "buckets" {:user_id user-id}))
+
 
 (defn create-user!
   [tid phone]
-  (first (jdbc/insert! db/db "users" {:tid tid :phone phone})))
+  (let [user (insert-user! tid phone)]
+    (init-bucket! (:id user))))

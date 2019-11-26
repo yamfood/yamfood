@@ -7,4 +7,4 @@
 
 
 ;(init)
-;(migratus/create m/config "users")
+;(migratus/create m/config "zero_bucket_products_trigger")

@@ -17,8 +17,11 @@
 
 (defn get-tid-from-update ; TODO: Make it work with all updates!
   [update]
-  (let [message (:message update)]
-    (:id (:from message))))
+  (let [message (:message update)
+        callback (:callback_query update)]
+    (cond
+      message (:id (:from message))
+      callback (:id (:from callback)))))
 
 
 (defn build-ctx
@@ -54,7 +57,5 @@
       (d/dispatch ctx [:callback update])))
   {:body "OK"})
 
-
-;(t/set-webhook token "https://93b7595a.ngrok.io/updates")
 
 

@@ -1,0 +1,1 @@
+DROP TRIGGER zero_bucket_products_trigger ON bucket_products;

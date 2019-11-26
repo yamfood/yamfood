@@ -1,0 +1,1 @@
+drop table "bucket_products";

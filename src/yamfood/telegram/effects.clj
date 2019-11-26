@@ -8,6 +8,7 @@
 (d/register-effect-handler!
   :core
   (fn [_ effect]
+    (println effect)
     (let [core-func (:function effect)
           on-complete (:on-complete effect)]
       (if on-complete
@@ -70,6 +71,7 @@
 (d/register-effect-handler!
   :edit-reply-markup
   (fn [ctx effect]
+    (println (str "\n\n###" effect))
     (edit-reply-markup
       (:token ctx)
       (:chat_id effect)
