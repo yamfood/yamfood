@@ -1,26 +1,25 @@
 (ns yamfood.telegram.handlers.utils
-  (:require [yamfood.core.users.bucket :as b]
-            [clojure.string :as str]))
+  (:require [clojure.string :as str]))
 
 
 (defn product-not-in-bucket-markup
   [state]
-  (let [positions-count (:positions_in_bucket state)]
+  (let [bucket-cost (:bucket_cost state)]
     {:inline_keyboard
      [[{:text "Хочу" :callback_data (str "want/" (:id state))}]
-      [{:text (format "Корзина (%d)" positions-count) :callback_data "basket"}]
+      [{:text (format "Корзина (%,d сум.)" bucket-cost) :callback_data "basket"}]
       [{:text                             "Еще!"
         :switch_inline_query_current_chat ""}]]}))
 
 
 (defn product-in-bucket-markup
   [state]
-  (let [positions-count (:positions_in_bucket state)]
+  (let [bucket-cost (:bucket_cost state)]
     {:inline_keyboard
      [[{:text "-" :callback_data (str "-/" (:id state))}
        {:text (str (:count_in_bucket state)) :callback_data "nothing"}
        {:text "+" :callback_data (str "+/" (:id state))}]
-      [{:text (format "Корзина (%d)" positions-count) :callback_data "basket"}]
+      [{:text (format "Корзина (%,d сум.)" bucket-cost) :callback_data "basket"}]
       [{:text                             "Еще!"
         :switch_inline_query_current_chat ""}]]}))
 

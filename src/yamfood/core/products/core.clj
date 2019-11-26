@@ -15,12 +15,21 @@
        (jdbc/query db/db)))
 
 
-(defn product-detail-query
+(def bucket-cost-query "
+  (select
+    (products.price * bucket_products.count)
+  from bucket_products,
+       products
+  where bucket_products.bucket_id = %d and
+        products.id = bucket_products.product_id) as bucket_cost")
+
+
+(defn product-detail-state-query
   [bucket-id]
   {:select   [:products.id :products.name :products.price
               :products.photo :products.thumbnail
               :products.energy
-              (hs/raw (format "(select count(id) from bucket_products where bucket_id = %d) as positions_in_bucket" bucket-id))
+              (hs/raw (format bucket-cost-query bucket-id))
               (hs/raw "coalesce(bucket_products.count, 0) as count_in_bucket")]
    :from     [:products]
    :order-by [:id]
@@ -31,14 +40,14 @@
 
 (defn- get-product-by-name-query
   [bucket-id name]
-  (-> (product-detail-query bucket-id)
+  (-> (product-detail-state-query bucket-id)
     (hh/merge-where [:= :products.name name])
     (hs/format)))
 
 
-(defn- get-product-by-id-query
+(defn- get-product-detail-state-by-id-query
   [bucket-id product-id]
-  (-> (product-detail-query bucket-id)
+  (-> (product-detail-state-query bucket-id)
       (hh/merge-where [:= :products.id product-id])
       (hs/format)))
 
@@ -52,6 +61,6 @@
 
 (defn get-state-for-product-detail!
   [bucket-id id]
-  (->> (get-product-by-id-query bucket-id id)
+  (->> (get-product-detail-state-by-id-query bucket-id id)
        (jdbc/query db/db)
        (first)))

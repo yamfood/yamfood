@@ -16,6 +16,7 @@
   (POST "/updates" request (telegram/process-updates request))
   (route/not-found "Not Found"))
 
+
 (def app
   (-> app-routes
       (wrap-json-body {:keywords? true})))
@@ -25,6 +26,7 @@
   (db/init)
   (let [port (Integer. (or (env :port) 666))]
     (run-jetty #'app {:port port :join? false})))
+
 
 ;(def server (-main))
 ;(.stop server)
