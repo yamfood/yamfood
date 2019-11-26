@@ -55,14 +55,14 @@
   [bucket-id product-id]
   (->> (increment-product-query bucket-id product-id)
       (jdbc/execute! db/db))
-  (p/get-product-by-id! bucket-id product-id))
+  (p/get-state-for-product-detail! bucket-id product-id))
 
 
 (defn decrement-product-in-bucket!
   [bucket-id product-id]
   (->> (decrement-product-query bucket-id product-id)
        (jdbc/execute! db/db))
-  (p/get-product-by-id! bucket-id product-id))
+  (p/get-state-for-product-detail! bucket-id product-id))
 
 
 (defn- insert-product-to-bucket!
@@ -78,7 +78,7 @@
   (let [product-id (:product_id (insert-product-to-bucket!
                                   bucket-id
                                   product-id))]
-    (p/get-product-by-id! bucket-id product-id)))
+    (p/get-state-for-product-detail! bucket-id product-id)))
 
 
 ;(increment-product-in-bucket! 3 5)

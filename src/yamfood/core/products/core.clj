@@ -20,6 +20,7 @@
   {:select   [:products.id :products.name :products.price
               :products.photo :products.thumbnail
               :products.energy
+              (hs/raw (format "(select count(id) from bucket_products where bucket_id = %d) as positions_in_bucket" bucket-id))
               (hs/raw "coalesce(bucket_products.count, 0) as count_in_bucket")]
    :from     [:products]
    :order-by [:id]
@@ -49,9 +50,8 @@
        (first)))
 
 
-(defn get-product-by-id!
+(defn get-state-for-product-detail!
   [bucket-id id]
   (->> (get-product-by-id-query bucket-id id)
        (jdbc/query db/db)
        (first)))
-

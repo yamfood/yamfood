@@ -4,31 +4,33 @@
 
 
 (defn product-not-in-bucket-markup
-  [product]
-  {:inline_keyboard
-   [[{:text "Хочу" :callback_data (str "want/" (:id product))}]
-    [{:text "Корзина" :callback_data "basket"}]
-    [{:text                             "Еще!"
-      :switch_inline_query_current_chat ""}]]})
+  [state]
+  (let [positions-count (:positions_in_bucket state)]
+    {:inline_keyboard
+     [[{:text "Хочу" :callback_data (str "want/" (:id state))}]
+      [{:text (format "Корзина (%d)" positions-count) :callback_data "basket"}]
+      [{:text                             "Еще!"
+        :switch_inline_query_current_chat ""}]]}))
 
 
 (defn product-in-bucket-markup
-  [product]
-  {:inline_keyboard
-   [[{:text "-" :callback_data (str "-/" (:id product))}
-     {:text (str (:count_in_bucket product)) :callback_data "nothing"}
-     {:text "+" :callback_data (str "+/" (:id product))}]
-    [{:text "Корзина" :callback_data "basket"}]
-    [{:text                             "Еще!"
-      :switch_inline_query_current_chat ""}]]})
+  [state]
+  (let [positions-count (:positions_in_bucket state)]
+    {:inline_keyboard
+     [[{:text "-" :callback_data (str "-/" (:id state))}
+       {:text (str (:count_in_bucket state)) :callback_data "nothing"}
+       {:text "+" :callback_data (str "+/" (:id state))}]
+      [{:text (format "Корзина (%d)" positions-count) :callback_data "basket"}]
+      [{:text                             "Еще!"
+        :switch_inline_query_current_chat ""}]]}))
 
 
 (defn product-detail-markup
-  [product]
-  (let [count-in-bucket (:count_in_bucket product)]
+  [state-for-detail]
+  (let [count-in-bucket (:count_in_bucket state-for-detail)]
     (if (= count-in-bucket 0)
-      (product-not-in-bucket-markup product)
-      (product-in-bucket-markup product))))
+      (product-not-in-bucket-markup state-for-detail)
+      (product-in-bucket-markup state-for-detail))))
 
 
 (defn get-callback-action
