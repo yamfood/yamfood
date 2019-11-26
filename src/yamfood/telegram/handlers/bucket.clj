@@ -26,7 +26,8 @@
     {:core {:function    #(b/increment-product-in-bucket!
                             bucket-id
                             product-id)
-            :on-complete #(d/dispatch ctx [:update-markup update %])}}))
+            :on-complete #(d/dispatch ctx [:update-markup update %])}
+     :answer-callback {:callback_query_id (:id callback-query)}}))
 
 (defn handle-dec
   [ctx update]
@@ -38,7 +39,8 @@
     {:core {:function    #(b/decrement-product-in-bucket!
                             bucket-id
                             product-id)
-            :on-complete #(d/dispatch ctx [:update-markup update %])}}))
+            :on-complete #(d/dispatch ctx [:update-markup update %])}
+     :answer-callback {:callback_query_id (:id callback-query)}}))
 
 (defn update-markup
   [_ update product]
