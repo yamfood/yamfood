@@ -17,7 +17,7 @@
 
 (def bucket-cost-query "
   (select
-    (products.price * bucket_products.count)
+    coalesce((products.price * bucket_products.count), 0)
   from bucket_products,
        products
   where bucket_products.bucket_id = %d and
