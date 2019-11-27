@@ -108,8 +108,7 @@
     {:inline_keyboard
      (conj (bucket-detail-products-markup bucket-state)
            [{:text "Еще!" :switch_inline_query_current_chat ""}]
-           [{:text (format "\uD83D\uDCB0 %,d сум." total_cost) :callback_data "nothing"}]
-           [{:text (format "\uD83D\uDD0B %,d кКал." total_energy) :callback_data "nothing"}]
+           [{:text (format "\uD83D\uDCB0 %,d сум. \uD83D\uDD0B %,d кКал." total_cost total_energy) :callback_data "nothing"}]
            [{:text "✅ Далее" :callback_data "nothing"}])}))
 
 
