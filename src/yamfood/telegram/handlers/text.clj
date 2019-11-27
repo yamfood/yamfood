@@ -8,9 +8,9 @@
 
 (defn get-product-caption
   [product]
-  (format "*%s* \n\n *Цена:* %,d сум."
+  (format "*%s* \n\n *Цена:* %s"
           (:name product)
-          (:price product)))
+          (u/to-money (:price product))))
 
 
 

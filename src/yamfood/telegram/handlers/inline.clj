@@ -2,16 +2,13 @@
   (:require [morse.api :as t]
             [environ.core :refer [env]]
             [yamfood.core.products.core :as p]
-            [yamfood.telegram.dispatcher :as d]))
-
-(defn format-money
-  [money]
-  (format "%,d сум." money))
+            [yamfood.telegram.dispatcher :as d]
+            [yamfood.telegram.handlers.utils :as u]))
 
 
 (defn get-product-description
   [product]
-  (str "Цена: " (format-money (:price product)) ", "
+  (str "Цена: " (u/to-money (:price product)) ", "
        (:energy product) "кКал"))
 
 

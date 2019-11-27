@@ -1,7 +1,8 @@
 (ns yamfood.telegram.handlers.bucket
   (:require [yamfood.telegram.handlers.utils :as u]
             [yamfood.core.users.bucket :as b]
-            [yamfood.telegram.dispatcher :as d]))
+            [yamfood.telegram.dispatcher :as d]
+            [clojure.string :as str]))
 
 
 (defn handle-want
@@ -91,7 +92,8 @@
                    (u/bucket-product-controls
                      "bucket"
                      (:id product)
-                     (format "%,d сум." (* (:price product) (:count product))))]))
+                     (u/to-money (* (:price product) (:count product))))]))
+
 
 (defn bucket-detail-products-markup
   [bucket-state]
@@ -108,7 +110,7 @@
     {:inline_keyboard
      (conj (bucket-detail-products-markup bucket-state)
            [{:text "Еще!" :switch_inline_query_current_chat ""}]
-           [{:text (format "\uD83D\uDCB0 %,d сум. \uD83D\uDD0B %,d кКал." total_cost total_energy) :callback_data "nothing"}]
+           [{:text (format "\uD83D\uDCB0 %s \uD83D\uDD0B %,d кКал." (u/to-money total_cost) total_energy) :callback_data "nothing"}]
            [{:text "✅ Далее" :callback_data "nothing"}])}))
 
 

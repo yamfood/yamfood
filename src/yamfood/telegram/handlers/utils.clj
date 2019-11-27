@@ -2,12 +2,13 @@
   (:require [clojure.string :as str]))
 
 
+(declare to-money)
 (defn product-not-in-bucket-markup
   [state]
   (let [bucket-cost (:bucket_cost state)]
     {:inline_keyboard
      [[{:text "Хочу" :callback_data (str "want/" (:id state))}]
-      [{:text (format "Корзина (%,d сум.)" bucket-cost) :callback_data "bucket"}]
+      [{:text (format "Корзина (%s)" (to-money bucket-cost)) :callback_data "bucket"}]
       [{:text                             "Еще!"
         :switch_inline_query_current_chat ""}]]}))
 
@@ -22,7 +23,7 @@
   (let [bucket-cost (:bucket_cost state)]
     {:inline_keyboard
      [(bucket-product-controls "detail" (:id state) (:count_in_bucket state))
-      [{:text (format "Корзина (%,d сум.)" bucket-cost) :callback_data "bucket"}]
+      [{:text (format "Корзина (%s)" (to-money bucket-cost)) :callback_data "bucket"}]
       [{:text                             "Еще!"
         :switch_inline_query_current_chat ""}]]}))
 
@@ -44,7 +45,7 @@
   (drop 1 (str/split callback-data #"/")))
 
 
-
-
-
+(defn to-money
+  [amount]
+  (str/replace (format "%,d сум" amount) "," " "))
 
