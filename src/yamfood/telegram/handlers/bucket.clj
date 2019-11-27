@@ -92,7 +92,8 @@
                    (u/bucket-product-controls
                      "bucket"
                      (:id product)
-                     (u/to-money (* (:price product) (:count product))))]))
+                     (format "%s сум"
+                             (u/fmt-values (* (:price product) (:count product)))))]))
 
 
 (defn bucket-detail-products-markup
@@ -110,7 +111,10 @@
     {:inline_keyboard
      (conj (bucket-detail-products-markup bucket-state)
            [{:text "Еще!" :switch_inline_query_current_chat ""}]
-           [{:text (format "\uD83D\uDCB0 %s \uD83D\uDD0B %,d кКал." (u/to-money total_cost) total_energy) :callback_data "nothing"}]
+           [{:text (format "\uD83D\uDCB0 %s сум \uD83D\uDD0B %s кКал."
+                           (u/fmt-values total_cost)
+                           (u/fmt-values total_energy))
+             :callback_data "nothing"}]
            [{:text "✅ Далее" :callback_data "nothing"}])}))
 
 

@@ -8,8 +8,9 @@
 
 (defn get-product-description
   [product]
-  (str "Цена: " (u/to-money (:price product)) ", "
-       (:energy product) "кКал"))
+  (format "Цена: %s сум , %s кКал"
+          (u/fmt-values (:price product))
+          (u/fmt-values (:energy product))))
 
 
 (defn query-result-from-product
