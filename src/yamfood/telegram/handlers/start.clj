@@ -5,8 +5,10 @@
 
 (def menu-markup
   {:inline_keyboard
-   [[{:text                             "test"
-      :switch_inline_query_current_chat ""}]]})
+   [[{:text                             "Что поесть?"
+      :switch_inline_query_current_chat ""}]
+    [{:text                             "Куда доставляете?"
+      :callback_data "location-check"}]]})
 
 
 (defn menu-message
@@ -16,7 +18,7 @@
     {:send-text
      {:chat-id chat-id
       :options {:reply_markup menu-markup}
-      :text    "Welcome"}}))
+      :text    "Готовим и бесплатно доставляем за 30 минут"}}))
 
 
 (def registration-markup
