@@ -91,7 +91,7 @@
                    (u/bucket-product-controls
                      "bucket"
                      (:id product)
-                     (format "%,dсум. x %d" (:price product) (:count product)))]))
+                     (format "%,dсум. (%d)" (* (:price product) (:count product)) (:count product)))]))
 
 (defn bucket-detail-products-markup
   [bucket-state]
