@@ -87,11 +87,11 @@
 
 (defn bucket-product-markup
   [val product]
-  (apply conj val [[{:text (format "\uD83E\uDD57 %s" (:name product)) :callback_data "nothing"}]
+  (apply conj val [[{:text (format "\uD83E\uDD57 %s x %d" (:name product) (:count product)) :callback_data "nothing"}]
                    (u/bucket-product-controls
                      "bucket"
                      (:id product)
-                     (format "%,dсум. (%d)" (* (:price product) (:count product)) (:count product)))]))
+                     (format "%,d сум." (* (:price product) (:count product))))]))
 
 (defn bucket-detail-products-markup
   [bucket-state]
