@@ -87,7 +87,7 @@
 
 (defn bucket-product-markup
   [val product]
-  (apply conj val [[{:text (:name product) :callback_data "nothing"}]
+  (apply conj val [[{:text (format "\uD83E\uDD57 %s" (:name product)) :callback_data "nothing"}]
                    (u/bucket-product-controls
                      "bucket"
                      (:id product)
@@ -108,9 +108,9 @@
     {:inline_keyboard
      (conj (bucket-detail-products-markup bucket-state)
            [{:text "Еще!" :switch_inline_query_current_chat ""}]
-           [{:text (format "Сумма: %,d сум." total_cost) :callback_data "nothing"}]
-           [{:text (format "Коллорийность: %,d кКал." total_energy) :callback_data "nothing"}]
-           [{:text "Далее" :callback_data "nothing"}])}))
+           [{:text (format "\uD83D\uDCB0 %,d сум." total_cost) :callback_data "nothing"}]
+           [{:text (format "\uD83D\uDD0B %,d кКал." total_energy) :callback_data "nothing"}]
+           [{:text "✅ Далее" :callback_data "nothing"}])}))
 
 
 (defn send-bucket
