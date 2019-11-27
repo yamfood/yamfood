@@ -33,6 +33,16 @@
 
 
 (d/register-event-handler!
+  :send-bucket
+  bucket/send-bucket)
+
+
+(d/register-event-handler!
+  :update-bucket-markup
+  bucket/update-bucket-markup)
+
+
+(d/register-event-handler!
   :start
   start/handle-start)
 

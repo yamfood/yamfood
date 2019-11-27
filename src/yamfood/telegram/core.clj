@@ -57,5 +57,4 @@
       (d/dispatch ctx [:callback update])))
   {:body "OK"})
 
-
-
+;(t/set-webhook token "https://2fd3434e.ngrok.io/updates")

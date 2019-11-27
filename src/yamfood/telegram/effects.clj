@@ -55,6 +55,15 @@
       (:photo effect))))
 
 
+(d/register-effect-handler!
+  :delete-message
+  (fn [ctx effect]
+    (t/delete-text
+      (:token ctx)
+      (:chat-id effect)
+      (:message-id effect))))
+
+
 (def base-url "https://api.telegram.org/bot")
 (defn edit-reply-markup
   "Edits only the reply markup of message

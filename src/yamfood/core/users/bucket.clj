@@ -6,18 +6,29 @@
             [honeysql.helpers :as hh]))
 
 
-(defn- get-bucket-query
-  [user-id]
-  (hs/format {:select [:id]
-              :from   [:buckets]
-              :where  [:= :user-id user-id]}))
-
-
 (defn- get-bucket-products-query
   [bucket-id]
-  (hs/format {:select [:product_id :count]
-              :from   [:bucket_products]
-              :where  [:= :bucket_id bucket-id]}))
+  (hs/format {:select [:products.id
+                       :bucket_products.count
+                       :products.name
+                       :products.price
+                       :products.energy]
+              :from   [:bucket_products :products]
+              :where  [:and
+                       [:= :bucket_products.bucket_id bucket-id]
+                       [:= :products.id :bucket_products.product_id]]
+              :order-by [:id]}))
+
+
+(defn- get-bucket-totals-query
+  [bucket-id]
+  (format "
+    select
+      coalesce(sum(bucket_products.count * products.price), 0) as total_cost,
+      coalesce(sum(bucket_products.count * products.energy), 0) as total_energy
+    from bucket_products, products
+    where bucket_products.bucket_id = %d and
+          products.id = bucket_products.product_id", bucket-id))
 
 
 (defn- get-bucket-products!
@@ -25,12 +36,16 @@
   (->> (get-bucket-products-query bucket-id)
        (jdbc/query db/db)))
 
-
-(defn- get-bucket!
-  [user-id]
-  (->> (get-bucket-query user-id)
+(defn get-bucket-totals!
+  [bucket-id]
+  (->> (get-bucket-totals-query bucket-id)
        (jdbc/query db/db)
        (first)))
+
+(defn get-bucket-state!
+  [bucket-id]
+  (let [bucket (get-bucket-totals! bucket-id)]
+    (assoc bucket :products (get-bucket-products! bucket-id))))
 
 
 (defn increment-product-query
@@ -81,5 +96,6 @@
     (p/get-state-for-product-detail! bucket-id product-id)))
 
 
+;(add-product-to-bucket! 4 6)
 ;(increment-product-in-bucket! 3 5)
 ;(p/get-product-by-id! 3 5)

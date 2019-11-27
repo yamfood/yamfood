@@ -7,19 +7,22 @@
   (let [bucket-cost (:bucket_cost state)]
     {:inline_keyboard
      [[{:text "Хочу" :callback_data (str "want/" (:id state))}]
-      [{:text (format "Корзина (%,d сум.)" bucket-cost) :callback_data "basket"}]
+      [{:text (format "Корзина (%,d сум.)" bucket-cost) :callback_data "bucket"}]
       [{:text                             "Еще!"
         :switch_inline_query_current_chat ""}]]}))
 
+(defn bucket-product-controls
+  [action-prefix product-id count]
+  [{:text "-" :callback_data (str action-prefix "-/" product-id)}
+   {:text (str count) :callback_data "nothing"}
+   {:text "+" :callback_data (str action-prefix "+/" product-id)}])
 
 (defn product-in-bucket-markup
   [state]
   (let [bucket-cost (:bucket_cost state)]
     {:inline_keyboard
-     [[{:text "-" :callback_data (str "-/" (:id state))}
-       {:text (str (:count_in_bucket state)) :callback_data "nothing"}
-       {:text "+" :callback_data (str "+/" (:id state))}]
-      [{:text (format "Корзина (%,d сум.)" bucket-cost) :callback_data "basket"}]
+     [(bucket-product-controls "detail" (:id state) (:count_in_bucket state))
+      [{:text (format "Корзина (%,d сум.)" bucket-cost) :callback_data "bucket"}]
       [{:text                             "Еще!"
         :switch_inline_query_current_chat ""}]]}))
 

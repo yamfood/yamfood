@@ -23,10 +23,10 @@
         bucket-id (:bucket_id (:user ctx))
         product-id (Integer.
                      (first (u/get-callback-params callback-data)))]
-    {:core {:function    #(b/increment-product-in-bucket!
-                            bucket-id
-                            product-id)
-            :on-complete #(d/dispatch ctx [:update-markup update %])}
+    {:core            {:function    #(b/increment-product-in-bucket!
+                                       bucket-id
+                                       product-id)
+                       :on-complete #(d/dispatch ctx [:update-markup update %])}
      :answer-callback {:callback_query_id (:id callback-query)}}))
 
 (defn handle-dec
@@ -36,10 +36,39 @@
         bucket-id (:bucket_id (:user ctx))
         product-id (Integer.
                      (first (u/get-callback-params callback-data)))]
-    {:core {:function    #(b/decrement-product-in-bucket!
-                            bucket-id
-                            product-id)
-            :on-complete #(d/dispatch ctx [:update-markup update %])}
+    {:core            {:function    #(b/decrement-product-in-bucket!
+                                       bucket-id
+                                       product-id)
+                       :on-complete #(d/dispatch ctx [:update-markup update %])}
+     :answer-callback {:callback_query_id (:id callback-query)}}))
+
+(defn handle-bucket-inc
+  [ctx update]
+  (let [callback-query (:callback_query update)
+        callback-data (:data callback-query)
+        bucket-id (:bucket_id (:user ctx))
+        product-id (Integer.
+                     (first (u/get-callback-params callback-data)))]
+    {:core            [{:function #(b/increment-product-in-bucket!
+                                     bucket-id
+                                     product-id)}
+                       {:function    #(b/get-bucket-state! bucket-id)
+                        :on-complete #(d/dispatch ctx [:update-bucket-markup update %])}]
+     :answer-callback {:callback_query_id (:id callback-query)}}))
+
+
+(defn handle-bucket-dec
+  [ctx update]
+  (let [callback-query (:callback_query update)
+        callback-data (:data callback-query)
+        bucket-id (:bucket_id (:user ctx))
+        product-id (Integer.
+                     (first (u/get-callback-params callback-data)))]
+    {:core            [{:function #(b/decrement-product-in-bucket!
+                                     bucket-id
+                                     product-id)}
+                       {:function    #(b/get-bucket-state! bucket-id)
+                        :on-complete #(d/dispatch ctx [:update-bucket-markup update %])}]
      :answer-callback {:callback_query_id (:id callback-query)}}))
 
 (defn update-markup
@@ -50,4 +79,56 @@
                          :reply_markup (u/product-detail-markup product)}}))
 
 
-(handle-want {} {:update_id 435322471, :callback_query {:id "340271654695056577", :from {:id 79225668, :is_bot false, :first_name "Рустам", :last_name "Бабаджанов", :username "kensay", :language_code "ru"}, :message {:message_id 9639, :from {:id 488312680, :is_bot true, :first_name "Kensay", :username "kensaybot"}, :chat {:id 79225668, :first_name "Рустам", :last_name "Бабаджанов", :username "kensay", :type "private"}, :date 1574768353, :photo [{:file_id "AgADBAADKaoxG0IYJVF7zRhSNk9rn0GDoBsABAEAAwIAA20AA37BAgABFgQ", :file_size 8077, :width 300, :height 300}], :caption "Рисовая каша с ежевикой \n\n Цена: 13,800 сум.", :caption_entities [{:offset 0, :length 23, :type "bold"} {:offset 27, :length 5, :type "bold"}], :reply_markup {:inline_keyboard [[{:text "Хочу", :callback_data "want/2"}] [{:text "Корзина", :callback_data "basket"}] [{:text "Еще!", :switch_inline_query_current_chat ""}]]}}, :chat_instance "4402156230761928760", :data "want/2"}})
+(defn handle-basket
+  [ctx update]
+  {:core {:function    #(b/get-bucket-state! (:bucket_id (:user ctx)))
+          :on-complete #(d/dispatch ctx [:send-bucket update %])}})
+
+
+(defn bucket-product-markup
+  [val product]
+  (apply conj val [[{:text (:name product) :callback_data "nothing"}]
+                   (u/bucket-product-controls
+                     "bucket"
+                     (:id product)
+                     (format "%,dсум. x %d" (:price product) (:count product)))]))
+
+(defn bucket-detail-products-markup
+  [bucket-state]
+  (cond
+    (empty? (:products bucket-state)) [[{:text "К сожалению, ваша корзина пока пуста :("
+                                         :callback_data "nothing"}]]
+    :else (reduce bucket-product-markup [] (:products bucket-state))))
+
+
+(defn bucket-detail-markup
+  [bucket-state]
+  (let [total_cost (:total_cost bucket-state)
+        total_energy (:total_energy bucket-state)]
+    {:inline_keyboard
+     (conj (bucket-detail-products-markup bucket-state)
+           [{:text "Еще!" :switch_inline_query_current_chat ""}]
+           [{:text (format "Сумма: %,d сум." total_cost) :callback_data "nothing"}]
+           [{:text (format "Коллорийность: %,d кКал." total_energy) :callback_data "nothing"}]
+           [{:text "Далее" :callback_data "nothing"}])}))
+
+
+(defn send-bucket
+  [_ update bucket-state]
+  (let [query (:callback_query update)
+        chat-id (:id (:from query))
+        message-id (:message_id (:message query))]
+    {:delete-message {:chat-id chat-id
+                      :message-id message-id}
+     :send-text {:chat-id chat-id
+                 :text    "Ваша корзина:"
+                 :options {:reply_markup (bucket-detail-markup bucket-state)}}}))
+
+
+
+(defn update-bucket-markup
+  [_ update bucket-state]
+  (let [query (:callback_query update)]
+    {:edit-reply-markup {:chat_id      (:id (:from query))
+                         :message_id   (:message_id (:message query))
+                         :reply_markup (bucket-detail-markup bucket-state)}}))
