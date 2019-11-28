@@ -1,0 +1,1 @@
+drop function delete_basket_product();

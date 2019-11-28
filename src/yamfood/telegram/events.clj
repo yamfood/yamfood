@@ -3,7 +3,7 @@
             [yamfood.telegram.handlers.start :as start]
             [yamfood.telegram.handlers.text :as text]
             [yamfood.telegram.handlers.callback :as callback]
-            [yamfood.telegram.handlers.bucket :as bucket]
+            [yamfood.telegram.handlers.basket :as basket]
             [yamfood.telegram.handlers.inline :as inline]))
 
 
@@ -29,17 +29,17 @@
 
 (d/register-event-handler!
   :update-markup
-  bucket/update-markup)
+  basket/update-markup)
 
 
 (d/register-event-handler!
-  :send-bucket
-  bucket/send-bucket)
+  :send-basket
+  basket/send-basket)
 
 
 (d/register-event-handler!
-  :update-bucket-markup
-  bucket/update-bucket-markup)
+  :update-basket-markup
+  basket/update-basket-markup)
 
 
 (d/register-event-handler!

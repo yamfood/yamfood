@@ -24,7 +24,7 @@
 (defn handle-text
   [ctx message]
   {:core {:function    #(products/get-product-by-name!
-                          (:bucket_id (:user ctx))
+                          (:basket_id (:user ctx))
                           (:text message))
           :on-complete #(d/dispatch ctx [:product-done message %])}})
 

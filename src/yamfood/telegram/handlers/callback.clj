@@ -1,5 +1,5 @@
 (ns yamfood.telegram.handlers.callback
-  (:require [yamfood.telegram.handlers.bucket :as bucket]
+  (:require [yamfood.telegram.handlers.basket :as basket]
             [yamfood.telegram.handlers.utils :as u]))
 
 ; TODO: Rewrite this to as dispatcher event handlers
@@ -8,9 +8,9 @@
   (let [query (:callback_query update)
         action (u/get-callback-action (:data query))]
     (cond
-      (= action "want") (bucket/handle-want ctx update)
-      (= action "detail+") (bucket/handle-inc ctx update)
-      (= action "detail-") (bucket/handle-dec ctx update)
-      (= action "bucket") (bucket/handle-basket ctx update)
-      (= action "bucket+") (bucket/handle-bucket-inc ctx update)
-      (= action "bucket-") (bucket/handle-bucket-dec ctx update))))
+      (= action "want") (basket/handle-want ctx update)
+      (= action "detail+") (basket/handle-inc ctx update)
+      (= action "detail-") (basket/handle-dec ctx update)
+      (= action "basket") (basket/handle-basket ctx update)
+      (= action "basket+") (basket/handle-basket-inc ctx update)
+      (= action "basket-") (basket/handle-basket-dec ctx update))))

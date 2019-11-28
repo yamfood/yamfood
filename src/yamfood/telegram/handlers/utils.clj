@@ -7,39 +7,39 @@
   (str/replace (format "%,d" amount) "," " "))
 
 
-(defn product-not-in-bucket-markup
+(defn product-not-in-basket-markup
   [state]
-  (let [bucket-cost (:bucket_cost state)]
+  (let [basket-cost (:basket_cost state)]
     {:inline_keyboard
      [[{:text "Хочу" :callback_data (str "want/" (:id state))}]
-      [{:text (format "Корзина (%s сум)" (fmt-values bucket-cost)) :callback_data "bucket"}]
+      [{:text (format "Корзина (%s сум)" (fmt-values basket-cost)) :callback_data "basket"}]
       [{:text                             "Еще!"
         :switch_inline_query_current_chat ""}]]}))
 
 
-(defn bucket-product-controls
+(defn basket-product-controls
   [action-prefix product-id count]
   [{:text "-" :callback_data (str action-prefix "-/" product-id)}
    {:text (str count) :callback_data "nothing"}
    {:text "+" :callback_data (str action-prefix "+/" product-id)}])
 
 
-(defn product-in-bucket-markup
+(defn product-in-basket-markup
   [state]
-  (let [bucket-cost (:bucket_cost state)]
+  (let [basket-cost (:basket_cost state)]
     {:inline_keyboard
-     [(bucket-product-controls "detail" (:id state) (:count_in_bucket state))
-      [{:text (format "Корзина (%s сум)" (fmt-values bucket-cost)) :callback_data "bucket"}]
+     [(basket-product-controls "detail" (:id state) (:count_in_basket state))
+      [{:text (format "Корзина (%s сум)" (fmt-values basket-cost)) :callback_data "basket"}]
       [{:text                             "Еще!"
         :switch_inline_query_current_chat ""}]]}))
 
 
 (defn product-detail-markup
   [state-for-detail]
-  (let [count-in-bucket (:count_in_bucket state-for-detail)]
-    (if (= count-in-bucket 0)
-      (product-not-in-bucket-markup state-for-detail)
-      (product-in-bucket-markup state-for-detail))))
+  (let [count-in-basket (:count_in_basket state-for-detail)]
+    (if (= count-in-basket 0)
+      (product-not-in-basket-markup state-for-detail)
+      (product-in-basket-markup state-for-detail))))
 
 
 (defn get-callback-action

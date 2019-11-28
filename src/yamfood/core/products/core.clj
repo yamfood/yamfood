@@ -16,53 +16,53 @@
        (jdbc/query db/db)))
 
 
-(def bucket-cost-query "
+(def basket-cost-query "
   (select
-    coalesce(sum(products.price * bucket_products.count), 0)
-  from bucket_products,
+    coalesce(sum(products.price * basket_products.count), 0)
+  from basket_products,
        products
-  where bucket_products.bucket_id = %d and
-        products.id = bucket_products.product_id) as bucket_cost")
+  where basket_products.basket_id = %d and
+        products.id = basket_products.product_id) as basket_cost")
 
 
 (defn product-detail-state-query
-  [bucket-id]
+  [basket-id]
   {:select   [:products.id :products.name :products.price
               :products.photo :products.thumbnail
               :products.energy
-              (hs/raw (format bucket-cost-query bucket-id))
-              (hs/raw "coalesce(bucket_products.count, 0) as count_in_bucket")]
+              (hs/raw (format basket-cost-query basket-id))
+              (hs/raw "coalesce(basket_products.count, 0) as count_in_basket")]
    :from     [:products]
    :order-by [:id]
-   :left-join [:bucket_products [:and
-                                 [:= :bucket_products.bucket_id bucket-id]
-                                 [:= :products.id :bucket_products.product_id]]]
+   :left-join [:basket_products [:and
+                                 [:= :basket_products.basket_id basket-id]
+                                 [:= :products.id :basket_products.product_id]]]
    :limit    1})
 
 
 (defn- get-product-by-name-query
-  [bucket-id name]
-  (-> (product-detail-state-query bucket-id)
+  [basket-id name]
+  (-> (product-detail-state-query basket-id)
     (hh/merge-where [:= :products.name name])
     (hs/format)))
 
 
 (defn- get-product-detail-state-by-id-query
-  [bucket-id product-id]
-  (-> (product-detail-state-query bucket-id)
+  [basket-id product-id]
+  (-> (product-detail-state-query basket-id)
       (hh/merge-where [:= :products.id product-id])
       (hs/format)))
 
 
 (defn get-product-by-name!
-  [bucket-id name]
-  (->> (get-product-by-name-query bucket-id name)
+  [basket-id name]
+  (->> (get-product-by-name-query basket-id name)
        (jdbc/query db/db)
        (first)))
 
 
 (defn get-state-for-product-detail!
-  [bucket-id id]
-  (->> (get-product-detail-state-by-id-query bucket-id id)
+  [basket-id id]
+  (->> (get-product-detail-state-by-id-query basket-id id)
        (jdbc/query db/db)
        (first)))
