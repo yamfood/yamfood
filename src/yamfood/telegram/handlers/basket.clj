@@ -114,7 +114,7 @@
                                     (u/fmt-values total_cost)
                                     (u/fmt-values total_energy))
              :callback_data "nothing"}]
-           [{:text "✅ Далее" :callback_data "nothing"}])}))
+           [{:text "✅ Далее" :callback_data "to-order"}])}))
 
 
 (defn send-basket

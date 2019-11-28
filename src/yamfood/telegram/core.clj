@@ -34,9 +34,11 @@
   [ctx update]
   (let [message (:message update)
         text (:text message)
-        contact (:contact message)]
+        contact (:contact message)
+        location (:location message)]
     (cond
       (= text "/start") (d/dispatch ctx [:start update])
+      location (d/dispatch ctx [:location update])
       contact (d/dispatch ctx [:contact update])
               text (d/dispatch ctx [:text message]))))
 
