@@ -7,4 +7,4 @@
 
 
 ;(init)
-;(migratus/create m/config "zero-basket-products-trigger")
+;(migratus/create m/config "user-location")

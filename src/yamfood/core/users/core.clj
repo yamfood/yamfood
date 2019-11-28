@@ -33,3 +33,19 @@
   [tid phone]
   (let [user (insert-user! tid phone)]
     (init-basket! (:id user))))
+
+
+(defn update-location-query
+  [user-id lon lat]
+  (hs/format {:update :users
+              :set {:location (hs/raw (format "POINT(%s, %s)" lon lat))}
+              :where [:= :id user-id]}))
+
+
+(defn update-location!
+  "Lon - longitude (X)
+   Lat - latitude (Y)"
+  [user-id lon lat]
+  (->> (update-location-query user-id lon lat)
+       (jdbc/execute! db/db)))
+

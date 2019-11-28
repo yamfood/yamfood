@@ -1,5 +1,6 @@
 (ns yamfood.telegram.handlers.order
-  (:require [yamfood.telegram.dispatcher :as d]))
+  (:require [yamfood.telegram.dispatcher :as d]
+            [yamfood.core.users.core :as users]))
 
 
 (def request-location-markup
@@ -21,39 +22,52 @@
                       :options request-location-markup}}))
 
 
+(def location-emoji "\uD83D\uDCCD")
+(def payment-emoji "\uD83D\uDCB5")
+(def money-emoji "\uD83D\uDCB0")
+(def comment-emoji "\uD83D\uDCAC")
+(def basket-emoji "\uD83E\uDDFA")
+
 (def order-confirmation-markup
   {:inline_keyboard
-   [[{:text "\uD83D\uDCCD" :callback_data "change-location"}
-     {:text "\uD83D\uDCB5" :callback_data "change-pay"}
-     {:text "\uD83D\uDCAC" :callback_data "change-comment"}]
-    [{:text "\uD83E\uDDFA Корзина" :callback_data "basket"}]
+   [[{:text location-emoji :callback_data "change-location"}
+     {:text payment-emoji :callback_data "change-payment-type"}
+     {:text comment-emoji :callback_data "change-comment"}]
+    [{:text (str basket-emoji " Корзина") :callback_data "basket"}]
     [{:text "✅ Подтвердить" :callback_data "nothing"}]]})
 
 
 (defn make-order-text
-  [basket-state]
-  (format "*Детали вашего заказ:* \n\n\uD83D\uDCB0 %s сум \n\uD83D\uDCB5 %s \n\uD83D\uDCAC Без комментария \n\n\uD83D\uDCCD %s"
+  [order-state]
+  (format (str "*Детали вашего заказа:* \n\n"
+               money-emoji " %s сум \n"
+               payment-emoji " %s \n"
+               comment-emoji " Без комментария \n\n"
+               location-emoji " %s")
           "85 000"
           "Наличными"
           "60, 1st Akkurgan Passage, Mirzo Ulugbek district, Tashkent"))
 
 
 (defn handle-location
-  [_ update]
+  [ctx update]
   (let [message (:message update)
-        chat-id (:id (:from message))]
+        chat-id (:id (:from message))
+        location (:location message)]
     {:send-text [{:chat-id chat-id
-                  :text "Локация обновлена"
+                  :text    "Локация обновлена"
                   :options {:reply_markup {:remove_keyboard true}}}
                  {:chat-id chat-id
                   :text    (make-order-text {})
                   :options {:reply_markup order-confirmation-markup
-                            :parse_mode "markdown"}}]}))
+                            :parse_mode   "markdown"}}]
+     :core      {:function #(users/update-location!
+                              (:id (:user ctx))
+                              (:longitude location)
+                              (:latitude location))}}))
 
 
 (d/register-event-handler!
   :location
   handle-location)
 
-
-(handle-location {} {:update_id 435322755, :message {:message_id 9781, :from {:id 79225668, :is_bot false, :first_name "Рустам", :last_name "Бабаджанов", :username "kensay", :language_code "ru"}, :chat {:id 79225668, :first_name "Рустам", :last_name "Бабаджанов", :username "kensay", :type "private"}, :date 1574962444, :reply_to_message {:message_id 9779, :from {:id 488312680, :is_bot true, :first_name "Kensay", :username "kensaybot"}, :chat {:id 79225668, :first_name "Рустам", :last_name "Бабаджанов", :username "kensay", :type "private"}, :date 1574962408, :text "Куда доставить?"}, :location {:latitude 32.020902, :longitude 34.740417}}})

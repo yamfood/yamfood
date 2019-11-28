@@ -12,7 +12,7 @@
 
 (defn log
   [message]
-  (println (str "\n\n ### " message "\n\n")))
+  (println (str "\n\n ### \n" message "\n\n")))
 
 
 (defn get-tid-from-update ; TODO: Make it work with all updates!
