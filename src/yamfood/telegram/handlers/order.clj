@@ -10,7 +10,7 @@
                         :request_location true}]]}})
 
 
-(defn handle-to-order
+(defn request-location
   [_ update]
   (let [query (:callback_query update)
         chat-id (:id (:from query))
@@ -22,6 +22,16 @@
                       :options request-location-markup}}))
 
 
+
+(defn handle-to-order
+  [_ update]
+  (let [query (:callback_query update)
+        chat-id (:id (:from query))]
+    {:send-text {:chat-id chat-id
+                 :text    "Куда доставить?"
+                 :options request-location-markup}}))
+
+
 (def location-emoji "\uD83D\uDCCD")
 (def payment-emoji "\uD83D\uDCB5")
 (def money-emoji "\uD83D\uDCB0")
@@ -30,7 +40,7 @@
 
 (def order-confirmation-markup
   {:inline_keyboard
-   [[{:text location-emoji :callback_data "change-location"}
+   [[{:text location-emoji :callback_data "request-location"}
      {:text payment-emoji :callback_data "change-payment-type"}
      {:text comment-emoji :callback_data "change-comment"}]
     [{:text (str basket-emoji " Корзина") :callback_data "basket"}]
@@ -71,3 +81,7 @@
   :location
   handle-location)
 
+
+(d/register-event-handler!
+  :request-location
+  request-location)
