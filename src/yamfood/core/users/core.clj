@@ -6,7 +6,11 @@
 
 (defn get-user-by-tid-query
   [tid]
-  (hs/format {:select [:users.id :users.phone :users.tid [:baskets.id :basket_id]]
+  (hs/format {:select [:users.id
+                       :users.phone
+                       :users.tid
+                       :users.location
+                       [:baskets.id :basket_id]]
               :from   [:users :baskets]
               :where  [:and
                        [:= :users.tid tid]

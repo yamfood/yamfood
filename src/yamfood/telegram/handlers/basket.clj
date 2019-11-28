@@ -122,11 +122,11 @@
   (let [query (:callback_query update)
         chat-id (:id (:from query))
         message-id (:message_id (:message query))]
-    {:delete-message {:chat-id chat-id
-                      :message-id message-id}
-     :send-text {:chat-id chat-id
-                 :text    "Ваша корзина:"
-                 :options {:reply_markup (basket-detail-markup basket-state)}}}))
+    {:send-text      {:chat-id chat-id
+                      :text    "Ваша корзина:"
+                      :options {:reply_markup (basket-detail-markup basket-state)}}
+     :delete-message {:chat-id    chat-id
+                      :message-id message-id}}))
 
 
 
