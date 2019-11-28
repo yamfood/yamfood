@@ -35,3 +35,13 @@
    {:inline-query-id (:id (:inline_query update))
     :options         {:cache_time 0}
     :results         (map query-result-from-product products)}})
+
+
+(d/register-event-handler!
+  :inline
+  handle-inline-query)
+
+
+(d/register-event-handler!
+  :products-done
+  return-products-to-inline-query)

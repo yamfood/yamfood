@@ -136,3 +136,19 @@
     {:edit-reply-markup {:chat_id      (:id (:from query))
                          :message_id   (:message_id (:message query))
                          :reply_markup (basket-detail-markup basket-state)}}))
+
+
+(d/register-event-handler!
+  :update-markup
+  update-markup)
+
+
+(d/register-event-handler!
+  :send-basket
+  send-basket)
+
+
+(d/register-event-handler!
+  :update-basket-markup
+  update-basket-markup)
+

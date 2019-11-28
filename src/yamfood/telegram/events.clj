@@ -1,61 +1,9 @@
 (ns yamfood.telegram.events
-  (:require [yamfood.telegram.dispatcher :as d]
-            [yamfood.telegram.handlers.start :as start]
-            [yamfood.telegram.handlers.text :as text]
-            [yamfood.telegram.handlers.callback :as callback]
-            [yamfood.telegram.handlers.basket :as basket]
-            [yamfood.telegram.handlers.inline :as inline]))
-
-
-(d/register-event-handler!
-  :inline
-  inline/handle-inline-query)
-
-
-(d/register-event-handler!
-  :callback
-  callback/handle-callback)
-
-
-(d/register-event-handler!
-  :products-done
-  inline/return-products-to-inline-query)
-
-
-(d/register-event-handler!
-  :product-done
-  text/react-to-text)
-
-
-(d/register-event-handler!
-  :update-markup
-  basket/update-markup)
-
-
-(d/register-event-handler!
-  :send-basket
-  basket/send-basket)
-
-
-(d/register-event-handler!
-  :update-basket-markup
-  basket/update-basket-markup)
-
-
-(d/register-event-handler!
-  :start
-  start/handle-start)
-
-
-(d/register-event-handler!
-  :contact
-  start/handle-contact)
-
-
-(d/register-event-handler!
-  :text
-  text/handle-text)
-
+  (:require [yamfood.telegram.handlers.start]
+            [yamfood.telegram.handlers.text]
+            [yamfood.telegram.handlers.callback]
+            [yamfood.telegram.handlers.basket]
+            [yamfood.telegram.handlers.inline]))
 
 
 

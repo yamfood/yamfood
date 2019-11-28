@@ -42,3 +42,15 @@
       {:send-text
        {:chat-id chat-id
         :text    "Если у вас возникли какие-то вопросы обратитесь к @kensay."}})))
+
+
+(d/register-event-handler!
+  :product-done
+  react-to-text)
+
+
+(d/register-event-handler!
+  :text
+  handle-text)
+
+
