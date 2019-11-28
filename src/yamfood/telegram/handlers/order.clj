@@ -26,10 +26,13 @@
 (defn handle-to-order
   [_ update]
   (let [query (:callback_query update)
-        chat-id (:id (:from query))]
-    {:send-text {:chat-id chat-id
-                 :text    "Куда доставить?"
-                 :options request-location-markup}}))
+        chat-id (:id (:from query))
+        message-id (:message_id (:message query))]
+    {:delete-message {:chat-id    chat-id
+                      :message-id message-id}
+     :send-text      {:chat-id chat-id
+                      :text    "Куда доставить?"
+                      :options request-location-markup}}))
 
 
 (def location-emoji "\uD83D\uDCCD")
