@@ -87,7 +87,7 @@
 
 (defn basket-product-markup
   [val product]
-  (apply conj val [[{:text (format "\uD83E\uDD57 %s x %d" (:name product) (:count product)) :callback_data "nothing"}]
+  (apply conj val [[{:text (format (str u/food-emoji " %s x %d") (:name product) (:count product)) :callback_data "nothing"}]
                    (u/basket-product-controls
                      "basket"
                      (:id product)
@@ -110,7 +110,8 @@
     {:inline_keyboard
      (conj (basket-detail-products-markup basket-state)
            [{:text "Еще!" :switch_inline_query_current_chat ""}]
-           [{:text          (format "\uD83D\uDCB0 %s сум \uD83D\uDD0B %s кКал."
+           [{:text          (format (str u/money-emoji " %s сум "
+                                         u/energy-emoji " %s кКал")
                                     (u/fmt-values total_cost)
                                     (u/fmt-values total_energy))
              :callback_data "nothing"}]

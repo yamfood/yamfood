@@ -1,13 +1,7 @@
 (ns yamfood.telegram.handlers.order
   (:require [yamfood.telegram.dispatcher :as d]
-            [yamfood.core.users.core :as users]))
-
-
-(def location-emoji "\uD83D\uDCCD")
-(def payment-emoji "\uD83D\uDCB5")
-(def money-emoji "\uD83D\uDCB0")
-(def comment-emoji "\uD83D\uDCAC")
-(def basket-emoji "\uD83E\uDDFA")
+            [yamfood.core.users.core :as users]
+            [yamfood.telegram.handlers.utils :as u]))
 
 
 (def request-location-markup
@@ -55,20 +49,20 @@
 
 (def order-confirmation-markup
   {:inline_keyboard
-   [[{:text location-emoji :callback_data "request-location"}
-     {:text payment-emoji :callback_data "change-payment-type"}
-     {:text comment-emoji :callback_data "change-comment"}]
-    [{:text (str basket-emoji " Корзина") :callback_data "basket"}]
+   [[{:text u/location-emoji :callback_data "request-location"}
+     {:text u/payment-emoji :callback_data "change-payment-type"}
+     {:text u/comment-emoji :callback_data "change-comment"}]
+    [{:text (str u/basket-emoji " Корзина") :callback_data "basket"}]
     [{:text "✅ Подтвердить" :callback_data "nothing"}]]})
 
 
 (defn make-order-text
   [order-state]
   (format (str "*Детали вашего заказа:* \n\n"
-               money-emoji " %s сум \n"
-               payment-emoji " %s \n"
-               comment-emoji " Без комментария \n\n"
-               location-emoji " %s")
+               u/money-emoji " %s сум \n"
+               u/payment-emoji " %s \n"
+               u/comment-emoji " Без комментария \n\n"
+               u/location-emoji " %s")
           "85 000"
           "Наличными"
           "60, 1st Akkurgan Passage, Mirzo Ulugbek district, Tashkent"))

@@ -8,9 +8,11 @@
 
 (defn get-product-caption
   [product]
-  (format "*%s* \n\n *Цена:* %s сум"
+  (format (str u/food-emoji " *%s* \n\n"
+               u/money-emoji "%s сум  " u/energy-emoji "%s кКал")
           (:name product)
-          (u/fmt-values (:price product))))
+          (u/fmt-values (:price product))
+          (u/fmt-values (:energy product))))
 
 
 
@@ -30,7 +32,7 @@
 
 
 (defn react-to-text
-  [ctx message product]
+  [_ message product]
   (let [chat (:chat message)
         chat-id (:id chat)]
     (if product

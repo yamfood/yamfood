@@ -32,7 +32,7 @@
   [message]
   {:send-text {:chat-id (:id (:chat message))
                :options {:reply_markup registration-markup}
-               :text    "Отправьте свой контакт"}})
+               :text    "Отправьте, пожалуйста, свой контакт"}})
 
 
 (defn parse-int [s]

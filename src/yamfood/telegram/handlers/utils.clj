@@ -2,6 +2,15 @@
   (:require [clojure.string :as str]))
 
 
+(def location-emoji "\uD83D\uDCCD")
+(def payment-emoji "\uD83D\uDCB5")
+(def money-emoji "\uD83D\uDCB0")
+(def comment-emoji "\uD83D\uDCAC")
+(def basket-emoji "\uD83E\uDDFA")
+(def food-emoji "\uD83E\uDD57")
+(def energy-emoji "\uD83D\uDD0B")
+
+
 (defn fmt-values
   [amount]
   (str/replace (format "%,d" amount) "," " "))

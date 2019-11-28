@@ -8,7 +8,7 @@
 
 (defn get-product-description
   [product]
-  (format "Цена: %s сум , %s кКал"
+  (format "%s сум, %s кКал"
           (u/fmt-values (:price product))
           (u/fmt-values (:energy product))))
 
