@@ -94,3 +94,9 @@
                                   basket-id
                                   product-id))]
     (p/get-state-for-product-detail! basket-id product-id)))
+
+
+(defn make-order-state!
+  [basket-id]
+  {:basket (get-basket-state! basket-id)})
+

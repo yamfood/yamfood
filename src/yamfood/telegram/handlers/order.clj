@@ -1,7 +1,8 @@
 (ns yamfood.telegram.handlers.order
   (:require [yamfood.telegram.dispatcher :as d]
             [yamfood.core.users.core :as users]
-            [yamfood.telegram.handlers.utils :as u]))
+            [yamfood.telegram.handlers.utils :as u]
+            [yamfood.core.users.basket :as b]))
 
 
 (def request-location-markup
@@ -25,10 +26,13 @@
 
 (defn make-order-state
   [ctx update]
-  {:core {:function    hash-map
-          :on-complete #(d/dispatch
-                          ctx
-                          [:send-order-detail update %])}})
+  (let [user (:user ctx)]
+    {:core {:function    #(assoc
+                            (b/make-order-state! (:basket_id user))
+                            :user user)
+            :on-complete #(d/dispatch
+                            ctx
+                            [:send-order-detail update %])}}))
 
 
 (defn handle-to-order
@@ -63,7 +67,7 @@
                u/payment-emoji " %s \n"
                u/comment-emoji " Без комментария \n\n"
                u/location-emoji " %s")
-          "85 000"
+          (u/fmt-values (:total_cost order-state))
           "Наличными"
           "60, 1st Akkurgan Passage, Mirzo Ulugbek district, Tashkent"))
 
@@ -116,5 +120,3 @@
   :send-order-detail
   send-order-detail)
 
-
-(send-order-detail {} {:update_id 435322822, :callback_query {:id "340271653891766996", :from {:id 79225668, :is_bot false, :first_name "Рустам", :last_name "Бабаджанов", :username "kensay", :language_code "ru"}, :message {:message_id 9911, :from {:id 488312680, :is_bot true, :first_name "Kensay", :username "kensaybot"}, :chat {:id 79225668, :first_name "Рустам", :last_name "Бабаджанов", :username "kensay", :type "private"}, :date 1574969847, :text "Ваша корзина:", :reply_markup {:inline_keyboard [[{:text "🥗 Рисовая каша с ежевикой x 1", :callback_data "nothing"}] [{:text "-", :callback_data "basket-/2"} {:text "13 800 сум", :callback_data "nothing"} {:text "+", :callback_data "basket+/2"}] [{:text "🥗 Скрембл с авокадо и помидорами x 3", :callback_data "nothing"}] [{:text "-", :callback_data "basket-/3"} {:text "66 000 сум", :callback_data "nothing"} {:text "+", :callback_data "basket+/3"}] [{:text "🥗 Сырники со сметаной и джемом x 2", :callback_data "nothing"}] [{:text "-", :callback_data "basket-/4"} {:text "30 000 сум", :callback_data "nothing"} {:text "+", :callback_data "basket+/4"}] [{:text "🥗 Свежесваренный кофе x 1", :callback_data "nothing"}] [{:text "-", :callback_data "basket-/9"} {:text "11 000 сум", :callback_data "nothing"} {:text "+", :callback_data "basket+/9"}] [{:text "🥗 Яблочный фреш x 1", :callback_data "nothing"}] [{:text "-", :callback_data "basket-/10"} {:text "9 900 сум", :callback_data "nothing"} {:text "+", :callback_data "basket+/10"}] [{:text "Еще!", :switch_inline_query_current_chat ""}] [{:text "💰 130 700 сум 🔋 3 380 кКал.", :callback_data "nothing"}] [{:text "✅ Далее", :callback_data "to-order"}]]}}, :chat_instance "4402156230761928760", :data "to-order"}} {})
