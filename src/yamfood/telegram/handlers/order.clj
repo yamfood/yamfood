@@ -67,7 +67,7 @@
                u/payment-emoji " %s \n"
                u/comment-emoji " Без комментария \n\n"
                u/location-emoji " %s")
-          (u/fmt-values (:total_cost order-state))
+          (u/fmt-values (:total_cost (:basket order-state)))
           "Наличными"
           "60, 1st Akkurgan Passage, Mirzo Ulugbek district, Tashkent"))
 

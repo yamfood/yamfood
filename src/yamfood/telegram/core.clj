@@ -27,7 +27,7 @@
 (defn build-ctx
   [update]
   {:token token
-   :user  (users/get-user-by-tid! (get-tid-from-update update))})
+   :user  (users/user-with-tid! (get-tid-from-update update))})
 
 
 (defn process-message

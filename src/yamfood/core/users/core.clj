@@ -1,25 +1,40 @@
 (ns yamfood.core.users.core
   (:require [yamfood.core.db.core :as db]
             [honeysql.core :as hs]
-            [clojure.java.jdbc :as jdbc]))
+            [clojure.java.jdbc :as jdbc]
+            [honeysql.helpers :as hh]))
 
 
-(defn get-user-by-tid-query
+(def user-query
+  {:select [:users.id
+            :users.phone
+            :users.tid
+            :users.location
+            [:baskets.id :basket_id]]
+   :from   [:users :baskets]
+   :where  [:= :baskets.user_id :users.id]})
+
+
+(defn user-with-tid-query
   [tid]
-  (hs/format {:select [:users.id
-                       :users.phone
-                       :users.tid
-                       :users.location
-                       [:baskets.id :basket_id]]
-              :from   [:users :baskets]
-              :where  [:and
-                       [:= :users.tid tid]
-                       [:= :baskets.user_id :users.id]]}))
+  (hs/format (hh/merge-where user-query [:= :users.id tid])))
 
 
-(defn get-user-by-tid!
+(defn user-with-basket-id-query
+  [basket-id]
+  (hs/format (hh/merge-where user-query [:= :baskets.id basket-id])))
+
+
+(defn user-with-basket-id!
+  [basket-id]
+  (->> (user-with-basket-id-query basket-id)
+       (jdbc/query db/db)
+       (first)))
+
+
+(defn user-with-tid!
   [tid]                                                     ; TODO: CACHE!
-  (->> (get-user-by-tid-query tid)
+  (->> (user-with-tid-query tid)
        (jdbc/query db/db)
        (first)))
 
@@ -42,8 +57,8 @@
 (defn update-location-query
   [user-id lon lat]
   (hs/format {:update :users
-              :set {:location (hs/raw (format "POINT(%s, %s)" lon lat))}
-              :where [:= :id user-id]}))
+              :set    {:location (hs/raw (format "POINT(%s, %s)" lon lat))}
+              :where  [:= :id user-id]}))
 
 
 (defn update-location!

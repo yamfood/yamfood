@@ -99,3 +99,8 @@
   [basket-id]
   {:basket (get-basket-state! basket-id)})
 
+
+(defn clear-basket!
+  [basket-id]
+  (jdbc/delete! db/db "basket_products" ["basket_id = ?" basket-id]))
+
