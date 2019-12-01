@@ -1,1 +1,2 @@
-alter table users drop column location;
+alter table users
+  drop column location;
