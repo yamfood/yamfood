@@ -2,7 +2,7 @@
   (:require [yamfood.telegram.dispatcher :as d]
             [yamfood.core.users.core :as users]
             [yamfood.telegram.handlers.utils :as u]
-            [yamfood.core.users.basket :as b]))
+            [yamfood.core.baskets.core :as b]))
 
 
 (def request-location-markup

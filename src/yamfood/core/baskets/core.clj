@@ -1,22 +1,21 @@
-(ns yamfood.core.users.basket
+(ns yamfood.core.baskets.core
   (:require [yamfood.core.products.core :as p]
             [yamfood.core.db.core :as db]
             [honeysql.core :as hs]
-            [clojure.java.jdbc :as jdbc]
-            [honeysql.helpers :as hh]))
+            [clojure.java.jdbc :as jdbc]))
 
 
 (defn- get-basket-products-query
   [basket-id]
-  (hs/format {:select [:products.id
-                       :basket_products.count
-                       :products.name
-                       :products.price
-                       :products.energy]
-              :from   [:basket_products :products]
-              :where  [:and
-                       [:= :basket_products.basket_id basket-id]
-                       [:= :products.id :basket_products.product_id]]
+  (hs/format {:select   [:products.id
+                         :basket_products.count
+                         :products.name
+                         :products.price
+                         :products.energy]
+              :from     [:basket_products :products]
+              :where    [:and
+                         [:= :basket_products.basket_id basket-id]
+                         [:= :products.id :basket_products.product_id]]
               :order-by [:id]}))
 
 
@@ -51,19 +50,19 @@
 (defn increment-product-query
   [basket-id product-id]
   (hs/format {:update :basket_products
-              :set {:count (hs/raw "count + 1")}
-              :where [:and
-                      [:= :basket_id basket-id]
-                      [:= :product_id product-id]]}))
+              :set    {:count (hs/raw "count + 1")}
+              :where  [:and
+                       [:= :basket_id basket-id]
+                       [:= :product_id product-id]]}))
 
 
 (defn decrement-product-query
   [basket-id product-id]
   (hs/format {:update :basket_products
-              :set {:count (hs/raw "count - 1")}
-              :where [:and
-                      [:= :basket_id basket-id]
-                      [:= :product_id product-id]]}))
+              :set    {:count (hs/raw "count - 1")}
+              :where  [:and
+                       [:= :basket_id basket-id]
+                       [:= :product_id product-id]]}))
 
 
 (defn increment-product-in-basket!

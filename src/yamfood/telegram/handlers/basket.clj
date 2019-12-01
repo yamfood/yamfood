@@ -1,6 +1,6 @@
 (ns yamfood.telegram.handlers.basket
   (:require [yamfood.telegram.handlers.utils :as u]
-            [yamfood.core.users.basket :as b]
+            [yamfood.core.baskets.core :as b]
             [yamfood.telegram.dispatcher :as d]))
 
 
