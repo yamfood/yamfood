@@ -15,9 +15,16 @@
    :where  [:= :baskets.user_id :users.id]})
 
 
+(defn location->clj
+  [user]
+  (let [point (:location user)]
+    (assoc user :location {:longitude (.x point)
+                           :latitude  (.y point)})))
+
+
 (defn user-with-tid-query
   [tid]
-  (hs/format (hh/merge-where user-query [:= :users.id tid])))
+  (hs/format (hh/merge-where user-query [:= :users.tid tid])))
 
 
 (defn user-with-basket-id-query
@@ -29,14 +36,17 @@
   [basket-id]
   (->> (user-with-basket-id-query basket-id)
        (jdbc/query db/db)
-       (first)))
+       (first)
+       (location->clj)))
 
 
 (defn user-with-tid!
   [tid]                                                     ; TODO: CACHE!
   (->> (user-with-tid-query tid)
        (jdbc/query db/db)
-       (first)))
+       (first)
+       (location->clj)))
+
 
 (defn insert-user!
   [tid phone]

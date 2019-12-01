@@ -13,7 +13,7 @@
 (defroutes
   app-routes
   (GET "/" [] "Hello World!")
-  (POST "/updates" request (telegram/process-updates request))
+  (POST "/updates" request (telegram/telegram-handler request))
   (route/not-found "Not Found"))
 
 

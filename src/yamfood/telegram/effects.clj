@@ -38,7 +38,6 @@
 (d/register-effect-handler!
   :send-text
   (fn [ctx effect]
-    (println (str "\n\n###\n" effect))
     (t/send-text
       (:token ctx)
       (:chat-id effect)

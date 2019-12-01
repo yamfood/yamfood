@@ -2,7 +2,8 @@
   (:require [yamfood.telegram.dispatcher :as d]
             [yamfood.core.users.core :as users]
             [yamfood.telegram.handlers.utils :as u]
-            [yamfood.core.baskets.core :as b]))
+            [yamfood.core.orders.core :as orders]
+            [yamfood.core.baskets.core :as baskets]))
 
 
 (def request-location-markup
@@ -28,7 +29,7 @@
   [ctx update]
   (let [user (:user ctx)]
     {:core {:function    #(assoc
-                            (b/make-order-state! (:basket_id user))
+                            (baskets/make-order-state! (:basket_id user))
                             :user user)
             :on-complete #(d/dispatch
                             ctx
@@ -57,7 +58,7 @@
      {:text u/payment-emoji :callback_data "change-payment-type"}
      {:text u/comment-emoji :callback_data "change-comment"}]
     [{:text (str u/basket-emoji " Корзина") :callback_data "basket"}]
-    [{:text "✅ Подтвердить" :callback_data "nothing"}]]})
+    [{:text "✅ Подтвердить" :callback_data "create-order"}]]})
 
 
 (defn make-order-text
@@ -106,6 +107,17 @@
                                (:latitude location))}]}))
 
 
+(defn handle-create-order
+  [ctx _]
+  (let [basket-id (:basket_id (:user ctx))
+        location (:location (:user ctx))
+        comment "test"]
+    {:core {:function #(orders/create-order-and-clear-basket!
+                         basket-id
+                         location
+                         comment)}}))
+
+
 (d/register-event-handler!
   :location
   handle-location)
@@ -120,3 +132,13 @@
   :send-order-detail
   send-order-detail)
 
+
+(d/register-event-handler!
+  :create-order
+  handle-create-order)
+
+
+(def ctt {:token "488312680:AAGsKHKufV9TQEAB8-g6INps-W82G_noRP8",
+          :user {:id 6, :phone 998909296339, :tid 79225668, :location {:longitude 34.740382, :latitude 32.020897}, :basket_id 1}})
+
+;(orders/create-order-and-clear-basket! 1 {:longitude 1 :latitude 1} "test")

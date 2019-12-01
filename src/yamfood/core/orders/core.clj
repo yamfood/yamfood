@@ -45,19 +45,16 @@
   (jdbc/insert-multi! db/db "order_products" products))
 
 
-(defn create-order!
+(defn create-order-and-clear-basket!
   [basket-id location comment]
-  (jdbc/with-db-transaction
-    [basket-id location comment]
-    (let [user (users/user-with-basket-id! basket-id)
-          order (insert-order! (:id user)
-                               (:longitude location)
-                               (:latitude location)
-                               comment)]
-      (-> (products-from-basket! basket-id)
-          (prepare-basket-products-to-order (:id order))
-          (insert-products!))
-      (b/clear-basket! basket-id))))
-
+  (let [user (users/user-with-basket-id! basket-id)
+        order (insert-order! (:id user)
+                             (:longitude location)
+                             (:latitude location)
+                             comment)]
+    (-> (products-from-basket! basket-id)
+        (prepare-basket-products-to-order (:id order))
+        (insert-products!))
+    (b/clear-basket! basket-id)))
 
 

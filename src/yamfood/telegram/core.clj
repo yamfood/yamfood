@@ -13,10 +13,12 @@
 (defn get-tid-from-update                                   ; TODO: Make it work with all updates!
   [update]
   (let [message (:message update)
-        callback (:callback_query update)]
+        callback (:callback_query update)
+        inline (:inline_query update)]
     (cond
       message (:id (:from message))
-      callback (:id (:from callback)))))
+      callback (:id (:from callback))
+      inline (:id (:from inline)))))
 
 
 (defn build-ctx
@@ -38,20 +40,24 @@
       text (d/dispatch ctx [:text message]))))
 
 
-(defn process-updates
+(defn handle-update
+  [update]
+  (let [message (:message update)
+        inline-query (:inline_query update)
+        callback-query (:callback_query update)
+        ctx (build-ctx update)]
+    (if message
+      (process-message ctx update))
+    (if inline-query
+      (d/dispatch ctx [:inline update]))
+    (if callback-query
+      (d/dispatch ctx [:callback update]))))
+
+
+(defn telegram-handler
   [request]
   (try
-    (let [update (:body request)
-          message (:message update)
-          inline-query (:inline_query update)
-          callback-query (:callback_query update)
-          ctx (build-ctx update)]
-      (if message
-        (process-message ctx update))
-      (if inline-query
-        (d/dispatch ctx [:inline update]))
-      (if callback-query
-        (d/dispatch ctx [:callback update])))
+    (handle-update (:body request))
     (catch Exception e
       (println
         (format

@@ -18,7 +18,8 @@
       (= action "basket+") (basket/handle-basket-inc ctx update)
       (= action "basket-") (basket/handle-basket-dec ctx update)
       (= action "to-order") (order/handle-to-order ctx update)
-      (= action "request-location") (d/dispatch ctx [:request-location update]))))
+      (= action "request-location") (d/dispatch ctx [:request-location update])
+      (= action "create-order") (d/dispatch ctx [:create-order update]))))
 
 
 (d/register-event-handler!
