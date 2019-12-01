@@ -10,12 +10,7 @@
 (def token (env :bot-token))
 
 
-(defn log
-  [message]
-  (println (str "\n\n ### \n" message "\n\n")))
-
-
-(defn get-tid-from-update ; TODO: Make it work with all updates!
+(defn get-tid-from-update                                   ; TODO: Make it work with all updates!
   [update]
   (let [message (:message update)
         callback (:callback_query update)]
@@ -40,23 +35,28 @@
       (= text "/start") (d/dispatch ctx [:start update])
       location (d/dispatch ctx [:location update])
       contact (d/dispatch ctx [:contact update])
-              text (d/dispatch ctx [:text message]))))
+      text (d/dispatch ctx [:text message]))))
 
 
 (defn process-updates
   [request]
-  (log (:body request))
-  (let [update (:body request)
-        message (:message update)
-        inline-query (:inline_query update)
-        callback-query (:callback_query update)
-        ctx (build-ctx update)]
-    (if message
-      (process-message ctx update))
-    (if inline-query
-      (d/dispatch ctx [:inline update]))
-    (if callback-query
-      (d/dispatch ctx [:callback update])))
+  (try
+    (let [update (:body request)
+          message (:message update)
+          inline-query (:inline_query update)
+          callback-query (:callback_query update)
+          ctx (build-ctx update)]
+      (if message
+        (process-message ctx update))
+      (if inline-query
+        (d/dispatch ctx [:inline update]))
+      (if callback-query
+        (d/dispatch ctx [:callback update])))
+    (catch Exception e
+      (println
+        (format
+          "\n\n %s \n\n"
+          {:update (:body request) :error e}))))
   {:body "OK"})
 
 ;(t/set-webhook token "https://19ab8c3c.ngrok.io/updates")
