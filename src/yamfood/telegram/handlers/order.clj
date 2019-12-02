@@ -108,14 +108,22 @@
 
 
 (defn handle-create-order
-  [ctx _]
-  (let [basket-id (:basket_id (:user ctx))
+  [ctx update]
+  (let [query (:callback_query update)
+        chat-id (:id (:from query))
+        message-id (:message_id (:message query))
+        basket-id (:basket_id (:user ctx))
         location (:location (:user ctx))
         comment "test"]
-    {:core {:function #(orders/create-order-and-clear-basket!
-                         basket-id
-                         location
-                         comment)}}))
+    {:core            {:function #(orders/create-order-and-clear-basket!
+                                    basket-id
+                                    location
+                                    comment)}
+     :answer-callback {:callback_query_id (:id query)
+                       :text              "Ваш заказ успешно создан! Мы будем держать вас в курсе его статуса."
+                       :show_alert true}
+     :delete-message  {:chat-id    chat-id
+                       :message-id message-id}}))
 
 
 (d/register-event-handler!
@@ -137,8 +145,3 @@
   :create-order
   handle-create-order)
 
-
-(def ctt {:token "488312680:AAGsKHKufV9TQEAB8-g6INps-W82G_noRP8",
-          :user {:id 6, :phone 998909296339, :tid 79225668, :location {:longitude 34.740382, :latitude 32.020897}, :basket_id 1}})
-
-;(orders/create-order-and-clear-basket! 1 {:longitude 1 :latitude 1} "test")

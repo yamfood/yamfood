@@ -65,4 +65,4 @@
           {:update (:body request) :error e}))))
   {:body "OK"})
 
-;(t/set-webhook token "https://19ab8c3c.ngrok.io/updates")
+;(t/set-webhook token "https://4868e9ba.ngrok.io/updates")

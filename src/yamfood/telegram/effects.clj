@@ -32,7 +32,8 @@
     (t/answer-callback
       (:token ctx)
       (:callback_query_id effect)
-      (:text effect))))
+      (:text effect)
+      (:show_alert effect))))
 
 
 (d/register-effect-handler!
