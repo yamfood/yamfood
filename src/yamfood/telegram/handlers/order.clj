@@ -121,7 +121,7 @@
                                     comment)}
      :answer-callback {:callback_query_id (:id query)
                        :text              "Ваш заказ успешно создан! Мы будем держать вас в курсе его статуса."
-                       :show_alert true}
+                       :show_alert        true}
      :delete-message  {:chat-id    chat-id
                        :message-id message-id}}))
 
@@ -129,13 +129,32 @@
 (defn handle-change-payment-type
   [_ update]
   {:answer-callback {:callback_query_id (:id (:callback_query update))
-                     :text "К сожалению, на данный момент мы принимает оплату только наличными :("
-                     :show_alert true}})
+                     :text              "К сожалению, на данный момент мы принимает оплату только наличными :("
+                     :show_alert        true}})
+
+
+(def write-comment-text "Напишите свой комментарий к заказу")
+(defn handle-change-comment
+  [_ update]
+  (let [query (:callback_query update)
+        chat-id (:id (:from query))
+        message-id (:message_id (:message query))]
+    {:send-text      {:chat-id chat-id
+                      :text    write-comment-text
+                      :options {:reply_markup {:force_reply true}}}
+     :delete-message {:chat-id chat-id
+                      :message-id message-id}}))
+
 
 
 (d/register-event-handler!
   :location
   handle-location)
+
+
+(d/register-event-handler!
+  :make-order-state
+  make-order-state)
 
 
 (d/register-event-handler!
@@ -156,3 +175,8 @@
 (d/register-event-handler!
   :change-payment-type
   handle-change-payment-type)
+
+
+(d/register-event-handler!
+  :change-comment
+  handle-change-comment)

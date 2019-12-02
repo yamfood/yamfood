@@ -32,11 +32,13 @@
   (let [message (:message update)
         text (:text message)
         contact (:contact message)
-        location (:location message)]
+        location (:location message)
+        reply-to (:reply_to_message message)]
     (cond
       (= text "/start") (d/dispatch ctx [:start update])
       location (d/dispatch ctx [:location update])
       contact (d/dispatch ctx [:contact update])
+      reply-to (d/dispatch ctx [:reply update])
       text (d/dispatch ctx [:text message]))))
 
 
