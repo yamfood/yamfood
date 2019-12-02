@@ -19,6 +19,7 @@
       (= action "basket-") (basket/handle-basket-dec ctx update)
       (= action "to-order") (order/handle-to-order ctx update)
       (= action "request-location") (d/dispatch ctx [:request-location update])
+      (= action "change-payment-type") (d/dispatch ctx [:change-payment-type update])
       (= action "create-order") (d/dispatch ctx [:create-order update]))))
 
 

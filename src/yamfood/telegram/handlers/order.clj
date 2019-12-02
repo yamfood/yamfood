@@ -126,6 +126,13 @@
                        :message-id message-id}}))
 
 
+(defn handle-change-payment-type
+  [_ update]
+  {:answer-callback {:callback_query_id (:id (:callback_query update))
+                     :text "К сожалению, на данный момент мы принимает оплату только наличными :("
+                     :show_alert true}})
+
+
 (d/register-event-handler!
   :location
   handle-location)
@@ -145,3 +152,7 @@
   :create-order
   handle-create-order)
 
+
+(d/register-event-handler!
+  :change-payment-type
+  handle-change-payment-type)
