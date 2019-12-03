@@ -28,7 +28,7 @@
   {:core {:function    #(products/get-product-by-name!
                           (:basket_id (:user ctx))
                           (:text message))
-          :on-complete #(d/dispatch ctx [:product-done message %])}})
+          :on-complete #(d/dispatch! ctx [:product-done message %])}})
 
 
 (defn react-to-text

@@ -31,7 +31,7 @@
     {:core {:function    #(assoc
                             (baskets/make-order-state! (:basket_id user))
                             :user user)
-            :on-complete #(d/dispatch
+            :on-complete #(d/dispatch!
                             ctx
                             [:send-order-detail update %])}}))
 

@@ -35,11 +35,11 @@
         location (:location message)
         reply-to (:reply_to_message message)]
     (cond
-      (= text "/start") (d/dispatch ctx [:start update])
-      location (d/dispatch ctx [:location update])
-      contact (d/dispatch ctx [:contact update])
-      reply-to (d/dispatch ctx [:reply update])
-      text (d/dispatch ctx [:text message]))))
+      (= text "/start") (d/dispatch! ctx [:start update])
+      location (d/dispatch! ctx [:location update])
+      contact (d/dispatch! ctx [:contact update])
+      reply-to (d/dispatch! ctx [:reply update])
+      text (d/dispatch! ctx [:text message]))))
 
 
 (defn handle-update
@@ -51,9 +51,9 @@
     (if message
       (process-message ctx update))
     (if inline-query
-      (d/dispatch ctx [:inline update]))
+      (d/dispatch! ctx [:inline update]))
     (if callback-query
-      (d/dispatch ctx [:callback update]))))
+      (d/dispatch! ctx [:callback update]))))
 
 
 (defn telegram-handler

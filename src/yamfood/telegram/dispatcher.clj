@@ -21,7 +21,7 @@
       (seq effects-map))))
 
 
-(defn dispatch
+(defn dispatch!
   [ctx [event & args]]
   (let [effects (apply (event @event-handlers) ctx args)]
     (apply-effects-map! ctx effects)))

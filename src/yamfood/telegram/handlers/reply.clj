@@ -9,7 +9,7 @@
         reply_message (:reply_to_message message)
         reply_text (:text reply_message)]
     (cond
-      (= reply_text write-comment-text) (d/dispatch ctx [:make-order-state update]))))
+      (= reply_text write-comment-text) (d/dispatch! ctx [:make-order-state update]))))
 
 
 (d/register-event-handler!

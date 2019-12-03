@@ -12,7 +12,7 @@
         callback-params (u/get-callback-params callback-data)
         product-id (Integer. (first callback-params))]
     {:core            {:function    #(baskets/add-product-to-basket! (:basket_id user) product-id)
-                       :on-complete #(d/dispatch ctx [:update-markup update %])}
+                       :on-complete #(d/dispatch! ctx [:update-markup update %])}
      :answer-callback {:callback_query_id (:id query)
                        :text              "Добавлено в корзину"}}))
 
@@ -26,7 +26,7 @@
     {:core            {:function    #(baskets/increment-product-in-basket!
                                        basket-id
                                        product-id)
-                       :on-complete #(d/dispatch ctx [:update-markup update %])}
+                       :on-complete #(d/dispatch! ctx [:update-markup update %])}
      :answer-callback {:callback_query_id (:id callback-query)}}))
 
 (defn handle-dec
@@ -39,7 +39,7 @@
     {:core            {:function    #(baskets/decrement-product-in-basket!
                                        basket-id
                                        product-id)
-                       :on-complete #(d/dispatch ctx [:update-markup update %])}
+                       :on-complete #(d/dispatch! ctx [:update-markup update %])}
      :answer-callback {:callback_query_id (:id callback-query)}}))
 
 (defn handle-basket-inc
@@ -53,7 +53,7 @@
                                      basket-id
                                      product-id)}
                        {:function    #(baskets/get-basket-state! basket-id)
-                        :on-complete #(d/dispatch ctx [:update-basket-markup update %])}]
+                        :on-complete #(d/dispatch! ctx [:update-basket-markup update %])}]
      :answer-callback {:callback_query_id (:id callback-query)}}))
 
 
@@ -68,7 +68,7 @@
                                      basket-id
                                      product-id)}
                        {:function    #(baskets/get-basket-state! basket-id)
-                        :on-complete #(d/dispatch ctx [:update-basket-markup update %])}]
+                        :on-complete #(d/dispatch! ctx [:update-basket-markup update %])}]
      :answer-callback {:callback_query_id (:id callback-query)}}))
 
 (defn update-markup
@@ -82,7 +82,7 @@
 (defn handle-basket
   [ctx update]
   {:core {:function    #(baskets/get-basket-state! (:basket_id (:user ctx)))
-          :on-complete #(d/dispatch ctx [:send-basket update %])}})
+          :on-complete #(d/dispatch! ctx [:send-basket update %])}})
 
 
 (defn basket-product-markup
