@@ -1,7 +1,7 @@
 (ns yamfood.telegram.effects
   (:require [yamfood.telegram.dispatcher :as d]
             [morse.api :as t]
-            [clj-http.client :as http]
+            [yamfood.telegram.methods :as -t]
             [environ.core :refer [env]]))
 
 
@@ -71,24 +71,10 @@
       (:message-id effect))))
 
 
-(def base-url "https://api.telegram.org/bot")
-(defn edit-reply-markup
-  "Edits only the reply markup of message
-  (https://core.telegram.org/bots/api#editmessagereplymarkup)"
-  ([token chat-id message-id reply-markup] (edit-reply-markup token chat-id message-id {} reply-markup))
-  ([token chat-id message-id options reply-markup]
-   (let [url   (str base-url token "/editMessageReplyMarkup")
-         query (into {:chat_id chat-id :reply_markup reply-markup :message_id message-id} options)
-         resp  (http/post url {:content-type :json
-                               :as           :json
-                               :form-params  query})]
-     (-> resp :body))))
-
 (d/register-effect-handler!
   :edit-reply-markup
   (fn [ctx effect]
-    (println (str "\n\n###" effect))
-    (edit-reply-markup
+    (-t/edit-reply-markup
       (:token ctx)
       (:chat_id effect)
       (:message_id effect)

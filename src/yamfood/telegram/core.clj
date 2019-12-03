@@ -6,9 +6,6 @@
             [yamfood.telegram.dispatcher :as d]))
 
 
-(def token (env :bot-token))
-
-
 (defn get-tid-from-update                                   ; TODO: Make it work with all updates!
   [update]
   (let [message (:message update)
@@ -22,8 +19,9 @@
 
 (defn build-ctx!
   [update]
-  {:token token
-   :user  (users/user-with-tid! (get-tid-from-update update))})
+  {:token          (env :bot-token)
+   :payments-token (env :payments-token)
+   :user           (users/user-with-tid! (get-tid-from-update update))})
 
 
 (defn process-message
