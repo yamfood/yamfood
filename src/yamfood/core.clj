@@ -1,7 +1,6 @@
 (ns yamfood.core
   (:require
     [environ.core :refer [env]]
-    [environ.core :refer [env]]
     [compojure.route :as route]
     [compojure.core :refer :all]
     [yamfood.core.db.init :as db]
