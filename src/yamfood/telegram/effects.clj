@@ -6,6 +6,12 @@
 
 
 (d/register-effect-handler!
+  :dispatch
+  (fn [ctx effect]
+    (d/dispatch! ctx (:args effect))))
+
+
+(d/register-effect-handler!
   :core
   (fn [_ effect]
     (println effect)

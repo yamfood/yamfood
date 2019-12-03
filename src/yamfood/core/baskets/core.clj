@@ -1,6 +1,7 @@
 (ns yamfood.core.baskets.core
-  (:require [yamfood.core.products.core :as p]
+  (:require [yamfood.core.products.core :as products]
             [yamfood.core.db.core :as db]
+            [yamfood.core.users.core :as users]
             [honeysql.core :as hs]
             [clojure.java.jdbc :as jdbc]))
 
@@ -69,14 +70,14 @@
   [basket-id product-id]
   (->> (increment-product-query basket-id product-id)
        (jdbc/execute! db/db))
-  (p/get-state-for-product-detail! basket-id product-id))
+  (products/get-state-for-product-detail! basket-id product-id))
 
 
 (defn decrement-product-in-basket!
   [basket-id product-id]
   (->> (decrement-product-query basket-id product-id)
        (jdbc/execute! db/db))
-  (p/get-state-for-product-detail! basket-id product-id))
+  (products/get-state-for-product-detail! basket-id product-id))
 
 
 (defn- insert-product-to-basket!
@@ -92,12 +93,13 @@
   (let [product-id (:product_id (insert-product-to-basket!
                                   basket-id
                                   product-id))]
-    (p/get-state-for-product-detail! basket-id product-id)))
+    (products/get-state-for-product-detail! basket-id product-id)))
 
 
 (defn make-order-state!
   [basket-id]
-  {:basket (get-basket-state! basket-id)})
+  {:basket (get-basket-state! basket-id)
+   :user (users/user-with-basket-id! basket-id)})
 
 
 (defn clear-basket!

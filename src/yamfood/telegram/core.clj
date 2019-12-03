@@ -21,7 +21,7 @@
       inline (:id (:from inline)))))
 
 
-(defn build-ctx
+(defn build-ctx!
   [update]
   {:token token
    :user  (users/user-with-tid! (get-tid-from-update update))})
@@ -42,12 +42,12 @@
       text (d/dispatch! ctx [:text message]))))
 
 
-(defn handle-update
+(defn handle-update!
   [update]
   (let [message (:message update)
         inline-query (:inline_query update)
         callback-query (:callback_query update)
-        ctx (build-ctx update)]
+        ctx (build-ctx! update)]
     (if message
       (process-message ctx update))
     (if inline-query
@@ -59,7 +59,7 @@
 (defn telegram-handler
   [request]
   (try
-    (handle-update (:body request))
+    (handle-update! (:body request))
     (catch Exception e
       (println
         (format

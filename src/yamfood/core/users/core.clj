@@ -10,6 +10,7 @@
             :users.phone
             :users.tid
             :users.location
+            :users.comment
             [:baskets.id :basket_id]]
    :from   [:users :baskets]
    :where  [:= :baskets.user_id :users.id]})
@@ -78,3 +79,7 @@
   (->> (update-location-query user-id lon lat)
        (jdbc/execute! db/db)))
 
+
+(defn update-comment!
+  [user-id comment]
+  (jdbc/update! db/db "users" {:comment comment} ["id = ?" user-id]))

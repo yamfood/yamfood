@@ -28,9 +28,7 @@
 (defn make-order-state
   [ctx update]
   (let [user (:user ctx)]
-    {:core {:function    #(assoc
-                            (baskets/make-order-state! (:basket_id user))
-                            :user user)
+    {:core {:function    #(baskets/make-order-state! (:basket_id user))
             :on-complete #(d/dispatch!
                             ctx
                             [:send-order-detail update %])}}))
@@ -66,10 +64,11 @@
   (format (str "*Детали вашего заказа:* \n\n"
                u/money-emoji " %s сум \n"
                u/payment-emoji " %s \n"
-               u/comment-emoji " Без комментария \n\n"
+               u/comment-emoji " `%s` \n\n"
                u/location-emoji " %s")
           (u/fmt-values (:total_cost (:basket order-state)))
           "Наличными"
+          (:comment (:user order-state))
           "60, 1st Akkurgan Passage, Mirzo Ulugbek district, Tashkent"))
 
 
