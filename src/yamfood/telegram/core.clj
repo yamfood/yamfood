@@ -1,10 +1,9 @@
 (ns yamfood.telegram.core
-  (:require [yamfood.core.users.core :as users]
-            [yamfood.telegram.dispatcher :as d]
-            [yamfood.telegram.events]
+  (:require [yamfood.telegram.events]
             [yamfood.telegram.effects]
-            [morse.api :as t]
-            [environ.core :refer [env]]))
+            [environ.core :refer [env]]
+            [yamfood.core.users.core :as users]
+            [yamfood.telegram.dispatcher :as d]))
 
 
 (def token (env :bot-token))
@@ -67,4 +66,4 @@
           {:update (:body request) :error e}))))
   {:body "OK"})
 
-;(t/set-webhook token "https://5cc9078c.ngrok.io/updates")
+;(morse.api/set-webhook token "https://5cc9078c.ngrok.io/updates")
