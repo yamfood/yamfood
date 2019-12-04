@@ -9,7 +9,7 @@
         text (:text message)
         user-id (:id (:user ctx))]
     {:core     {:function #(users/update-comment! user-id text)}
-     :dispatch {:args [:make-order-state update]}}))
+     :dispatch {:args [:pre-order-state update]}}))
 
 
 (def write-comment-text "Напишите свой комментарий к заказу")

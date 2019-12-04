@@ -1,9 +1,9 @@
 (ns yamfood.telegram.handlers.order
-  (:require [yamfood.telegram.dispatcher :as d]
-            [yamfood.core.users.core :as users]
-            [yamfood.telegram.handlers.utils :as u]
-            [yamfood.core.orders.core :as orders]
-            [yamfood.core.baskets.core :as baskets]))
+  (:require [yamfood.core.users.core :as usr]
+            [yamfood.core.orders.core :as ord]
+            [yamfood.telegram.dispatcher :as d]
+            [yamfood.core.baskets.core :as bsk]
+            [yamfood.telegram.handlers.utils :as u]))
 
 
 (def request-location-markup
@@ -25,10 +25,10 @@
                       :message-id message-id}}))
 
 
-(defn make-order-state
+(defn pre-order-state
   [ctx update]
   (let [user (:user ctx)]
-    {:core {:function    #(baskets/make-order-state! (:basket_id user))
+    {:core {:function    #(bsk/pre-order-state! (:basket_id user))
             :on-complete #(d/dispatch!
                             ctx
                             [:send-order-detail update %])}}))
@@ -42,7 +42,7 @@
         message-id (:message_id (:message query))]
     (into
       (cond
-        (:location user) (make-order-state ctx update)
+        (:location user) (pre-order-state ctx update)
         :else {:send-text {:chat-id chat-id
                            :text    "Куда доставить?"
                            :options request-location-markup}})
@@ -53,7 +53,6 @@
 (def order-confirmation-markup
   {:inline_keyboard
    [[{:text u/location-emoji :callback_data "request-location"}
-     {:text u/payment-emoji :callback_data "change-payment-type"}
      {:text u/comment-emoji :callback_data "change-comment"}]
     [{:text (str u/basket-emoji " Корзина") :callback_data "basket"}]
     [{:text "✅ Подтвердить" :callback_data "create-order"}]]})
@@ -63,28 +62,16 @@
   [order-state]
   (format (str "*Детали вашего заказа:* \n\n"
                u/money-emoji " %s сум \n"
-               u/payment-emoji " %s \n"
                u/comment-emoji " `%s` \n\n"
                u/location-emoji " %s")
           (u/fmt-values (:total_cost (:basket order-state)))
-          "Наличными"
           (:comment (:user order-state))
           "60, 1st Akkurgan Passage, Mirzo Ulugbek district, Tashkent"))
 
 
-(defn get-chat-id-from-update
-  "Use when you don't know input update type"
-  [update]
-  (let [message (:message update)
-        query (:callback_query update)]
-    (cond
-      message (:id (:from message))
-      query (:id (:from query)))))
-
-
 (defn send-order-detail
   [_ update order-state]
-  (let [chat-id (get-chat-id-from-update update)]
+  (let [chat-id (u/chat-id update)]
     {:send-text {:chat-id chat-id
                  :text    (make-order-text order-state)
                  :options {:reply_markup order-confirmation-markup
@@ -99,8 +86,8 @@
     {:send-text {:chat-id chat-id
                  :text    "Локация обновлена"
                  :options {:reply_markup {:remove_keyboard true}}}
-     :core      [(:core (make-order-state ctx update))
-                 {:function #(users/update-location!
+     :core      [(:core (pre-order-state ctx update))
+                 {:function #(usr/update-location!
                                (:id (:user ctx))
                                (:longitude location)
                                (:latitude location))}]}))
@@ -114,13 +101,14 @@
         basket-id (:basket_id (:user ctx))
         location (:location (:user ctx))
         comment "test"]
-    {:core            {:function #(orders/create-order-and-clear-basket!
+    {:core            {:function #(ord/create-order-and-clear-basket!
                                     basket-id
                                     location
                                     comment)}
      :answer-callback {:callback_query_id (:id query)
                        :text              "Ваш заказ успешно создан! Мы будем держать вас в курсе его статуса."
                        :show_alert        true}
+     :dispatch        {:args [:order-status update]}
      :delete-message  {:chat-id    chat-id
                        :message-id message-id}}))
 
@@ -141,9 +129,45 @@
     {:send-text      {:chat-id chat-id
                       :text    write-comment-text
                       :options {:reply_markup {:force_reply true}}}
-     :delete-message {:chat-id chat-id
+     :delete-message {:chat-id    chat-id
                       :message-id message-id}}))
 
+
+(defn order-products-text
+  [products]
+  (doall
+    (map
+      #(format (str u/food-emoji " %d x %s\n") (:count %) (:name %))
+      products)))
+
+
+(defn order-status-text
+  [order]
+  (format (str "*Заказ №1334:*\n\n"
+               (apply str (order-products-text (:products order)))
+               "\n"
+               u/money-emoji " 53 200 сум (Не оплачено)\n\n"
+               "Ожидает подтверждения оператором")))
+
+
+(defn order-reply-markup
+  [order]
+  {:inline_keyboard [[{:text "Оплатить картой" :callback_data "nothing"}]]})
+
+
+(defn order-status
+  ([ctx update]
+   (order-status ctx update nil))
+  ([ctx update order]
+   (let [user (:user ctx)
+         chat-id (u/chat-id update)]
+     (cond
+       (= order nil) {:core {:function    #(ord/user-active-order! (:id user))
+                             :on-complete #(d/dispatch! ctx [:order-status update %])}}
+       :else {:send-text {:chat-id chat-id
+                          :text    (order-status-text order)
+                          :options {:parse_mode   "markdown"
+                                    :reply_markup (order-reply-markup order)}}}))))
 
 
 (d/register-event-handler!
@@ -152,8 +176,8 @@
 
 
 (d/register-event-handler!
-  :make-order-state
-  make-order-state)
+  :pre-order-state
+  pre-order-state)
 
 
 (d/register-event-handler!
@@ -179,3 +203,8 @@
 (d/register-event-handler!
   :change-comment
   handle-change-comment)
+
+
+(d/register-event-handler!
+  :order-status
+  order-status)

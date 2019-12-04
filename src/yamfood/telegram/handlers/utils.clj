@@ -59,3 +59,14 @@
 (defn get-callback-params
   [callback-data]
   (drop 1 (str/split callback-data #"/")))
+
+
+(defn chat-id
+  "Use when you don't know input update type"
+  [update]
+  (let [message (:message update)
+        query (:callback_query update)]
+    (cond
+      message (:id (:from message))
+      query (:id (:from query)))))
+

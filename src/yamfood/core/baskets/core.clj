@@ -96,7 +96,7 @@
     (products/get-state-for-product-detail! basket-id product-id)))
 
 
-(defn make-order-state!
+(defn pre-order-state!
   [basket-id]
   {:basket (get-basket-state! basket-id)
    :user (users/user-with-basket-id! basket-id)})

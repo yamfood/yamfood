@@ -64,4 +64,6 @@
           {:update (:body request) :error e}))))
   {:body "OK"})
 
-;(morse.api/set-webhook token "https://5cc9078c.ngrok.io/updates")
+;(morse.api/set-webhook (env :bot-token) "https://d4d815c9.ngrok.io/updates")
+(def upd {:update_id 435323018, :callback_query {:id "340271655783135633", :from {:id 79225668, :is_bot false, :first_name "Рустам", :last_name "Бабаджанов", :username "kensay", :language_code "ru"}, :message {:message_id 10091, :from {:id 488312680, :is_bot true, :first_name "Kensay", :username "kensaybot"}, :chat {:id 79225668, :first_name "Рустам", :last_name "Бабаджанов", :username "kensay", :type "private"}, :date 1575467316, :text "Детали вашего заказа: \n\n💰 64 600 сум \n💬 Побольше чего нибудь \n\n📍 60, 1st Akkurgan Passage, Mirzo Ulugbek district, Tashkent", :entities [{:offset 0, :length 21, :type "bold"} {:offset 42, :length 20, :type "code"}], :reply_markup {:inline_keyboard [[{:text "📍", :callback_data "request-location"} {:text "💬", :callback_data "change-comment"}] [{:text "🧺 Корзина", :callback_data "basket"}] [{:text "✅ Подтвердить", :callback_data "create-order"}]]}}, :chat_instance "4402156230761928760", :data "create-order"}})
+(d/dispatch! (build-ctx! upd) [:order-status upd])

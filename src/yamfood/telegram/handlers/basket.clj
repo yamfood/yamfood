@@ -87,7 +87,11 @@
 
 (defn basket-product-markup
   [val product]
-  (apply conj val [[{:text (format (str u/food-emoji " %s x %d") (:name product) (:count product)) :callback_data "nothing"}]
+  (apply conj val [[{:callback_data "nothing"
+                     :text          (format (str u/food-emoji " %d x %s")
+                                            (:count product)
+                                            (:name product))}]
+
                    (u/basket-product-controls
                      "basket"
                      (:id product)

@@ -19,8 +19,7 @@
 (defn location->clj
   [user]
   (let [point (:location user)]
-    (assoc user :location {:longitude (.x point)
-                           :latitude  (.y point)})))
+    (assoc user :location (db/point->clj point))))
 
 
 (defn user-with-tid-query

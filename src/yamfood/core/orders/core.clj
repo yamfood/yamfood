@@ -3,7 +3,8 @@
             [honeysql.core :as hs]
             [yamfood.core.db.core :as db]
             [yamfood.core.users.core :as users]
-            [yamfood.core.baskets.core :as b]))
+            [yamfood.core.baskets.core :as b]
+            [honeysql.helpers :as hh]))
 
 
 (defn- products-from-basket-query
@@ -11,6 +12,65 @@
   (hs/format {:select [:product_id :count]
               :from   [:basket_products]
               :where  [:= :basket_id basket-id]}))
+
+
+(def order-detail-query
+  {:select [:orders.id
+            :orders.location
+            :orders.comment]
+   :from [:orders]
+   :order-by [:id]})
+
+
+(def order-products-query
+  {:select [:products.name
+            :order_products.count]
+   :from [:order_products :products]
+   :where [:= :order_products.product_id :products.id]})
+
+
+(defn products-by-order-id-query
+  [order-id]
+  (hs/format (hh/merge-where
+               order-products-query
+               [:= :order_products.order_id order-id])))
+
+
+(defn products-by-order-id!
+  [order-id]
+  (->> (products-by-order-id-query order-id)
+       (jdbc/query db/db)))
+
+
+(defn orders-by-user-id-query
+  [user-id]
+  (hs/format (hh/merge-where order-detail-query [:= :orders.user_id user-id])))
+
+
+(defn fmt-order-location
+  [order]
+  (assoc order
+    :location
+    (db/point->clj (:location order))))
+
+
+(defn orders-by-user-id!
+  [user-id]
+  (->> (orders-by-user-id-query user-id)
+       (jdbc/query db/db)
+       (map fmt-order-location)))
+
+
+(defn add-products
+  [order]
+  (assoc order :products (products-by-order-id! (:id order))))
+
+
+(defn user-active-order!
+  [user-id]
+  (-> (orders-by-user-id! user-id)
+      (last)
+      (add-products)))
 
 
 (defn products-from-basket!
