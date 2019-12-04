@@ -42,10 +42,12 @@
 
 (defn user-with-tid!
   [tid]                                                     ; TODO: CACHE!
-  (->> (user-with-tid-query tid)
-       (jdbc/query db/db)
-       (first)
-       (location->clj)))
+  (let [user (->> (user-with-tid-query tid)
+                  (jdbc/query db/db)
+                  (first))]
+    (if user
+        (location->clj user)
+        nil)))
 
 
 (defn insert-user!
