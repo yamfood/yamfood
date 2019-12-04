@@ -24,10 +24,10 @@
   (https://core.telegram.org/bots/api#editmessagereplymarkup)"
   ([token provider-token
     chat-id title description
-    payload currency prices]
+    payload currency prices options]
    (send-invoice token provider-token "test"
                  chat-id title description
-                 payload currency prices {}))
+                 payload currency prices options))
   ([token provider-token
     start_parameter chat-id
     title description payload

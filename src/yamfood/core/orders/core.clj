@@ -24,6 +24,7 @@
 
 (def order-products-query
   {:select [:products.name
+            :products.price
             :order_products.count]
    :from [:order_products :products]
    :where [:= :order_products.product_id :products.id]})

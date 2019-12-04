@@ -21,7 +21,9 @@
       (= action "request-location") (d/dispatch! ctx [:request-location update])
       (= action "change-payment-type") (d/dispatch! ctx [:change-payment-type update])
       (= action "change-comment") (d/dispatch! ctx [:change-comment update])
-      (= action "create-order") (d/dispatch! ctx [:create-order update]))))
+      (= action "create-order") (d/dispatch! ctx [:create-order update])
+      (= action "invoice") (d/dispatch! ctx [:send-invoice update])
+      (= action "cancel-invoice") (d/dispatch! ctx [:cancel-invoice update]))))
 
 
 (d/register-event-handler!

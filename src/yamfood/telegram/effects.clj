@@ -79,3 +79,18 @@
       (:chat_id effect)
       (:message_id effect)
       (:reply_markup effect))))
+
+
+(d/register-effect-handler!
+  :send-invoice
+  (fn [ctx effect]
+    (-t/send-invoice
+      (:token ctx)
+      (:payments-token ctx)
+      (:chat-id effect)
+      (:title effect)
+      (:description effect)
+      (:payload effect)
+      (:currency effect)
+      (:prices effect)
+      (:options effect))))

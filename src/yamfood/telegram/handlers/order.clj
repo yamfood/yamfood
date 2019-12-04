@@ -152,7 +152,18 @@
 
 (defn order-reply-markup
   [order]
-  {:inline_keyboard [[{:text "Оплатить картой" :callback_data "nothing"}]]})
+  {:inline_keyboard [[{:text "Оплатить картой" :callback_data (str "invoice/" (:id order))}]]})
+
+
+(defn product-price
+  [product]
+  {:label  (format "%d x %s" (:count product) (:name product))
+   :amount (* (:price product) 100)})
+
+
+(defn order-prices
+  [order]
+  (map product-price (:products order)))
 
 
 (defn order-status
@@ -168,6 +179,48 @@
                           :text    (order-status-text order)
                           :options {:parse_mode   "markdown"
                                     :reply_markup (order-reply-markup order)}}}))))
+
+
+(defn invoice-description
+  [order]
+  (format (str (apply str (order-products-text (:products order))))))
+
+
+(defn invoice-reply-markup
+  []
+  {:inline_keyboard [[{:text "Оплатить" :pay true}]
+                     [{:text "Отмена" :callback_data "cancel-invoice"}]]})
+
+
+(defn send-invoice
+  ([ctx update]
+   (send-invoice ctx update nil))
+  ([ctx update order]
+   (let [user (:user ctx)
+         chat-id (u/chat-id update)
+         message-id (:message_id (:message (:callback_query update)))]
+     (cond
+       (= order nil) {:core {:function    #(ord/user-active-order! (:id user))
+                             :on-complete #(d/dispatch! ctx [:send-invoice update %])}}
+       :else {:send-invoice   {:chat-id     chat-id
+                               :title       (str "Оплатить заказ №" (:id order))
+                               :description (invoice-description order)
+                               :payload     {}
+                               :currency    "UZS"
+                               :prices      (order-prices order)
+                               :options     {:reply_markup (invoice-reply-markup)}}
+              :delete-message {:chat-id    chat-id
+                               :message-id message-id}}))))
+
+
+(defn cancel-invoice
+  [_ update]
+  (let [query (:callback_query update)
+        chat-id (:id (:from query))
+        message-id (:message_id (:message query))]
+    {:dispatch       {:args [:order-status update]}
+     :delete-message {:chat-id    chat-id
+                      :message-id message-id}}))
 
 
 (d/register-event-handler!
@@ -208,3 +261,14 @@
 (d/register-event-handler!
   :order-status
   order-status)
+
+
+(d/register-event-handler!
+  :send-invoice
+  send-invoice)
+
+
+(d/register-event-handler!
+  :cancel-invoice
+  cancel-invoice)
+
