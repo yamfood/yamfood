@@ -19,7 +19,9 @@
 (defn location->clj
   [user]
   (let [point (:location user)]
-    (assoc user :location (db/point->clj point))))
+    (if point
+      (assoc user :location (db/point->clj point))
+      user)))
 
 
 (defn user-with-tid-query
@@ -48,6 +50,9 @@
     (if user
         (location->clj user)
         nil)))
+
+
+(user-with-tid! 79225668)
 
 
 (defn insert-user!
