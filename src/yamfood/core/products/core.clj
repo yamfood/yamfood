@@ -41,29 +41,29 @@
    :limit     1})
 
 
-(defn- get-product-by-name-query
+(defn- product-by-name-query
   [basket-id name]
   (-> (product-detail-state-query basket-id)
       (hh/merge-where [:= :products.name name])
       (hs/format)))
 
 
-(defn- get-product-detail-state-by-id-query
+(defn- product-detail-state-by-id-query
   [basket-id product-id]
   (-> (product-detail-state-query basket-id)
       (hh/merge-where [:= :products.id product-id])
       (hs/format)))
 
 
-(defn get-product-by-name!
+(defn product-by-name!
   [basket-id name]
-  (->> (get-product-by-name-query basket-id name)
+  (->> (product-by-name-query basket-id name)
        (jdbc/query db/db)
        (first)))
 
 
-(defn get-state-for-product-detail!
+(defn state-for-product-detail!
   [basket-id id]
-  (->> (get-product-detail-state-by-id-query basket-id id)
+  (->> (product-detail-state-by-id-query basket-id id)
        (jdbc/query db/db)
        (first)))

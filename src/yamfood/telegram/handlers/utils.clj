@@ -51,12 +51,12 @@
       (product-in-basket-markup state-for-detail))))
 
 
-(defn get-callback-action
+(defn callback-action
   [callback-data]
   (first (str/split callback-data #"/")))
 
 
-(defn get-callback-params
+(defn callback-params
   [callback-data]
   (drop 1 (str/split callback-data #"/")))
 

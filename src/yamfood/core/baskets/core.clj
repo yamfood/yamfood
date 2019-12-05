@@ -7,7 +7,7 @@
     [yamfood.core.products.core :as products]))
 
 
-(defn- get-basket-products-query
+(defn- basket-products-query
   [basket-id]
   (hs/format {:select   [:products.id
                          :basket_products.count
@@ -21,7 +21,7 @@
               :order-by [:id]}))
 
 
-(defn- get-basket-totals-query
+(defn- basket-totals-query
   [basket-id]
   (format "
     select
@@ -32,23 +32,23 @@
           products.id = basket_products.product_id", basket-id))
 
 
-(defn- get-basket-products!
+(defn- basket-products!
   [basket-id]
-  (->> (get-basket-products-query basket-id)
+  (->> (basket-products-query basket-id)
        (jdbc/query db/db)))
 
 
-(defn get-basket-totals!
+(defn basket-totals!
   [basket-id]
-  (->> (get-basket-totals-query basket-id)
+  (->> (basket-totals-query basket-id)
        (jdbc/query db/db)
        (first)))
 
 
-(defn get-basket-state!
+(defn basket-state!
   [basket-id]
-  (let [basket (get-basket-totals! basket-id)]
-    (assoc basket :products (get-basket-products! basket-id))))
+  (let [basket (basket-totals! basket-id)]
+    (assoc basket :products (basket-products! basket-id))))
 
 
 (defn increment-product-query
@@ -73,14 +73,14 @@
   [basket-id product-id]
   (->> (increment-product-query basket-id product-id)
        (jdbc/execute! db/db))
-  (products/get-state-for-product-detail! basket-id product-id))
+  (products/state-for-product-detail! basket-id product-id))
 
 
 (defn decrement-product-in-basket!
   [basket-id product-id]
   (->> (decrement-product-query basket-id product-id)
        (jdbc/execute! db/db))
-  (products/get-state-for-product-detail! basket-id product-id))
+  (products/state-for-product-detail! basket-id product-id))
 
 
 (defn- insert-product-to-basket!
@@ -96,12 +96,12 @@
   (let [product-id (:product_id (insert-product-to-basket!
                                   basket-id
                                   product-id))]
-    (products/get-state-for-product-detail! basket-id product-id)))
+    (products/state-for-product-detail! basket-id product-id)))
 
 
 (defn pre-order-state!
   [basket-id]
-  {:basket (get-basket-state! basket-id)
+  {:basket (basket-state! basket-id)
    :user   (users/user-with-basket-id! basket-id)})
 
 

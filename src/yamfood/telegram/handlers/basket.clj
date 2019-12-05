@@ -5,25 +5,25 @@
     [yamfood.telegram.handlers.utils :as u]))
 
 
-(defn handle-want
+(defn want-handler
   [ctx update]
   (let [query (:callback_query update)
         user (:user ctx)
         callback-data (:data query)
-        callback-params (u/get-callback-params callback-data)
+        callback-params (u/callback-params callback-data)
         product-id (Integer. (first callback-params))]
     {:core            {:function    #(baskets/add-product-to-basket! (:basket_id user) product-id)
                        :on-complete #(d/dispatch! ctx [:update-markup update %])}
      :answer-callback {:callback_query_id (:id query)
                        :text              "Добавлено в корзину"}}))
 
-(defn handle-detail-inc
+(defn detail-inc-handler
   [ctx update]
   (let [callback-query (:callback_query update)
         callback-data (:data callback-query)
         basket-id (:basket_id (:user ctx))
         product-id (Integer.
-                     (first (u/get-callback-params callback-data)))]
+                     (first (u/callback-params callback-data)))]
     {:core            {:function    #(baskets/increment-product-in-basket!
                                        basket-id
                                        product-id)
@@ -31,13 +31,13 @@
      :answer-callback {:callback_query_id (:id callback-query)}}))
 
 
-(defn handle-detail-dec
+(defn detail-dec-handler
   [ctx update]
   (let [callback-query (:callback_query update)
         callback-data (:data callback-query)
         basket-id (:basket_id (:user ctx))
         product-id (Integer.
-                     (first (u/get-callback-params callback-data)))]
+                     (first (u/callback-params callback-data)))]
     {:core            {:function    #(baskets/decrement-product-in-basket!
                                        basket-id
                                        product-id)
@@ -45,37 +45,37 @@
      :answer-callback {:callback_query_id (:id callback-query)}}))
 
 
-(defn handle-basket-inc
+(defn basket-inc-handler
   [ctx update]
   (let [callback-query (:callback_query update)
         callback-data (:data callback-query)
         basket-id (:basket_id (:user ctx))
         product-id (Integer.
-                     (first (u/get-callback-params callback-data)))]
+                     (first (u/callback-params callback-data)))]
     {:core            [{:function #(baskets/increment-product-in-basket!
                                      basket-id
                                      product-id)}
-                       {:function    #(baskets/get-basket-state! basket-id)
+                       {:function    #(baskets/basket-state! basket-id)
                         :on-complete #(d/dispatch! ctx [:update-basket-markup update %])}]
      :answer-callback {:callback_query_id (:id callback-query)}}))
 
 
-(defn handle-basket-dec
+(defn basket-dec-handler
   [ctx update]
   (let [callback-query (:callback_query update)
         callback-data (:data callback-query)
         basket-id (:basket_id (:user ctx))
         product-id (Integer.
-                     (first (u/get-callback-params callback-data)))]
+                     (first (u/callback-params callback-data)))]
     {:core            [{:function #(baskets/decrement-product-in-basket!
                                      basket-id
                                      product-id)}
-                       {:function    #(baskets/get-basket-state! basket-id)
+                       {:function    #(baskets/basket-state! basket-id)
                         :on-complete #(d/dispatch! ctx [:update-basket-markup update %])}]
      :answer-callback {:callback_query_id (:id callback-query)}}))
 
 
-(defn update-markup
+(defn update-detail-markup
   [_ update product]
   (let [query (:callback_query update)]
     {:edit-reply-markup {:chat_id      (:id (:from query))
@@ -83,9 +83,9 @@
                          :reply_markup (u/product-detail-markup product)}}))
 
 
-(defn handle-basket
+(defn basket-handler
   [ctx update]
-  {:core {:function    #(baskets/get-basket-state! (:basket_id (:user ctx)))
+  {:core {:function    #(baskets/basket-state! (:basket_id (:user ctx)))
           :on-complete #(d/dispatch! ctx [:send-basket update %])}})
 
 
@@ -148,37 +148,37 @@
 
 (d/register-event-handler!
   :detail-want
-  handle-want)
+  want-handler)
 
 
 (d/register-event-handler!
   :detail-inc
-  handle-detail-inc)
+  detail-inc-handler)
 
 
 (d/register-event-handler!
   :detail-dec
-  handle-detail-dec)
+  detail-dec-handler)
 
 
 (d/register-event-handler!
   :basket
-  handle-basket)
+  basket-handler)
 
 
 (d/register-event-handler!
   :inc-basket-product
-  handle-basket-inc)
+  basket-inc-handler)
 
 
 (d/register-event-handler!
   :dec-basket-product
-  handle-basket-dec)
+  basket-dec-handler)
 
 
 (d/register-event-handler!
   :update-markup
-  update-markup)
+  update-detail-markup)
 
 
 (d/register-event-handler!

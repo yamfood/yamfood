@@ -40,7 +40,7 @@
   (bigdec (re-find #"\d+" s)))
 
 
-(defn handle-contact
+(defn contact-handler
   [_ update]
   (let [message (:message update)
         contact (:contact message)
@@ -53,7 +53,7 @@
                  (:send-text (menu-message message))]}))
 
 
-(defn handle-start
+(defn start-handler
   [ctx update]
   (let [message (:message update)]
     (if (:user ctx)
@@ -63,10 +63,10 @@
 
 (d/register-event-handler!
   :start
-  handle-start)
+  start-handler)
 
 
 (d/register-event-handler!
   :contact
-  handle-contact)
+  contact-handler)
 

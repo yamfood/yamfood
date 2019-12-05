@@ -7,11 +7,10 @@
     [yamfood.telegram.handlers.utils :as u]))
 
 
-(def request-location-markup
-  {:reply_markup
-   {:resize_keyboard true
-    :keyboard        [[{:text             "Отправить текущее положение"
-                        :request_location true}]]}})
+(def markup-for-request-location
+  {:resize_keyboard true
+   :keyboard        [[{:text             "Отправить текущее положение"
+                       :request_location true}]]})
 
 
 (defn request-location
@@ -21,7 +20,7 @@
         message-id (:message_id (:message query))]
     {:send-text      {:chat-id chat-id
                       :text    "Куда доставить?"
-                      :options request-location-markup}
+                      :options {:reply_markup markup-for-request-location}}
      :delete-message {:chat-id    chat-id
                       :message-id message-id}}))
 
@@ -35,7 +34,7 @@
                             [:send-order-detail update %])}}))
 
 
-(defn handle-to-order
+(defn to-order-handler
   [ctx update]
   (let [query (:callback_query update)
         chat-id (:id (:from query))
@@ -46,7 +45,7 @@
         (:location user) (pre-order-state ctx update)
         :else {:send-text {:chat-id chat-id
                            :text    "Куда доставить?"
-                           :options request-location-markup}})
+                           :options markup-for-request-location}})
       {:delete-message {:chat-id    chat-id
                         :message-id message-id}})))
 
@@ -59,7 +58,7 @@
     [{:text "✅ Подтвердить" :callback_data "create-order"}]]})
 
 
-(defn make-order-text
+(defn pre-order-text
   [order-state]
   (format (str "*Детали вашего заказа:* \n\n"
                u/money-emoji " %s сум \n"
@@ -70,16 +69,16 @@
           "60, 1st Akkurgan Passage, Mirzo Ulugbek district, Tashkent"))
 
 
-(defn send-order-detail
+(defn order-detail-handler
   [_ update order-state]
   (let [chat-id (u/chat-id update)]
     {:send-text {:chat-id chat-id
-                 :text    (make-order-text order-state)
+                 :text    (pre-order-text order-state)
                  :options {:reply_markup order-confirmation-markup
                            :parse_mode   "markdown"}}}))
 
 
-(defn handle-location
+(defn location-handler
   [ctx update]
   (let [message (:message update)
         chat-id (:id (:from message))
@@ -94,7 +93,7 @@
                                (:latitude location))}]}))
 
 
-(defn handle-create-order
+(defn create-order-handler
   [ctx update]
   (let [query (:callback_query update)
         chat-id (:id (:from query))
@@ -114,15 +113,8 @@
                        :message-id message-id}}))
 
 
-(defn handle-change-payment-type
-  [_ update]
-  {:answer-callback {:callback_query_id (:id (:callback_query update))
-                     :text              "К сожалению, на данный момент мы принимает оплату только наличными :("
-                     :show_alert        true}})
-
-
 (def write-comment-text "Напишите свой комментарий к заказу")
-(defn handle-change-comment
+(defn change-comment-handler
   [_ update]
   (let [query (:callback_query update)
         chat-id (:id (:from query))
@@ -187,7 +179,7 @@
   (format (str (apply str (order-products-text (:products order))))))
 
 
-(defn invoice-reply-markup []
+(def invoice-reply-markup
   {:inline_keyboard [[{:text "Оплатить" :pay true}]
                      [{:text "Отмена" :callback_data "cancel-invoice"}]]})
 
@@ -208,12 +200,12 @@
                                :payload     {}
                                :currency    "UZS"
                                :prices      (order-prices order)
-                               :options     {:reply_markup (invoice-reply-markup)}}
+                               :options     {:reply_markup invoice-reply-markup}}
               :delete-message {:chat-id    chat-id
                                :message-id message-id}}))))
 
 
-(defn cancel-invoice
+(defn cancel-invoice-handler
   [_ update]
   (let [query (:callback_query update)
         chat-id (:id (:from query))
@@ -225,12 +217,12 @@
 
 (d/register-event-handler!
   :to-order
-  handle-to-order)
+  to-order-handler)
 
 
 (d/register-event-handler!
   :location
-  handle-location)
+  location-handler)
 
 
 (d/register-event-handler!
@@ -245,22 +237,17 @@
 
 (d/register-event-handler!
   :send-order-detail
-  send-order-detail)
+  order-detail-handler)
 
 
 (d/register-event-handler!
   :create-order
-  handle-create-order)
-
-
-(d/register-event-handler!
-  :change-payment-type
-  handle-change-payment-type)
+  create-order-handler)
 
 
 (d/register-event-handler!
   :change-comment
-  handle-change-comment)
+  change-comment-handler)
 
 
 (d/register-event-handler!
@@ -275,5 +262,5 @@
 
 (d/register-event-handler!
   :cancel-invoice
-  cancel-invoice)
+  cancel-invoice-handler)
 

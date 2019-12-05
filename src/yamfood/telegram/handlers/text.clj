@@ -6,7 +6,7 @@
     [yamfood.core.products.core :as products]))
 
 
-(defn get-product-caption
+(defn product-caption
   [product]
   (format (str u/food-emoji " *%s* \n\n"
                u/money-emoji "%s сум  " u/energy-emoji "%s кКал")
@@ -15,29 +15,29 @@
           (u/fmt-values (:energy product))))
 
 
-(defn get-product-detail-options
+(defn product-detail-options
   [product]
-  {:caption      (get-product-caption product)
+  {:caption      (product-caption product)
    :parse_mode   "markdown"
    :reply_markup (json/write-str (u/product-detail-markup product))})
 
 
-(defn handle-text
+(defn text-handler
   [ctx message]
-  {:core {:function    #(products/get-product-by-name!
+  {:core {:function    #(products/product-by-name!
                           (:basket_id (:user ctx))
                           (:text message))
           :on-complete #(d/dispatch! ctx [:product-done message %])}})
 
 
-(defn react-to-text
+(defn product-done-handler
   [_ message product]
   (let [chat (:chat message)
         chat-id (:id chat)]
     (if product
       {:send-photo
        {:chat-id chat-id
-        :options (get-product-detail-options product)
+        :options (product-detail-options product)
         :photo   (:photo product)}}
 
       {:send-text
@@ -47,11 +47,11 @@
 
 (d/register-event-handler!
   :product-done
-  react-to-text)
+  product-done-handler)
 
 
 (d/register-event-handler!
   :text
-  handle-text)
+  text-handler)
 
 

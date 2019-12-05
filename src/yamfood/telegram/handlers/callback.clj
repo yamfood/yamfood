@@ -4,10 +4,10 @@
     [yamfood.telegram.handlers.utils :as u]))
 
 
-(defn handle-callback
+(defn callback-handler
   [_ update]
   (let [query (:callback_query update)
-        action (u/get-callback-action (:data query))]
+        action (u/callback-action (:data query))]
     (case action
       "want" {:dispatch {:args [:detail-want update]}}
       "detail+" {:dispatch {:args [:detail-inc update]}}
@@ -26,4 +26,4 @@
 
 (d/register-event-handler!
   :callback
-  handle-callback)
+  callback-handler)

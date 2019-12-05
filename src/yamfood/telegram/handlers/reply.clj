@@ -1,10 +1,10 @@
 (ns yamfood.telegram.handlers.reply
   (:require
-    [yamfood.telegram.dispatcher :as d]
-    [yamfood.core.users.core :as users]))
+    [yamfood.core.users.core :as users]
+    [yamfood.telegram.dispatcher :as d]))
 
 
-(defn handle-comment
+(defn comment-handler
   [ctx update]
   (let [message (:message update)
         text (:text message)
@@ -14,17 +14,17 @@
 
 
 (def write-comment-text "Напишите свой комментарий к заказу")
-(defn handle-message-with-reply
+(defn message-with-reply-handler
   [ctx update]
   (println update)
   (let [message (:message update)
         reply_message (:reply_to_message message)
         reply_text (:text reply_message)]
     (cond
-      (= reply_text write-comment-text) (handle-comment ctx update)
+      (= reply_text write-comment-text) (comment-handler ctx update)
       :else (println "Can't find handler"))))
 
 
 (d/register-event-handler!
   :reply
-  handle-message-with-reply)
+  message-with-reply-handler)

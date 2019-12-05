@@ -7,7 +7,7 @@
     [yamfood.telegram.dispatcher :as d]))
 
 
-(defn get-tid-from-update                                   ; TODO: Make it work with all updates!
+(defn tid-from-update                                   ; TODO: Make it work with all updates!
   [update]
   (let [message (:message update)
         callback (:callback_query update)
@@ -23,7 +23,7 @@
   {:token          (env :bot-token)
    :payments-token (env :payments-token)
    :user           (users/user-with-tid!
-                     (get-tid-from-update update))})
+                     (tid-from-update update))})
 
 
 (defn process-message
@@ -41,7 +41,7 @@
       text (d/dispatch! ctx [:text message]))))
 
 
-(defn handle-update!
+(defn update-handler!
   [update]
   (let [message (:message update)
         inline-query (:inline_query update)
@@ -55,10 +55,10 @@
       (d/dispatch! ctx [:callback update]))))
 
 
-(defn telegram-handler
+(defn telegram-handler!
   [request]
   (try
-    (handle-update! (:body request))
+    (update-handler! (:body request))
     (catch Exception e
       (println
         (format
