@@ -6,9 +6,7 @@
                  [org.clojure/data.json "0.2.6"]
 
                  [ring "1.7.1"]
-                 [ring/ring-defaults "0.3.2"]
                  [ring/ring-json "0.5.0"]
-                 [ring-logger "1.0.1"]
                  [compojure "1.6.1"]
 
                  [environ "1.1.0"]
@@ -16,7 +14,6 @@
                  [morse "0.4.3"]
 
                  [migratus "1.2.4"]
-                 [clj-postgresql "0.7.0"]
                  [org.clojure/java.jdbc "0.7.10"]
                  [honeysql "0.9.6"]]
   :uberjar-name "yamfood.jar"
