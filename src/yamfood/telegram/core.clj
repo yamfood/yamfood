@@ -3,9 +3,7 @@
             [yamfood.telegram.effects]
             [environ.core :refer [env]]
             [yamfood.core.users.core :as users]
-            [yamfood.telegram.dispatcher :as d]
-            [yamfood.core.orders.core :as ord]
-            [yamfood.telegram.handlers.order :as order]))
+            [yamfood.telegram.dispatcher :as d]))
 
 
 (defn get-tid-from-update                                   ; TODO: Make it work with all updates!
@@ -23,7 +21,8 @@
   [update]
   {:token          (env :bot-token)
    :payments-token (env :payments-token)
-   :user           (users/user-with-tid! (get-tid-from-update update))})
+   :user           (users/user-with-tid!
+                     (get-tid-from-update update))})
 
 
 (defn process-message
