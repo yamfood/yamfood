@@ -1,9 +1,10 @@
 (ns yamfood.telegram.handlers.order
-  (:require [yamfood.core.users.core :as usr]
-            [yamfood.core.orders.core :as ord]
-            [yamfood.telegram.dispatcher :as d]
-            [yamfood.core.baskets.core :as bsk]
-            [yamfood.telegram.handlers.utils :as u]))
+  (:require
+    [yamfood.core.users.core :as usr]
+    [yamfood.core.orders.core :as ord]
+    [yamfood.telegram.dispatcher :as d]
+    [yamfood.core.baskets.core :as bsk]
+    [yamfood.telegram.handlers.utils :as u]))
 
 
 (def request-location-markup
@@ -186,8 +187,7 @@
   (format (str (apply str (order-products-text (:products order))))))
 
 
-(defn invoice-reply-markup
-  []
+(defn invoice-reply-markup []
   {:inline_keyboard [[{:text "Оплатить" :pay true}]
                      [{:text "Отмена" :callback_data "cancel-invoice"}]]})
 

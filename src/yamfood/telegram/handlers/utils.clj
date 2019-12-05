@@ -1,9 +1,9 @@
 (ns yamfood.telegram.handlers.utils
-  (:require [clojure.string :as str]))
+  (:require
+    [clojure.string :as str]))
 
 
 (def location-emoji "\uD83D\uDCCD")
-(def payment-emoji "\uD83D\uDCB5")
 (def money-emoji "\uD83D\uDCB0")
 (def comment-emoji "\uD83D\uDCAC")
 (def basket-emoji "\uD83E\uDDFA")

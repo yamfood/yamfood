@@ -1,9 +1,9 @@
 (ns yamfood.telegram.handlers.inline
-  (:require [morse.api :as t]
-            [environ.core :refer [env]]
-            [yamfood.core.products.core :as p]
-            [yamfood.telegram.dispatcher :as d]
-            [yamfood.telegram.handlers.utils :as u]))
+  (:require
+    [environ.core :refer [env]]
+    [yamfood.core.products.core :as p]
+    [yamfood.telegram.dispatcher :as d]
+    [yamfood.telegram.handlers.utils :as u]))
 
 
 (defn get-product-description

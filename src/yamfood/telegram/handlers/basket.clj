@@ -1,7 +1,8 @@
 (ns yamfood.telegram.handlers.basket
-  (:require [yamfood.telegram.handlers.utils :as u]
-            [yamfood.core.baskets.core :as baskets]
-            [yamfood.telegram.dispatcher :as d]))
+  (:require
+    [yamfood.telegram.dispatcher :as d]
+    [yamfood.core.baskets.core :as baskets]
+    [yamfood.telegram.handlers.utils :as u]))
 
 
 (defn handle-want
@@ -73,6 +74,7 @@
                         :on-complete #(d/dispatch! ctx [:update-basket-markup update %])}]
      :answer-callback {:callback_query_id (:id callback-query)}}))
 
+
 (defn update-markup
   [_ update product]
   (let [query (:callback_query update)]
@@ -134,7 +136,6 @@
                       :options {:reply_markup (basket-detail-markup basket-state)}}
      :delete-message {:chat-id    chat-id
                       :message-id message-id}}))
-
 
 
 (defn update-basket-markup

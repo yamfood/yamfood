@@ -1,9 +1,10 @@
 (ns yamfood.telegram.core
-  (:require [yamfood.telegram.events]
-            [yamfood.telegram.effects]
-            [environ.core :refer [env]]
-            [yamfood.core.users.core :as users]
-            [yamfood.telegram.dispatcher :as d]))
+  (:require
+    [yamfood.telegram.events]
+    [yamfood.telegram.effects]
+    [environ.core :refer [env]]
+    [yamfood.core.users.core :as users]
+    [yamfood.telegram.dispatcher :as d]))
 
 
 (defn get-tid-from-update                                   ; TODO: Make it work with all updates!

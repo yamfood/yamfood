@@ -1,6 +1,7 @@
 (ns yamfood.telegram.handlers.reply
-  (:require [yamfood.telegram.dispatcher :as d]
-            [yamfood.core.users.core :as users]))
+  (:require
+    [yamfood.telegram.dispatcher :as d]
+    [yamfood.core.users.core :as users]))
 
 
 (defn handle-comment

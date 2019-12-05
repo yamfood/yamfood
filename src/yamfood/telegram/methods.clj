@@ -1,6 +1,7 @@
 (ns yamfood.telegram.methods
-  (:require [clj-http.client :as http]
-            [environ.core :refer [env]]))
+  (:require
+    [clj-http.client :as http]
+    [environ.core :refer [env]]))
 
 
 (def base-url "https://api.telegram.org/bot")
@@ -46,18 +47,3 @@
                               :as           :json
                               :form-params  query})]
      (-> resp :body))))
-
-
-;(try
-;  (send-invoice
-;    "987870891:AAFa3fERJBlQcdagHX3U8lcgvcpV22YO8oY"
-;    "371317599:TEST:79225668"
-;    57248115
-;    "test"
-;    "test"
-;    {:test "test"}
-;    "UZS"
-;    [{:label "Сумма" :amount 50000}])
-;  (catch Exception e
-;    (println e)))
-

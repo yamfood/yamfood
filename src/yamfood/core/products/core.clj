@@ -1,8 +1,9 @@
 (ns yamfood.core.products.core
-  (:require [yamfood.core.db.core :as db]
-            [honeysql.core :as hs]
-            [honeysql.helpers :as hh]
-            [clojure.java.jdbc :as jdbc]))
+  (:require
+    [honeysql.core :as hs]
+    [honeysql.helpers :as hh]
+    [clojure.java.jdbc :as jdbc]
+    [yamfood.core.db.core :as db]))
 
 
 (defn- get-all-products-query []
@@ -27,24 +28,24 @@
 
 (defn product-detail-state-query
   [basket-id]
-  {:select   [:products.id :products.name :products.price
-              :products.photo :products.thumbnail
-              :products.energy
-              (hs/raw (format basket-cost-query basket-id))
-              (hs/raw "coalesce(basket_products.count, 0) as count_in_basket")]
-   :from     [:products]
-   :order-by [:id]
+  {:select    [:products.id :products.name :products.price
+               :products.photo :products.thumbnail
+               :products.energy
+               (hs/raw (format basket-cost-query basket-id))
+               (hs/raw "coalesce(basket_products.count, 0) as count_in_basket")]
+   :from      [:products]
+   :order-by  [:id]
    :left-join [:basket_products [:and
                                  [:= :basket_products.basket_id basket-id]
                                  [:= :products.id :basket_products.product_id]]]
-   :limit    1})
+   :limit     1})
 
 
 (defn- get-product-by-name-query
   [basket-id name]
   (-> (product-detail-state-query basket-id)
-    (hh/merge-where [:= :products.name name])
-    (hs/format)))
+      (hh/merge-where [:= :products.name name])
+      (hs/format)))
 
 
 (defn- get-product-detail-state-by-id-query

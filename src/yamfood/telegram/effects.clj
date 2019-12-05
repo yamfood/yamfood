@@ -1,8 +1,9 @@
 (ns yamfood.telegram.effects
-  (:require [yamfood.telegram.dispatcher :as d]
-            [morse.api :as t]
-            [yamfood.telegram.methods :as -t]
-            [environ.core :refer [env]]))
+  (:require
+    [morse.api :as t]
+    [environ.core :refer [env]]
+    [yamfood.telegram.methods :as -t]
+    [yamfood.telegram.dispatcher :as d]))
 
 
 (d/register-effect-handler!

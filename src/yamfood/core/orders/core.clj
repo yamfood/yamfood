@@ -1,10 +1,11 @@
 (ns yamfood.core.orders.core
-  (:require [clojure.java.jdbc :as jdbc]
-            [honeysql.core :as hs]
-            [yamfood.core.db.core :as db]
-            [yamfood.core.users.core :as users]
-            [yamfood.core.baskets.core :as b]
-            [honeysql.helpers :as hh]))
+  (:require
+    [honeysql.core :as hs]
+    [honeysql.helpers :as hh]
+    [clojure.java.jdbc :as jdbc]
+    [yamfood.core.db.core :as db]
+    [yamfood.core.baskets.core :as b]
+    [yamfood.core.users.core :as users]))
 
 
 (defn- products-from-basket-query
@@ -15,10 +16,10 @@
 
 
 (def order-detail-query
-  {:select [:orders.id
-            :orders.location
-            :orders.comment]
-   :from [:orders]
+  {:select   [:orders.id
+              :orders.location
+              :orders.comment]
+   :from     [:orders]
    :order-by [:id]})
 
 
@@ -26,8 +27,8 @@
   {:select [:products.name
             :products.price
             :order_products.count]
-   :from [:order_products :products]
-   :where [:= :order_products.product_id :products.id]})
+   :from   [:order_products :products]
+   :where  [:= :order_products.product_id :products.id]})
 
 
 (defn products-by-order-id-query

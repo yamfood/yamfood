@@ -1,6 +1,7 @@
 (ns yamfood.telegram.handlers.callback
-  (:require [yamfood.telegram.dispatcher :as d]
-            [yamfood.telegram.handlers.utils :as u]))
+  (:require
+    [yamfood.telegram.dispatcher :as d]
+    [yamfood.telegram.handlers.utils :as u]))
 
 
 (defn handle-callback

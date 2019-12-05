@@ -1,7 +1,8 @@
 (ns yamfood.telegram.handlers.start
-  (:require [yamfood.core.users.core :as users]
-            [environ.core :refer [env]]
-            [yamfood.telegram.dispatcher :as d]))
+  (:require
+    [yamfood.core.users.core :as users]
+    [environ.core :refer [env]]
+    [yamfood.telegram.dispatcher :as d]))
 
 
 (def menu-markup

@@ -1,8 +1,9 @@
 (ns yamfood.core.users.core
-  (:require [yamfood.core.db.core :as db]
-            [honeysql.core :as hs]
-            [clojure.java.jdbc :as jdbc]
-            [honeysql.helpers :as hh]))
+  (:require
+    [honeysql.core :as hs]
+    [honeysql.helpers :as hh]
+    [clojure.java.jdbc :as jdbc]
+    [yamfood.core.db.core :as db]))
 
 
 (def user-query
@@ -48,11 +49,8 @@
                   (jdbc/query db/db)
                   (first))]
     (if user
-        (location->clj user)
-        nil)))
-
-
-(user-with-tid! 79225668)
+      (location->clj user)
+      nil)))
 
 
 (defn insert-user!

@@ -1,9 +1,10 @@
 (ns yamfood.core.baskets.core
-  (:require [yamfood.core.products.core :as products]
-            [yamfood.core.db.core :as db]
-            [yamfood.core.users.core :as users]
-            [honeysql.core :as hs]
-            [clojure.java.jdbc :as jdbc]))
+  (:require
+    [honeysql.core :as hs]
+    [clojure.java.jdbc :as jdbc]
+    [yamfood.core.db.core :as db]
+    [yamfood.core.users.core :as users]
+    [yamfood.core.products.core :as products]))
 
 
 (defn- get-basket-products-query
@@ -36,11 +37,13 @@
   (->> (get-basket-products-query basket-id)
        (jdbc/query db/db)))
 
+
 (defn get-basket-totals!
   [basket-id]
   (->> (get-basket-totals-query basket-id)
        (jdbc/query db/db)
        (first)))
+
 
 (defn get-basket-state!
   [basket-id]
@@ -99,7 +102,7 @@
 (defn pre-order-state!
   [basket-id]
   {:basket (get-basket-state! basket-id)
-   :user (users/user-with-basket-id! basket-id)})
+   :user   (users/user-with-basket-id! basket-id)})
 
 
 (defn clear-basket!

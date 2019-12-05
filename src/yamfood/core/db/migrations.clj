@@ -1,5 +1,7 @@
 (ns yamfood.core.db.migrations
-  (:require [yamfood.core.db.core :as db]))
+  (:require
+    [yamfood.core.db.core :as db]))
+
 
 (def config {:store                :database
              :migration-dir        "migrations/"

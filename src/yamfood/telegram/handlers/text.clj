@@ -1,9 +1,9 @@
 (ns yamfood.telegram.handlers.text
-  (:require [morse.api :as t]
-            [yamfood.core.products.core :as products]
-            [yamfood.telegram.handlers.utils :as u]
-            [yamfood.telegram.dispatcher :as d]
-            [clojure.data.json :as json]))
+  (:require
+    [clojure.data.json :as json]
+    [yamfood.telegram.dispatcher :as d]
+    [yamfood.telegram.handlers.utils :as u]
+    [yamfood.core.products.core :as products]))
 
 
 (defn get-product-caption
@@ -13,7 +13,6 @@
           (:name product)
           (u/fmt-values (:price product))
           (u/fmt-values (:energy product))))
-
 
 
 (defn get-product-detail-options
