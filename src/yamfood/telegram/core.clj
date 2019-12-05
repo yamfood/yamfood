@@ -66,4 +66,4 @@
           {:update (:body request) :error e}))))
   {:body "OK"})
 
-;(morse.api/set-webhook (env :bot-token) "https://d4d815c9.ngrok.io/updates")
+;(morse.api/set-webhook (env :bot-token) "https://36b851f9.ngrok.io/updates")

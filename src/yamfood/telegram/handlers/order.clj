@@ -224,6 +224,11 @@
 
 
 (d/register-event-handler!
+  :to-order
+  handle-to-order)
+
+
+(d/register-event-handler!
   :location
   handle-location)
 

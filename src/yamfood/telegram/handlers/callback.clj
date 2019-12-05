@@ -5,25 +5,24 @@
             [yamfood.telegram.dispatcher :as d]))
 
 
-; TODO: Rewrite this as dispatcher event handlers?
 (defn handle-callback
-  [ctx update]
+  [_ update]
   (let [query (:callback_query update)
         action (u/get-callback-action (:data query))]
     (cond
-      (= action "want") (basket/handle-want ctx update)
-      (= action "detail+") (basket/handle-inc ctx update)
-      (= action "detail-") (basket/handle-dec ctx update)
-      (= action "basket") (basket/handle-basket ctx update)
-      (= action "basket+") (basket/handle-basket-inc ctx update)
-      (= action "basket-") (basket/handle-basket-dec ctx update)
-      (= action "to-order") (order/handle-to-order ctx update)
-      (= action "request-location") (d/dispatch! ctx [:request-location update])
-      (= action "change-payment-type") (d/dispatch! ctx [:change-payment-type update])
-      (= action "change-comment") (d/dispatch! ctx [:change-comment update])
-      (= action "create-order") (d/dispatch! ctx [:create-order update])
-      (= action "invoice") (d/dispatch! ctx [:send-invoice update])
-      (= action "cancel-invoice") (d/dispatch! ctx [:cancel-invoice update]))))
+      (= action "want") {:dispatch {:args [:detail-want update]}}
+      (= action "detail+") {:dispatch {:args [:detail-inc update]}}
+      (= action "detail-") {:dispatch {:args [:detail-dec update]}}
+      (= action "basket") {:dispatch {:args [:basket update]}}
+      (= action "basket+") {:dispatch {:args [:inc-basket-product update]}}
+      (= action "basket-") {:dispatch {:args [:dec-basket-product update]}}
+      (= action "to-order") {:dispatch {:args [:to-order update]}}
+      (= action "request-location") {:dispatch {:args [:request-location update]}}
+      (= action "change-payment-type") {:dispatch {:args [:change-payment-type update]}}
+      (= action "change-comment") {:dispatch {:args [:change-comment update]}}
+      (= action "create-order") {:dispatch {:args [:create-order update]}}
+      (= action "invoice") {:dispatch {:args [:send-invoice update]}}
+      (= action "cancel-invoice") {:dispatch {:args [:cancel-invoice update]}})))
 
 
 (d/register-event-handler!

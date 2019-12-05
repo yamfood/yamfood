@@ -16,7 +16,7 @@
      :answer-callback {:callback_query_id (:id query)
                        :text              "Добавлено в корзину"}}))
 
-(defn handle-inc
+(defn handle-detail-inc
   [ctx update]
   (let [callback-query (:callback_query update)
         callback-data (:data callback-query)
@@ -29,7 +29,8 @@
                        :on-complete #(d/dispatch! ctx [:update-markup update %])}
      :answer-callback {:callback_query_id (:id callback-query)}}))
 
-(defn handle-dec
+
+(defn handle-detail-dec
   [ctx update]
   (let [callback-query (:callback_query update)
         callback-data (:data callback-query)
@@ -41,6 +42,7 @@
                                        product-id)
                        :on-complete #(d/dispatch! ctx [:update-markup update %])}
      :answer-callback {:callback_query_id (:id callback-query)}}))
+
 
 (defn handle-basket-inc
   [ctx update]
@@ -141,6 +143,36 @@
     {:edit-reply-markup {:chat_id      (:id (:from query))
                          :message_id   (:message_id (:message query))
                          :reply_markup (basket-detail-markup basket-state)}}))
+
+
+(d/register-event-handler!
+  :detail-want
+  handle-want)
+
+
+(d/register-event-handler!
+  :detail-inc
+  handle-detail-inc)
+
+
+(d/register-event-handler!
+  :detail-dec
+  handle-detail-dec)
+
+
+(d/register-event-handler!
+  :basket
+  handle-basket)
+
+
+(d/register-event-handler!
+  :inc-basket-product
+  handle-basket-inc)
+
+
+(d/register-event-handler!
+  :dec-basket-product
+  handle-basket-dec)
 
 
 (d/register-event-handler!
