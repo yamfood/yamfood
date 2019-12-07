@@ -58,6 +58,7 @@
 
 (defn telegram-handler!
   [request]
+  (println (str "\n\n" (:body request) "\n\n"))
   (try
     (update-handler! (:body request))
     (catch Exception e
@@ -68,3 +69,5 @@
   {:body "OK"})
 
 ;(morse.api/set-webhook (env :bot-token) "https://82ef538e.ngrok.io/updates")
+;(def upd {:update_id 435323081, :message {:message_id 10144, :from {:id 79225668, :is_bot false, :first_name "Рустам", :last_name "Бабаджанов", :username "kensay", :language_code "ru"}, :chat {:id 79225668, :first_name "Рустам", :last_name "Бабаджанов", :username "kensay", :type "private"}, :date 1575727101, :text "/start", :entities [{:offset 0, :length 6, :type "bot_command"}]}})
+;(build-ctx! upd)
