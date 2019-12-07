@@ -37,4 +37,3 @@
 (d/register-event-handler!
   :inline
   inline-query-handler)
-

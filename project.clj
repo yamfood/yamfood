@@ -14,6 +14,7 @@
                  [morse "0.4.3"]
 
                  [migratus "1.2.4"]
+                 [clj-postgresql "0.7.0"]
                  [org.clojure/java.jdbc "0.7.10"]
                  [honeysql "0.9.6"]]
   :uberjar-name "yamfood.jar"

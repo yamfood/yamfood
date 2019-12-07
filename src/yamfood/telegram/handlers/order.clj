@@ -263,4 +263,3 @@
 (d/register-event-handler!
   :cancel-invoice
   cancel-invoice-handler)
-

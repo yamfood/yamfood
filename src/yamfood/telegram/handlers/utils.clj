@@ -69,4 +69,3 @@
     (cond
       message (:id (:from message))
       query (:id (:from query)))))
-

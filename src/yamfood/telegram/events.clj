@@ -7,9 +7,3 @@
     [yamfood.telegram.handlers.order]
     [yamfood.telegram.handlers.reply]
     [yamfood.telegram.handlers.inline]))
-
-
-
-
-
-

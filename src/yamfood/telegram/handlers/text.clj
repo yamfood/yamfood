@@ -53,5 +53,3 @@
 (d/register-event-handler!
   :text
   text-handler)
-
-

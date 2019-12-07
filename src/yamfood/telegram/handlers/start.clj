@@ -69,4 +69,3 @@
 (d/register-event-handler!
   :contact
   contact-handler)
-

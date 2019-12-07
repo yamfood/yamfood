@@ -108,4 +108,3 @@
 (defn clear-basket!
   [basket-id]
   (jdbc/delete! db/db "basket_products" ["basket_id = ?" basket-id]))
-

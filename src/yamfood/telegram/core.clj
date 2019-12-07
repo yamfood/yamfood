@@ -7,7 +7,7 @@
     [yamfood.telegram.dispatcher :as d]))
 
 
-(defn tid-from-update                                   ; TODO: Make it work with all updates!
+(defn tid-from-update                                       ; TODO: Make it work with all updates!
   [update]
   (let [message (:message update)
         callback (:callback_query update)
@@ -66,4 +66,4 @@
           {:update (:body request) :error e}))))
   {:body "OK"})
 
-;(morse.api/set-webhook (env :bot-token) "https://36b851f9.ngrok.io/updates")
+;(morse.api/set-webhook (env :bot-token) "https://82ef538e.ngrok.io/updates")

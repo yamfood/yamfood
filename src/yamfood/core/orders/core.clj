@@ -118,5 +118,3 @@
         (prepare-basket-products-to-order (:id order))
         (insert-products!))
     (b/clear-basket! basket-id)))
-
-

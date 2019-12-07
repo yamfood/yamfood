@@ -21,7 +21,9 @@
       "change-comment" {:dispatch {:args [:change-comment update]}}
       "create-order" {:dispatch {:args [:create-order update]}}
       "invoice" {:dispatch {:args [:send-invoice update]}}
-      "cancel-invoice" {:dispatch {:args [:cancel-invoice update]}})))
+      "cancel-invoice" {:dispatch {:args [:cancel-invoice update]}}
+      {:answer-callback {:callback_query_id (:id query)
+                         :text " "}})))
 
 
 (d/register-event-handler!

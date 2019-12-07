@@ -189,4 +189,3 @@
 (d/register-event-handler!
   :update-basket-markup
   update-basket-markup)
-
