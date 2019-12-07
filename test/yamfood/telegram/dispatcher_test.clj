@@ -1,4 +1,4 @@
-(ns yamfood.telegram.dispatcher-tests
+(ns yamfood.telegram.dispatcher-test
   (:require [clojure.test :refer :all]
             [yamfood.telegram.dispatcher :as d]))
 

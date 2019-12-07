@@ -56,7 +56,7 @@
                :text    "Отправьте, пожалуйста, свой контакт"}})
 
 
-(deftest test-start
+(deftest start-handler-test
   (testing "Test start with existing user"
     (is (= (start/start-handler existing-user-ctx upd)
            existing-user-result)))
