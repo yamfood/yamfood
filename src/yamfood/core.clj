@@ -1,18 +1,20 @@
 (ns yamfood.core
   (:require
+    [compojure.core :as c]
     [environ.core :refer [env]]
     [compojure.route :as route]
-    [compojure.core :refer :all]
     [yamfood.core.db.init :as db]
+    [yamfood.web.admin.core :as admin]
     [yamfood.telegram.core :as telegram]
     [ring.adapter.jetty :refer [run-jetty]]
     [ring.middleware.json :refer [wrap-json-body]]))
 
 
-(defroutes
+(c/defroutes
   app-routes
-  (GET "/" [] "Hello World!")
-  (POST "/updates" request (telegram/telegram-handler! request))
+  (c/GET "/" [] "Hello World!")
+  (c/context "/admin" [] admin/routes)
+  (c/POST "/updates" request (telegram/telegram-handler! request))
   (route/not-found "Not Found"))
 
 

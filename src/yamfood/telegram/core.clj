@@ -7,7 +7,8 @@
     [yamfood.telegram.dispatcher :as d]))
 
 
-(defn tid-from-update                                       ; TODO: Make it work with all updates!
+; TODO: Make it work with all updates!
+(defn tid-from-update
   [update]
   (let [message (:message update)
         callback (:callback_query update)
