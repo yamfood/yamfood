@@ -1,6 +1,7 @@
 (ns yamfood.telegram.handlers.inline-test
-  (:require [clojure.test :refer :all]
-            [yamfood.telegram.handlers.inline :as inline]))
+  (:require
+    [clojure.test :refer :all]
+    [yamfood.telegram.handlers.inline :as inline]))
 
 
 (def upd
@@ -153,7 +154,6 @@
                                       :title                 "Яблочный фреш",
                                       :description           "9 900 сум, 360 кКал",
                                       :thumb_url             "https://i.ibb.co/hXGZv1t/9-900.png"}]}})
-
 
 
 (deftest inline-handler-test
