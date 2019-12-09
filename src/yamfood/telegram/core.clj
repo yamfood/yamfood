@@ -39,7 +39,7 @@
       location (d/dispatch! ctx [:location update])
       contact (d/dispatch! ctx [:contact update])
       reply-to (d/dispatch! ctx [:reply update])
-      text (d/dispatch! ctx [:text message]))))
+      text (d/dispatch! ctx [:text update]))))
 
 
 (defn update-handler!
@@ -68,4 +68,4 @@
           {:update (:body request) :error e}))))
   {:body "OK"})
 
-;(morse.api/set-webhook (env :bot-token) "https://82ef538e.ngrok.io/updates")
+;(morse.api/set-webhook (env :bot-token) "https://b35686c6.ngrok.io/updates")

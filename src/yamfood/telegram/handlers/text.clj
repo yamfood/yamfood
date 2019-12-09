@@ -22,34 +22,28 @@
    :reply_markup (json/write-str (u/product-detail-markup product))})
 
 
-(defn text-handler
-  [ctx message]
-  {:core {:function    #(products/product-by-name!
-                          (:basket_id (:user ctx))
-                          (:text message))
-          :on-complete #(d/dispatch! ctx [:product-done message %])}})
+(defn product-detail-handler
+  ([ctx update]
+   (let [message (:message update)]
+     {:core {:function    #(products/product-by-name!
+                             (:basket_id (:user ctx))
+                             (:text message))
+             :on-complete #(d/dispatch! ctx [:text update %])}}))
+  ([_ update product]
+   (let [message (:message update)
+         chat (:chat message)
+         chat-id (:id chat)]
+     (if product
+       {:send-photo
+        {:chat-id chat-id
+         :options (product-detail-options product)
+         :photo   (:photo product)}}
 
-
-(defn product-done-handler
-  [_ message product]
-  (let [chat (:chat message)
-        chat-id (:id chat)]
-    (if product
-      {:send-photo
-       {:chat-id chat-id
-        :options (product-detail-options product)
-        :photo   (:photo product)}}
-
-      {:send-text
-       {:chat-id chat-id
-        :text    "Если у вас возникли какие-то вопросы обратитесь к @kensay."}})))
-
-
-(d/register-event-handler!
-  :product-done
-  product-done-handler)
+       {:send-text
+        {:chat-id chat-id
+         :text    "Если у вас возникли какие-то вопросы обратитесь к @kensay."}}))))
 
 
 (d/register-event-handler!
   :text
-  text-handler)
+  product-detail-handler)
