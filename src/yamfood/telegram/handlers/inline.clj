@@ -25,7 +25,7 @@
 
 (defn inline-query-handler
   ([ctx update]
-   {:core {:function    p/get-all-products!
+   {:core {:function    p/all-products!
            :on-complete #(d/dispatch! ctx [:inline update %])}})
   ([_ update products]
    {:answer-inline

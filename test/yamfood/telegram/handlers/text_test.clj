@@ -52,7 +52,7 @@
                     :basket_id 4}})
 
 
-(def product-not-in-basket
+(def product-not-in-basket-state
   {:id              1,
    :name            "Глазунья с болгарским перцем и паштетом",
    :price           15000,
@@ -63,7 +63,7 @@
    :count_in_basket 0})
 
 
-(def product-in-basket
+(def product-in-basket-state
   {:id              1,
    :name            "Глазунья с болгарским перцем и паштетом",
    :price           15000,
@@ -74,7 +74,7 @@
    :count_in_basket 2})
 
 
-(def result-with-product-not-in-basket
+(def result-with-product-not-in-basket-state
   {:send-photo {:chat-id 79225668,
                 :options {:caption      "🥗 *Глазунья с болгарским перцем и паштетом* \n\n💰15 000 сум  🔋360 кКал",
                           :parse_mode   "markdown",
@@ -82,7 +82,7 @@
                 :photo   "https://i.ibb.co/T8TRNm3/image.png"}})
 
 
-(def result-with-product-in-basket
+(def result-with-product-in-basket-state
   {:send-photo {:chat-id 79225668,
                 :options {:caption      "🥗 *Глазунья с болгарским перцем и паштетом* \n\n💰15 000 сум  🔋360 кКал",
                           :parse_mode   "markdown",
@@ -98,13 +98,13 @@
   (testing "Testing text update with product which is not in basket yet"
     (is (= (text/product-detail-handler ctx
                                         upd-with-product-name
-                                        product-not-in-basket)
-           result-with-product-not-in-basket)))
+                                        product-not-in-basket-state)
+           result-with-product-not-in-basket-state)))
   (testing "Testing text update with product in basket"
     (is (= (text/product-detail-handler ctx
                                         upd-with-product-name
-                                        product-in-basket)
-           result-with-product-in-basket)))
+                                        product-in-basket-state)
+           result-with-product-in-basket-state)))
   (testing "Testing text update with random text"
     (is (= (text/product-detail-handler ctx
                                         upd-with-random-text

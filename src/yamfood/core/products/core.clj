@@ -6,14 +6,14 @@
     [yamfood.core.db.core :as db]))
 
 
-(defn- get-all-products-query []
+(defn- all-products-query []
   (hs/format {:select   [:id :name :price :photo :thumbnail :energy]
               :from     [:products]
               :order-by [:id]}))
 
 
-(defn get-all-products! []
-  (->> (get-all-products-query)
+(defn all-products! []
+  (->> (all-products-query)
        (jdbc/query db/db)))
 
 
@@ -41,7 +41,7 @@
    :limit     1})
 
 
-(defn- product-by-name-query
+(defn- product-detail-state-by-name-query
   [basket-id name]
   (-> (product-detail-state-query basket-id)
       (hh/merge-where [:= :products.name name])
@@ -55,9 +55,9 @@
       (hs/format)))
 
 
-(defn product-by-name!
+(defn product-detail-state-by-name!
   [basket-id name]
-  (->> (product-by-name-query basket-id name)
+  (->> (product-detail-state-by-name-query basket-id name)
        (jdbc/query db/db)
        (first)))
 
