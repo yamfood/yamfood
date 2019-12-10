@@ -1,7 +1,8 @@
 (ns yamfood.telegram.handlers.inline-test
   (:require
     [clojure.test :refer :all]
-    [yamfood.telegram.handlers.inline :as inline]))
+    [yamfood.telegram.handlers.inline :as inline]
+    [yamfood.core.products.core :as products]))
 
 
 (def upd
@@ -27,6 +28,9 @@
                     :location  {:longitude 34.74037, :latitude 32.020955},
                     :comment   "Test",
                     :basket_id 4}})
+
+
+
 
 
 (def products
@@ -92,7 +96,13 @@
     :energy    360}])
 
 
-(def inline-handler-results
+(def inline-handler-result
+  {:run {:function   products/all-products!,
+         :next-event :inline}})
+
+
+
+(def prepared-inline-handler-result
   {:answer-inline {:inline-query-id "340271653120582092",
                    :options         {:cache_time 0},
                    :results         [{:type                  "article",
@@ -158,9 +168,12 @@
 
 
 (deftest inline-handler-test
-  (testing "Testing inline handler")
-  (is (= (inline/inline-query-handler ctx products)
-         inline-handler-results)))
+  (testing "Testing inline handler"
+    (is (= (inline/inline-query-handler ctx)
+           inline-handler-result)))
+  (testing "Testing inline handler with prepared products"
+    (is (= (inline/inline-query-handler ctx products)
+           prepared-inline-handler-result))))
 
 
 

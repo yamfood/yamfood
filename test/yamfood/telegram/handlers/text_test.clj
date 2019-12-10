@@ -1,7 +1,8 @@
 (ns yamfood.telegram.handlers.text-test
   (:require
     [clojure.test :refer :all]
-    [yamfood.telegram.handlers.text :as text]))
+    [yamfood.telegram.handlers.text :as text]
+    [yamfood.core.products.core :as products]))
 
 
 (def default-ctx
@@ -81,6 +82,13 @@
    :count_in_basket 2})
 
 
+(def result-for-raw-text-update
+  {:run {:function   products/product-detail-state-by-name!
+         :args       [(:basket_id (:user default-ctx))
+                      (:text (:message (:update ctx-with-product-name)))]
+         :next-event :text}})
+
+
 (def result-with-product-not-in-basket-state
   {:send-photo {:chat-id 79225668,
                 :options {:caption      "🥗 *Глазунья с болгарским перцем и паштетом* \n\n💰15 000 сум  🔋360 кКал",
@@ -102,6 +110,9 @@
 
 
 (deftest text-handler-test
+  (testing "Testing raw text update"
+    (is (= (text/product-detail-handler ctx-with-product-name)
+           result-for-raw-text-update)))
   (testing "Testing text update with product which is not in basket yet"
     (is (= (text/product-detail-handler ctx-with-product-name
                                         product-not-in-basket-state)
