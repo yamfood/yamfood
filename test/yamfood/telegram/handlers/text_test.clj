@@ -4,52 +4,59 @@
     [yamfood.telegram.handlers.text :as text]))
 
 
-(def upd-with-random-text
-  {:update_id 435323085,
-   :message   {:message_id 10148,
-               :from       {:id
-                                           79225668,
-                            :is_bot        false,
-                            :first_name    "Рустам",
-                            :last_name     "Бабаджанов",
-                            :username      "kensay",
-                            :language_code "ru"},
-               :chat       {:id         79225668,
-                            :first_name "Рустам",
-                            :last_name  "Бабаджанов",
-                            :username   "kensay",
-                            :type       "private"},
-               :date       1575898013,
-               :text       "Psgb"}})
-
-
-(def upd-with-product-name
-  {:update_id 435323084,
-   :message   {:message_id 10146,
-               :from       {:id            79225668,
-                            :is_bot        false,
-                            :first_name    "Рустам",
-                            :last_name     "Бабаджанов",
-                            :username      "kensay",
-                            :language_code "ru"},
-               :chat       {:id         79225668,
-                            :first_name "Рустам",
-                            :last_name  "Бабаджанов",
-                            :username   "kensay",
-                            :type       "private"},
-               :date       1575898003,
-               :text       "Глазунья с болгарским перцем и паштетом"}})
-
-
-(def ctx
+(def default-ctx
   {:token          "488312680:AAGsKHKufV9TQEAB8-g6INps-W82G_noRP8",
    :payments-token "371317599:TEST:79225668",
+   :update         {}
    :user           {:id        10,
                     :phone     998909296339,
                     :tid       79225668,
                     :location  {:longitude 34.74037, :latitude 32.020955},
                     :comment   "Test",
                     :basket_id 4}})
+
+
+(def ctx-with-random-text
+  (assoc
+    default-ctx
+    :update
+    {:update_id 435323085,
+     :message   {:message_id 10148,
+                 :from       {:id
+                                             79225668,
+                              :is_bot        false,
+                              :first_name    "Рустам",
+                              :last_name     "Бабаджанов",
+                              :username      "kensay",
+                              :language_code "ru"},
+                 :chat       {:id         79225668,
+                              :first_name "Рустам",
+                              :last_name  "Бабаджанов",
+                              :username   "kensay",
+                              :type       "private"},
+                 :date       1575898013,
+                 :text       "Psgb"}}))
+
+
+(def ctx-with-product-name
+  (assoc
+    default-ctx
+    :update
+    {:update_id 435323084,
+     :message   {:message_id 10146,
+                 :from       {:id            79225668,
+                              :is_bot        false,
+                              :first_name    "Рустам",
+                              :last_name     "Бабаджанов",
+                              :username      "kensay",
+                              :language_code "ru"},
+                 :chat       {:id         79225668,
+                              :first_name "Рустам",
+                              :last_name  "Бабаджанов",
+                              :username   "kensay",
+                              :type       "private"},
+                 :date       1575898003,
+                 :text       "Глазунья с болгарским перцем и паштетом"}}))
 
 
 (def product-not-in-basket-state
@@ -96,18 +103,15 @@
 
 (deftest text-handler-test
   (testing "Testing text update with product which is not in basket yet"
-    (is (= (text/product-detail-handler ctx
-                                        upd-with-product-name
+    (is (= (text/product-detail-handler ctx-with-product-name
                                         product-not-in-basket-state)
            result-with-product-not-in-basket-state)))
   (testing "Testing text update with product in basket"
-    (is (= (text/product-detail-handler ctx
-                                        upd-with-product-name
+    (is (= (text/product-detail-handler ctx-with-product-name
                                         product-in-basket-state)
            result-with-product-in-basket-state)))
   (testing "Testing text update with random text"
-    (is (= (text/product-detail-handler ctx
-                                        upd-with-random-text
+    (is (= (text/product-detail-handler ctx-with-random-text
                                         nil)
            result-with-random-text))))
 

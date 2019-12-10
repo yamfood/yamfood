@@ -28,6 +28,7 @@
 (def existing-user-ctx
   {:token          "488312680:AAGsKHKufV9TQEAB8-g6INps-W82G_noRP8",
    :payments-token "371317599:TEST:79225668",
+   :update         upd
    :user           {:id        10,
                     :phone     998909296339,
                     :tid       79225668,
@@ -40,6 +41,7 @@
 (def new-user-ctx
   {:token          "488312680:AAGsKHKufV9TQEAB8-g6INps-W82G_noRP8",
    :payments-token "371317599:TEST:79225668",
+   :update         upd
    :user           nil})
 
 
@@ -59,8 +61,8 @@
 
 (deftest start-handler-test
   (testing "Test start with existing user"
-    (is (= (start/start-handler existing-user-ctx upd)
+    (is (= (start/start-handler existing-user-ctx)
            existing-user-result)))
   (testing "Test start with new user"
-    (is (= (start/start-handler new-user-ctx upd)
+    (is (= (start/start-handler new-user-ctx)
            new-user-result))))

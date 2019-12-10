@@ -20,6 +20,7 @@
 (def ctx
   {:token          "488312680:AAGsKHKufV9TQEAB8-g6INps-W82G_noRP8",
    :payments-token "371317599:TEST:79225668",
+   :update         upd
    :user           {:id        10,
                     :phone     998909296339,
                     :tid       79225668,
@@ -158,7 +159,7 @@
 
 (deftest inline-handler-test
   (testing "Testing inline handler")
-  (is (= (inline/inline-query-handler ctx upd products)
+  (is (= (inline/inline-query-handler ctx products)
          inline-handler-results)))
 
 

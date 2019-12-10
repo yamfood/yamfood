@@ -14,8 +14,9 @@
 
 
 (defn request-location
-  [_ update]
-  (let [query (:callback_query update)
+  [ctx]
+  (let [update (:update ctx)
+        query (:callback_query update)
         chat-id (:id (:from query))
         message-id (:message_id (:message query))]
     {:send-text      {:chat-id chat-id
@@ -26,23 +27,23 @@
 
 
 (defn pre-order-state
-  [ctx update]
+  [ctx]
   (let [user (:user ctx)]
-    {:core {:function    #(bsk/pre-order-state! (:basket_id user))
-            :on-complete #(d/dispatch!
-                            ctx
-                            [:send-order-detail update %])}}))
+    {:run {:function   bsk/pre-order-state!
+           :args       [(:basket_id user)]
+           :next-event :send-order-detail}}))
 
 
 (defn to-order-handler
-  [ctx update]
-  (let [query (:callback_query update)
+  [ctx]
+  (let [update (:update ctx)
+        query (:callback_query update)
         chat-id (:id (:from query))
         user (:user ctx)
         message-id (:message_id (:message query))]
     (into
       (cond
-        (:location user) (pre-order-state ctx update)
+        (:location user) (pre-order-state ctx)
         :else {:send-text {:chat-id chat-id
                            :text    "Куда доставить?"
                            :options markup-for-request-location}})
@@ -70,8 +71,9 @@
 
 
 (defn order-detail-handler
-  [_ update order-state]
-  (let [chat-id (u/chat-id update)]
+  [ctx order-state]
+  (let [update (:update ctx)
+        chat-id (u/chat-id update)]
     {:send-text {:chat-id chat-id
                  :text    (pre-order-text order-state)
                  :options {:reply_markup order-confirmation-markup
@@ -87,25 +89,24 @@
     {:send-text {:chat-id chat-id
                  :text    "Локация обновлена"
                  :options {:reply_markup {:remove_keyboard true}}}
-     :core      [(:core (pre-order-state ctx update))
-                 {:function #(usr/update-location!
-                               (:id (:user ctx))
-                               (:longitude location)
-                               (:latitude location))}]}))
+     :run       [(:run (pre-order-state ctx))
+                 {:function usr/update-location!
+                  :args     [(:id (:user ctx))
+                             (:longitude location)
+                             (:latitude location)]}]}))
 
 
 (defn create-order-handler
-  [ctx update]
-  (let [query (:callback_query update)
+  [ctx]
+  (let [update (:update ctx)
+        query (:callback_query update)
         chat-id (:id (:from query))
         message-id (:message_id (:message query))
         basket-id (:basket_id (:user ctx))
         location (:location (:user ctx))
         comment "test"]
-    {:core            {:function #(ord/create-order-and-clear-basket!
-                                    basket-id
-                                    location
-                                    comment)}
+    {:run             {:function ord/create-order-and-clear-basket!
+                       :args     [basket-id location comment]}
      :answer-callback {:callback_query_id (:id query)
                        :text              "Ваш заказ успешно создан! Мы будем держать вас в курсе его статуса."
                        :show_alert        true}
@@ -116,8 +117,9 @@
 
 (def write-comment-text "Напишите свой комментарий к заказу")
 (defn change-comment-handler
-  [_ update]
-  (let [query (:callback_query update)
+  [ctx]
+  (let [update (:update ctx)
+        query (:callback_query update)
         chat-id (:id (:from query))
         message-id (:message_id (:message query))]
     {:send-text      {:chat-id chat-id
@@ -161,18 +163,17 @@
 
 
 (defn order-status
-  ([ctx update]
-   (order-status ctx update nil))
-  ([ctx update order]
-   (let [user (:user ctx)
+  ([ctx]
+   {:run {:function   ord/user-active-order!
+          :args       [(:id (:user ctx))]
+          :next-event :order-status}})
+  ([ctx order]
+   (let [update (:update ctx)
          chat-id (u/chat-id update)]
-     (cond
-       (= order nil) {:core {:function    #(ord/user-active-order! (:id user))
-                             :on-complete #(d/dispatch! ctx [:order-status update %])}}
-       :else {:send-text {:chat-id chat-id
-                          :text    (order-status-text order)
-                          :options {:parse_mode   "markdown"
-                                    :reply_markup (order-reply-markup order)}}}))))
+     {:send-text {:chat-id chat-id
+                  :text    (order-status-text order)
+                  :options {:parse_mode   "markdown"
+                            :reply_markup (order-reply-markup order)}}})))
 
 
 (defn invoice-description
@@ -186,29 +187,29 @@
 
 
 (defn send-invoice
-  ([ctx update]
-   (send-invoice ctx update nil))
-  ([ctx update order]
-   (let [user (:user ctx)
+  ([ctx]
+   {:run {:function   ord/user-active-order!
+          :args       [(:id (:user ctx))]
+          :next-event :send-invoice}})
+  ([ctx order]
+   (let [update (:update ctx)
          chat-id (u/chat-id update)
          message-id (:message_id (:message (:callback_query update)))]
-     (cond
-       (= order nil) {:core {:function    #(ord/user-active-order! (:id user))
-                             :on-complete #(d/dispatch! ctx [:send-invoice update %])}}
-       :else {:send-invoice   {:chat-id     chat-id
-                               :title       (str "Оплатить заказ №" (:id order))
-                               :description (invoice-description order)
-                               :payload     {}
-                               :currency    "UZS"
-                               :prices      (order-prices order)
-                               :options     {:reply_markup invoice-reply-markup}}
-              :delete-message {:chat-id    chat-id
-                               :message-id message-id}}))))
+     {:send-invoice   {:chat-id     chat-id
+                       :title       (str "Оплатить заказ №" (:id order))
+                       :description (invoice-description order)
+                       :payload     {}
+                       :currency    "UZS"
+                       :prices      (order-prices order)
+                       :options     {:reply_markup invoice-reply-markup}}
+      :delete-message {:chat-id    chat-id
+                       :message-id message-id}})))
 
 
 (defn cancel-invoice-handler
-  [_ update]
-  (let [query (:callback_query update)
+  [ctx]
+  (let [update (:update ctx)
+        query (:callback_query update)
         chat-id (:id (:from query))
         message-id (:message_id (:message query))]
     {:dispatch       {:args [:order-status update]}

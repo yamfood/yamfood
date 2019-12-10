@@ -26,10 +26,9 @@
   ([ctx]
    (let [update (:update ctx)
          message (:message update)]
-     {:core {:function    #(products/product-detail-state-by-name!
-                             (:basket_id (:user ctx))
-                             (:text message))
-             :on-complete #(d/dispatch! ctx [:text %])}}))
+     {:run {:function   products/product-detail-state-by-name!
+            :args       [(:basket_id (:user ctx)) (:text message)]
+            :next-event :text}}))
   ([ctx product-detail-state]
    (let [update (:update ctx)
          message (:message update)

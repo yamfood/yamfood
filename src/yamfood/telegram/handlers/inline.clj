@@ -24,9 +24,9 @@
 
 
 (defn inline-query-handler
-  ([ctx]
-   {:core {:function    p/all-products!
-           :on-complete #(d/dispatch! ctx [:inline %])}})
+  ([_]
+   {:run {:function   p/all-products!
+          :next-event :inline}})
   ([ctx products]
    (let [update (:update ctx)]
      {:answer-inline

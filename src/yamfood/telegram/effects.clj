@@ -13,26 +13,13 @@
 
 
 (d/register-effect-handler!
-  :core
-  (fn [_ effect]
-    (let [core-func (:function effect)
-          on-complete (:on-complete effect)]
-      (if on-complete
-        (on-complete (core-func))
-        (core-func)))))
-
-
-(d/register-effect-handler!
   :run
   (fn [ctx effect]
     (let [func (:function effect)
           args (:args effect)
-          update (:update effect)
-          on-complete (:on-complete effect)]
-      (if on-complete
-        (d/dispatch! ctx [on-complete
-                          update
-                          (apply func args)])
+          next-event (:next-event effect)]
+      (if next-event
+        (d/dispatch! ctx [next-event (apply func args)])
         (apply func args)))))
 
 

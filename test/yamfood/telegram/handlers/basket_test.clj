@@ -42,6 +42,7 @@
 
 (def ctx
   {:token          "488312680:AAGsKHKufV9TQEAB8-g6INps-W82G_noRP8",
+   :update         upd
    :payments-token "371317599:TEST:79225668",
    :user           {:id        10,
                     :phone     998909296339,
@@ -125,17 +126,17 @@
            filled-basket-markup)))
 
   (testing "Testing update-basket-markup to empty basket"
-    (is (= (basket/update-basket-markup ctx upd empty-basket-state)
+    (is (= (basket/update-basket-markup ctx empty-basket-state)
            result-for-update-markup-to-empty-basket)))
 
   (testing "Testing update-basket-markup to not empty basket"
-    (is (= (basket/update-basket-markup ctx upd filled-basket-state)
+    (is (= (basket/update-basket-markup ctx filled-basket-state)
            result-for-update-markup-to-filled-basket)))
 
   (testing "Testing send-basket with full basket"
-    (is (= (basket/send-basket ctx upd filled-basket-state)
+    (is (= (basket/send-basket ctx filled-basket-state)
            result-for-filled-basket)))
 
   (testing "Testing send-basket with empty basket"
-    (is (= (basket/send-basket ctx upd empty-basket-state)
+    (is (= (basket/send-basket ctx empty-basket-state)
            result-for-empty-basket-state))))
