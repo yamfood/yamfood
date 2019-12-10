@@ -41,8 +41,9 @@
 
 
 (defn contact-handler
-  [_ update]
-  (let [message (:message update)
+  [ctx]
+  (let [update (:update ctx)
+        message (:message update)
         contact (:contact message)
         phone (parse-int (:phone_number contact))
         tid (:id (:from message))]
@@ -54,8 +55,9 @@
 
 
 (defn start-handler
-  [ctx update]
-  (let [message (:message update)]
+  [ctx]
+  (let [update (:update ctx)
+        message (:message update)]
     (if (:user ctx)
       (menu-message message)
       (init-registration message))))

@@ -24,14 +24,15 @@
 
 
 (defn inline-query-handler
-  ([ctx update]
+  ([ctx]
    {:core {:function    p/all-products!
-           :on-complete #(d/dispatch! ctx [:inline update %])}})
-  ([_ update products]
-   {:answer-inline
-    {:inline-query-id (:id (:inline_query update))
-     :options         {:cache_time 0}
-     :results         (map query-result-from-product products)}}))
+           :on-complete #(d/dispatch! ctx [:inline %])}})
+  ([ctx products]
+   (let [update (:update ctx)]
+     {:answer-inline
+      {:inline-query-id (:id (:inline_query update))
+       :options         {:cache_time 0}
+       :results         (map query-result-from-product products)}})))
 
 
 (d/register-event-handler!

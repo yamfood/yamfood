@@ -5,8 +5,9 @@
 
 
 (defn callback-handler
-  [_ update]
-  (let [query (:callback_query update)
+  [ctx]
+  (let [update (:update ctx)
+        query (:callback_query update)
         action (u/callback-action (:data query))]
     (case action
       "want" {:dispatch {:args [:detail-want update]}}
@@ -23,7 +24,7 @@
       "invoice" {:dispatch {:args [:send-invoice update]}}
       "cancel-invoice" {:dispatch {:args [:cancel-invoice update]}}
       {:answer-callback {:callback_query_id (:id query)
-                         :text " "}})))
+                         :text              " "}})))
 
 
 (d/register-event-handler!

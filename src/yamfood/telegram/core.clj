@@ -23,6 +23,7 @@
   [update]
   {:token          (env :bot-token)
    :payments-token (env :payments-token)
+   :update         update
    :user           (users/user-with-tid!
                      (tid-from-update update))})
 
@@ -35,11 +36,11 @@
         location (:location message)
         reply-to (:reply_to_message message)]
     (cond
-      (= text "/start") (d/dispatch! ctx [:start update])
-      location (d/dispatch! ctx [:location update])
-      contact (d/dispatch! ctx [:contact update])
-      reply-to (d/dispatch! ctx [:reply update])
-      text (d/dispatch! ctx [:text update]))))
+      (= text "/start") (d/dispatch! ctx [:start])
+      location (d/dispatch! ctx [:location])
+      contact (d/dispatch! ctx [:contact])
+      reply-to (d/dispatch! ctx [:reply])
+      text (d/dispatch! ctx [:text]))))
 
 
 (defn update-handler!
@@ -51,9 +52,9 @@
     (if message
       (process-message ctx update))
     (if inline-query
-      (d/dispatch! ctx [:inline update]))
+      (d/dispatch! ctx [:inline]))
     (if callback-query
-      (d/dispatch! ctx [:callback update]))))
+      (d/dispatch! ctx [:callback]))))
 
 
 (defn telegram-handler!
@@ -68,4 +69,5 @@
           {:update (:body request) :error e}))))
   {:body "OK"})
 
-;(morse.api/set-webhook (env :bot-token) "https://b35686c6.ngrok.io/updates")
+
+;(morse.api/set-webhook (env :bot-token) "https://27f8ce66.ngrok.io/updates")

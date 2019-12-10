@@ -79,8 +79,9 @@
 
 
 (defn location-handler
-  [ctx update]
-  (let [message (:message update)
+  [ctx]
+  (let [update (:update ctx)
+        message (:message update)
         chat-id (:id (:from message))
         location (:location message)]
     {:send-text {:chat-id chat-id

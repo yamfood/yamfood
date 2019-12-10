@@ -23,14 +23,16 @@
 
 
 (defn product-detail-handler
-  ([ctx update]
-   (let [message (:message update)]
+  ([ctx]
+   (let [update (:update ctx)
+         message (:message update)]
      {:core {:function    #(products/product-detail-state-by-name!
                              (:basket_id (:user ctx))
                              (:text message))
-             :on-complete #(d/dispatch! ctx [:text update %])}}))
-  ([_ update product-detail-state]
-   (let [message (:message update)
+             :on-complete #(d/dispatch! ctx [:text %])}}))
+  ([ctx product-detail-state]
+   (let [update (:update ctx)
+         message (:message update)
          chat (:chat message)
          chat-id (:id chat)]
      (if product-detail-state

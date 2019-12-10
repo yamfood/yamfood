@@ -5,8 +5,9 @@
 
 
 (defn comment-handler
-  [ctx update]
-  (let [message (:message update)
+  [ctx]
+  (let [update (:update ctx)
+        message (:message update)
         text (:text message)
         user-id (:id (:user ctx))]
     {:core     {:function #(users/update-comment! user-id text)}
@@ -15,13 +16,13 @@
 
 (def write-comment-text "Напишите свой комментарий к заказу")
 (defn message-with-reply-handler
-  [ctx update]
-  (println update)
-  (let [message (:message update)
+  [ctx]
+  (let [update (:update ctx)
+        message (:message update)
         reply_message (:reply_to_message message)
         reply_text (:text reply_message)]
     (cond
-      (= reply_text write-comment-text) (comment-handler ctx update)
+      (= reply_text write-comment-text) (comment-handler ctx)
       :else (println "Can't find handler"))))
 
 
