@@ -1,8 +1,8 @@
-(ns yamfood.telegram.handlers.text-test
+(ns yamfood.telegram.handlers.product-test
   (:require
     [clojure.test :refer :all]
-    [yamfood.telegram.handlers.text :as text]
-    [yamfood.core.products.core :as products]))
+    [yamfood.core.products.core :as products]
+    [yamfood.telegram.handlers.product :as product]))
 
 
 (def default-ctx
@@ -111,18 +111,18 @@
 
 (deftest text-handler-test
   (testing "Testing raw text update"
-    (is (= (text/product-detail-handler ctx-with-product-name)
+    (is (= (product/product-detail-handler ctx-with-product-name)
            result-for-raw-text-update)))
   (testing "Testing text update with product which is not in basket yet"
-    (is (= (text/product-detail-handler ctx-with-product-name
-                                        product-not-in-basket-state)
+    (is (= (product/product-detail-handler ctx-with-product-name
+                                           product-not-in-basket-state)
            result-with-product-not-in-basket-state)))
   (testing "Testing text update with product in basket"
-    (is (= (text/product-detail-handler ctx-with-product-name
-                                        product-in-basket-state)
+    (is (= (product/product-detail-handler ctx-with-product-name
+                                           product-in-basket-state)
            result-with-product-in-basket-state)))
   (testing "Testing text update with random text"
-    (is (= (text/product-detail-handler ctx-with-random-text
-                                        nil)
+    (is (= (product/product-detail-handler ctx-with-random-text
+                                           nil)
            result-with-random-text))))
 

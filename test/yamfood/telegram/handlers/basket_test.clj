@@ -1,8 +1,7 @@
 (ns yamfood.telegram.handlers.basket-test
   (:require
     [clojure.test :refer :all]
-    [yamfood.telegram.handlers.basket :as basket]
-    [yamfood.core.baskets.core :as baskets]))
+    [yamfood.telegram.handlers.basket :as basket]))
 
 
 (def upd
