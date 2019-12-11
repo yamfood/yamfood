@@ -33,7 +33,8 @@
     {:run             {:function   baskets/increment-product-in-basket!
                        :args       [basket-id product-id]
                        :next-event :update-markup}
-     :answer-callback {:callback_query_id (:id callback-query)}}))
+     :answer-callback {:callback_query_id (:id callback-query)
+                       :text              " "}}))
 
 
 (defn detail-dec-handler
@@ -47,7 +48,8 @@
     {:run             {:function   baskets/decrement-product-in-basket!
                        :args       [basket-id product-id]
                        :next-event :update-markup}
-     :answer-callback {:callback_query_id (:id callback-query)}}))
+     :answer-callback {:callback_query_id (:id callback-query)
+                       :text              " "}}))
 
 
 (defn update-detail-markup

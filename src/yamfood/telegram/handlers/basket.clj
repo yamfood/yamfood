@@ -18,7 +18,8 @@
                        {:function   baskets/basket-state!
                         :args       [basket-id]
                         :next-event :update-basket-markup}]
-     :answer-callback {:callback_query_id (:id callback-query)}}))
+     :answer-callback {:callback_query_id (:id callback-query)
+                       :text              " "}}))
 
 
 (defn basket-dec-handler
@@ -34,7 +35,8 @@
                        {:function   baskets/basket-state!
                         :args       [basket-id]
                         :next-event :update-basket-markup}]
-     :answer-callback {:callback_query_id (:id callback-query)}}))
+     :answer-callback {:callback_query_id (:id callback-query)
+                       :text              " "}}))
 
 
 (defn basket-handler
