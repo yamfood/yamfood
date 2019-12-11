@@ -53,12 +53,12 @@
 
 
 (defn update-detail-markup
-  [ctx product]
+  [ctx product-state]
   (let [update (:update ctx)
         query (:callback_query update)]
     {:edit-reply-markup {:chat_id      (:id (:from query))
                          :message_id   (:message_id (:message query))
-                         :reply_markup (u/product-detail-markup product)}}))
+                         :reply_markup (u/product-detail-markup product-state)}}))
 
 
 (defn product-caption
