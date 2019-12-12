@@ -24,7 +24,7 @@
         reply_text (:text reply_message)]
     (cond
       (= reply_text write-comment-text) (comment-handler ctx)
-      :else (println "Can't find handler"))))
+      :else {})))
 
 
 (d/register-event-handler!
