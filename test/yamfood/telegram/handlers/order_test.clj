@@ -201,3 +201,44 @@
     (is (= (order/location-handler location-ctx)
            location-result))))
 
+
+(def change-comment-upd
+  {:update_id      435323164,
+   :callback_query {:id      "340271657069740466",
+                    :from    {:id            79225668,
+                              :is_bot        false,
+                              :first_name    "Рустам",
+                              :last_name     "Бабаджанов",
+                              :username      "kensay",
+                              :language_code "ru"},
+                    :message {:message_id 10205,
+                              :from       {:id         488312680,
+                                           :is_bot     true,
+                                           :first_name "Kensay",
+                                           :username   "kensaybot"},
+                              :chat       {:id         79225668,
+                                           :first_name "Рустам",
+                                           :last_name  "Бабаджанов",
+                                           :username   "kensay",
+                                           :type       "private"},
+                              :date       1576242419},
+                    :data    "change-comment"}})
+
+
+(def change-comment-ctx
+  (assoc default-ctx
+    :update
+    change-comment-upd))
+
+
+(def change-comment-result
+  {:send-text      {:chat-id 79225668,
+                    :text    "Напишите свой комментарий к заказу",
+                    :options {:reply_markup {:force_reply true}}},
+   :delete-message {:chat-id 79225668, :message-id 10205}})
+
+
+(deftest change-comment-handler-test
+  (testing "change-comment-handler"
+    (is (= (order/change-comment-handler change-comment-ctx)
+           change-comment-result))))
