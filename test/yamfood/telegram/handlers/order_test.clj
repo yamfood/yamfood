@@ -3,7 +3,8 @@
     [clojure.test :refer :all]
     [yamfood.core.baskets.core :as basket]
     [yamfood.telegram.handlers.order :as order]
-    [yamfood.core.users.core :as users]))
+    [yamfood.core.users.core :as users]
+    [yamfood.core.orders.core :as ord]))
 
 
 (def default-ctx
@@ -242,3 +243,75 @@
   (testing "change-comment-handler"
     (is (= (order/change-comment-handler change-comment-ctx)
            change-comment-result))))
+
+
+(def create-order-upd
+  {:update_id      435323166,
+   :callback_query {:id      "340271655591288140",
+                    :from    {:id            79225668,
+                              :is_bot        false,
+                              :first_name    "Рустам",
+                              :last_name     "Бабаджанов",
+                              :username      "kensay",
+                              :language_code "ru"},
+                    :message {:message_id 10208,
+                              :from       {:id         488312680,
+                                           :is_bot     true,
+                                           :first_name "Kensay",
+                                           :username   "kensaybot"},
+                              :chat       {:id         79225668,
+                                           :first_name "Рустам",
+                                           :last_name  "Бабаджанов",
+                                           :username   "kensay",
+                                           :type       "private"},
+                              :date       1576243362},
+                    :data    "create-order"}})
+
+
+(def create-order-ctx
+  (assoc default-ctx
+    :update
+    create-order-upd))
+
+
+(def create-order-result
+  {:run             {:function ord/create-order-and-clear-basket!
+                     :args     [4 {:longitude 34.74037, :latitude 32.020955} "test"]},
+   :answer-callback {:callback_query_id "340271655591288140",
+                     :text              "Ваш заказ успешно создан! Мы будем держать вас в курсе его статуса.",
+                     :show_alert        true},
+   :dispatch        {:args [:order-status]},
+   :delete-message  {:chat-id 79225668, :message-id 10208}})
+
+
+(def raw-order-status-result
+  {:run {:function   ord/user-active-order!
+         :args       [10],
+         :next-event :order-status}})
+
+
+(def active-order
+  {:id       24,
+   :location {:longitude 32.020991, :latitude 34.740309},
+   :comment  "test",
+   :products ({:name "Глазунья с болгарским перцем и паштетом", :price 15000, :count 3}
+              {:name "Рисовая каша с ежевикой", :price 13800, :count 2})})
+
+
+(def order-status-result
+  {:send-text {:chat-id 79225668,
+               :text    (order/order-status-text active-order)
+               :options {:parse_mode   "markdown",
+                         :reply_markup {:inline_keyboard [[{:text "Оплатить картой", :callback_data "invoice/24"}]]}}}})
+
+
+(deftest create-order-test
+  (testing "create-order-handler"
+    (is (= (order/create-order-handler create-order-ctx)
+           create-order-result)))
+  (testing "raw order-status"
+    (is (= (order/order-status create-order-ctx)
+           raw-order-status-result)))
+  (testing "order-status with active order"
+    (is (= (order/order-status create-order-ctx active-order)
+           order-status-result))))
