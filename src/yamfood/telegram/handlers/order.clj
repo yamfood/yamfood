@@ -13,7 +13,7 @@
                        :request_location true}]]})
 
 
-(defn request-location
+(defn request-location-handler
   [ctx]
   (let [update (:update ctx)
         query (:callback_query update)
@@ -234,7 +234,7 @@
 
 (d/register-event-handler!
   :request-location
-  request-location)
+  request-location-handler)
 
 
 (d/register-event-handler!
