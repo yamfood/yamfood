@@ -2,7 +2,8 @@
   (:require
     [clojure.test :refer :all]
     [yamfood.core.baskets.core :as basket]
-    [yamfood.telegram.handlers.order :as order]))
+    [yamfood.telegram.handlers.order :as order]
+    [yamfood.core.users.core :as users]))
 
 
 (def default-ctx
@@ -77,6 +78,35 @@
            to-order-without-location-result))))
 
 
+(def pre-order-state
+  {:basket {:total_cost   72600,
+            :total_energy 2160,
+            :products     ({:id 1, :count 3, :name "Глазунья с болгарским перцем и паштетом", :price 15000, :energy 360}
+                           {:id 2, :count 2, :name "Рисовая каша с ежевикой", :price 13800, :energy 540})},
+   :user   {:id        10,
+            :phone     998909296339,
+            :tid       79225668,
+            :location  {:longitude 34.740309, :latitude 32.020991},
+            :comment   "Тест",
+            :basket_id 4}})
+
+
+(def order-detail-handler-result
+  {:send-text {:chat-id 79225668,
+               :text    (order/pre-order-text pre-order-state)
+               :options {:reply_markup {:inline_keyboard [[{:text "📍", :callback_data "request-location"}
+                                                           {:text "💬", :callback_data "change-comment"}]
+                                                          [{:text "🧺 Корзина", :callback_data "basket"}]
+                                                          [{:text "✅ Подтвердить", :callback_data "create-order"}]]},
+                         :parse_mode   "markdown"}}})
+
+
+(deftest order-detail-handler-test
+  (testing "Testing order-detail-handler"
+    (is (= (order/order-detail-handler to-order-ctx pre-order-state)
+           order-detail-handler-result))))
+
+
 (def request-location-upd
   {:update_id      435323162,
    :callback_query {:id      "340271655233464235",
@@ -119,4 +149,55 @@
     (is (= (order/request-location-handler request-location-ctx)
            request-location-result))))
 
+
+(def upd-with-location
+  {:update_id 435323163,
+   :message   {:message_id       10203,
+               :from             {:id            79225668,
+                                  :is_bot        false,
+                                  :first_name    "Рустам",
+                                  :last_name     "Бабаджанов",
+                                  :username      "kensay",
+                                  :language_code "ru"},
+               :chat             {:id         79225668,
+                                  :first_name "Рустам",
+                                  :last_name  "Бабаджанов",
+                                  :username   "kensay",
+                                  :type       "private"},
+               :date             1576242412,
+               :reply_to_message {:message_id 10202,
+                                  :from       {:id         488312680,
+                                               :is_bot     true,
+                                               :first_name "Kensay",
+                                               :username   "kensaybot"},
+                                  :chat       {:id         79225668,
+                                               :first_name "Рустам",
+                                               :last_name  "Бабаджанов",
+                                               :username   "kensay",
+                                               :type       "private"},
+                                  :date       1576242194,
+                                  :text       "Куда доставить?"},
+               :location         {:latitude  32.020991,
+                                  :longitude 34.740309}}})
+
+
+(def location-ctx
+  (assoc default-ctx
+    :update
+    upd-with-location))
+
+
+(def location-result
+  {:send-text {:chat-id 79225668, :text "Локация обновлена", :options {:reply_markup {:remove_keyboard true}}},
+   :run       [{:function   basket/pre-order-state!
+                :args       [4],
+                :next-event :send-order-detail}
+               {:function users/update-location!
+                :args     [10 34.740309 32.020991]}]})
+
+
+(deftest location-handler-test
+  (testing "Testing location handler"
+    (is (= (order/location-handler location-ctx)
+           location-result))))
 
