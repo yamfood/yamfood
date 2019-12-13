@@ -315,3 +315,104 @@
   (testing "order-status with active order"
     (is (= (order/order-status create-order-ctx active-order)
            order-status-result))))
+
+
+(def send-invoice-upd
+  {:update_id      435323167,
+   :callback_query {:id      "340271653298426848",
+                    :from    {:id            79225668,
+                              :is_bot        false,
+                              :first_name    "Рустам",
+                              :last_name     "Бабаджанов",
+                              :username      "kensay",
+                              :language_code "ru"},
+                    :message {:message_id 10209,
+                              :from       {:id         488312680,
+                                           :is_bot     true,
+                                           :first_name "Kensay",
+                                           :username   "kensaybot"},
+                              :chat       {:id         79225668,
+                                           :first_name "Рустам",
+                                           :last_name  "Бабаджанов",
+                                           :username   "kensay",
+                                           :type       "private"},
+                              :date       1576243378},
+                    :data    "invoice/24"}})
+
+
+(def send-invoice-ctx
+  (assoc default-ctx
+    :update
+    send-invoice-upd))
+
+
+(def raw-send-invoice-result
+  {:run {:function   ord/user-active-order!,
+         :args       [10],
+         :next-event :send-invoice}})
+
+
+(def send-invoice-result
+  {:send-invoice   {:chat-id     79225668,
+                    :title       "Оплатить заказ №24",
+                    :description "",
+                    :payload     {},
+                    :currency    "UZS",
+                    :prices      (),
+                    :options     {:reply_markup {:inline_keyboard [[{:text "Оплатить", :pay true}]
+                                                                   [{:text "Отмена", :callback_data "cancel-invoice"}]]}}},
+   :delete-message {:chat-id 79225668, :message-id 10209}})
+
+
+(deftest send-invoice-test
+  (testing "raw send-invoice"
+    (is (= (order/send-invoice send-invoice-ctx)
+           raw-send-invoice-result)))
+  (testing "send-invoice with order"
+    (is (= (order/send-invoice send-invoice-ctx active-order)
+           send-invoice-result))))
+
+
+(def cancel-invoice-upd
+  {:update_id      435323168,
+   :callback_query {:id      "340271654156348694",
+                    :from    {:id            79225668,
+                              :is_bot        false,
+                              :first_name    "Рустам",
+                              :last_name     "Бабаджанов",
+                              :username      "kensay",
+                              :language_code "ru"},
+                    :message {:message_id 10210,
+                              :from       {:id         488312680,
+                                           :is_bot     true,
+                                           :first_name "Kensay",
+                                           :username   "kensaybot"},
+                              :chat       {:id         79225668,
+                                           :first_name "Рустам",
+                                           :last_name  "Бабаджанов",
+                                           :username   "kensay",
+                                           :type       "private"},
+                              :date       1576243888,
+                              :invoice    {:title           "Оплатить заказ №24",
+                                           :description     "🥗 3 x Глазунья с болгарским перцем и паштетом\n🥗 2 x Рисовая каша с ежевикой\n",
+                                           :start_parameter "test",
+                                           :currency        "UZS",
+                                           :total_amount    2880000}},
+                    :data    "cancel-invoice"}})
+
+
+(def cancel-invoice-ctx
+  (assoc default-ctx
+    :update
+    cancel-invoice-upd))
+
+
+(def cancel-invoice-result
+  {:dispatch       {:args [:order-status]},
+   :delete-message {:chat-id 79225668, :message-id 10210}})
+
+
+(deftest cancel-invoice-test
+  (testing "cancel-invoice"
+    (is (= (order/cancel-invoice-handler cancel-invoice-ctx)
+           cancel-invoice-result))))

@@ -212,7 +212,7 @@
         query (:callback_query update)
         chat-id (:id (:from query))
         message-id (:message_id (:message query))]
-    {:dispatch       {:args [:order-status update]}
+    {:dispatch       {:args [:order-status]}
      :delete-message {:chat-id    chat-id
                       :message-id message-id}}))
 
