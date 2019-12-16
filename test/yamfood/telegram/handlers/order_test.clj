@@ -56,7 +56,7 @@
 
 
 (def to-order-result
-  {:run            {:function   basket/pre-order-state!,
+  {:run            {:function   basket/order-confirmation-state!,
                     :args       [4],
                     :next-event :send-order-detail},
    :delete-message {:chat-id 79225668, :message-id 10199}})
@@ -190,7 +190,7 @@
 
 (def location-result
   {:send-text {:chat-id 79225668, :text "Локация обновлена", :options {:reply_markup {:remove_keyboard true}}},
-   :run       [{:function   basket/pre-order-state!
+   :run       [{:function   basket/order-confirmation-state!
                 :args       [4],
                 :next-event :send-order-detail}
                {:function users/update-location!

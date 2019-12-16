@@ -99,7 +99,7 @@
     (products/state-for-product-detail! basket-id product-id)))
 
 
-(defn pre-order-state!
+(defn order-confirmation-state!
   [basket-id]
   {:basket (basket-state! basket-id)
    :user   (users/user-with-basket-id! basket-id)})

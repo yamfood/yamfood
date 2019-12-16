@@ -26,10 +26,10 @@
                       :message-id message-id}}))
 
 
-(defn pre-order-state
+(defn order-confirmation-state
   [ctx]
   (let [user (:user ctx)]
-    {:run {:function   bsk/pre-order-state!
+    {:run {:function   bsk/order-confirmation-state!
            :args       [(:basket_id user)]
            :next-event :send-order-detail}}))
 
@@ -43,7 +43,7 @@
         message-id (:message_id (:message query))]
     (into
       (cond
-        (:location user) (pre-order-state ctx)
+        (:location user) (order-confirmation-state ctx)
         :else {:send-text {:chat-id chat-id
                            :text    "Куда доставить?"
                            :options markup-for-request-location}})
@@ -89,7 +89,7 @@
     {:send-text {:chat-id chat-id
                  :text    "Локация обновлена"
                  :options {:reply_markup {:remove_keyboard true}}}
-     :run       [(:run (pre-order-state ctx))
+     :run       [(:run (order-confirmation-state ctx))
                  {:function usr/update-location!
                   :args     [(:id (:user ctx))
                              (:longitude location)
@@ -228,8 +228,8 @@
 
 
 (d/register-event-handler!
-  :pre-order-state
-  pre-order-state)
+  :order-confirmation-state
+  order-confirmation-state)
 
 
 (d/register-event-handler!

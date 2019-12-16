@@ -92,7 +92,7 @@
 (def comment-result
   {:run      {:function users/update-comment!
               :args     [10 "Тест"]}
-   :dispatch {:args [:pre-order-state]}})
+   :dispatch {:args [:order-confirmation-state]}})
 
 
 (def unknown-result
