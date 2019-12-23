@@ -9,4 +9,4 @@
 
 
 ;(init)
-;(migratus/create m/config "order-created-at")
+;(migratus/create m/config "products_is_active")

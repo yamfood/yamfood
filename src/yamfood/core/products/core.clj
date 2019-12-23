@@ -9,6 +9,7 @@
 (defn- all-products-query []
   (hs/format {:select   [:id :name :price :photo :thumbnail :energy]
               :from     [:products]
+              :where    [:= :is_active true]
               :order-by [:id]}))
 
 
@@ -34,6 +35,7 @@
                (hs/raw (format basket-cost-query basket-id))
                (hs/raw "coalesce(basket_products.count, 0) as count_in_basket")]
    :from      [:products]
+   :where     [:= :products.is_active true]
    :order-by  [:id]
    :left-join [:basket_products [:and
                                  [:= :basket_products.basket_id basket-id]
