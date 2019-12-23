@@ -15,7 +15,7 @@
                     :phone     998909296339,
                     :tid       79225668,
                     :location  {:longitude 34.74037, :latitude 32.020955},
-                    :comment   "Test",
+                    :comment   "Comment #1",
                     :basket_id 4}})
 
 
@@ -276,7 +276,7 @@
 
 (def create-order-result
   {:run             {:function ord/create-order-and-clear-basket!
-                     :args     [4 {:longitude 34.74037, :latitude 32.020955} "test"]},
+                     :args     [4 {:longitude 34.74037, :latitude 32.020955} "Comment #1"]},
    :answer-callback {:callback_query_id "340271655591288140",
                      :text              "Ваш заказ успешно создан! Мы будем держать вас в курсе его статуса.",
                      :show_alert        true},
