@@ -6,12 +6,13 @@
     [yamfood.core.db.init :as db]
     [yamfood.telegram.core :as telegram]
     [ring.adapter.jetty :refer [run-jetty]]
+    [yamfood.web.core :as web]
     [ring.middleware.json :refer [wrap-json-body]]))
 
 
 (c/defroutes
   app-routes
-  (c/GET "/" [] "Hello World!")
+  (c/context "/" [] web/web-routes)
   (c/POST "/updates" request (telegram/telegram-handler! request))
   (route/not-found "Not Found"))
 
