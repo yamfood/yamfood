@@ -46,7 +46,7 @@
         (:location user) (order-confirmation-state ctx)
         :else {:send-text {:chat-id chat-id
                            :text    "Куда доставить?"
-                           :options markup-for-request-location}})
+                           :options {:reply_markup markup-for-request-location}}})
       {:delete-message {:chat-id    chat-id
                         :message-id message-id}})))
 
