@@ -9,4 +9,4 @@
 
 
 ;(init)
-;(migratus/create m/config "order_logs")
+;(migratus/create m/config "regions_is_active")
