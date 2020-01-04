@@ -35,7 +35,7 @@
 
 (def contact-handler-result
   {:run       {:function users/create-user!,
-               :args     [79225668 998909296339M]},
+               :args     [79225668 998909296339M "Рустам Бабаджанов"]},
    :send-text [{:chat-id 79225668, :options {:reply_markup {:remove_keyboard true}}, :text "Принято!"}
                {:chat-id 79225668,
                 :options {:reply_markup {:inline_keyboard [[{:text "Что поесть?", :switch_inline_query_current_chat ""}]
@@ -45,5 +45,5 @@
 
 (deftest contact-handler-test
   (testing "Test contact handler with raw update"
-    (= (start/contact-handler ctx)
-       contact-handler-result)))
+    (is (= (start/contact-handler ctx)
+           contact-handler-result))))

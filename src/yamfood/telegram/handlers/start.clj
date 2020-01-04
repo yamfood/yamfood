@@ -46,9 +46,11 @@
         message (:message update)
         contact (:contact message)
         phone (parse-int (:phone_number contact))
-        tid (:id (:from message))]
+        from (:from message)
+        tid (:id from)
+        name (str (:first_name from) " " (:last_name from))]
     {:run       {:function users/create-user!
-                 :args     [tid phone]}
+                 :args     [tid phone name]}
      :send-text [{:chat-id (:id (:chat message))
                   :options {:reply_markup {:remove_keyboard true}}
                   :text    "Принято!"}

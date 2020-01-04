@@ -9,4 +9,4 @@
 
 
 ;(init)
-;(migratus/create m/config "products_is_active")
+;(migratus/create m/config "user_name")

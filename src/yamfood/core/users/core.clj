@@ -54,8 +54,8 @@
 
 
 (defn insert-user!
-  [tid phone]
-  (first (jdbc/insert! db/db "users" {:tid tid :phone phone})))
+  [tid phone name]
+  (first (jdbc/insert! db/db "users" {:tid tid :phone phone :name name})))
 
 
 (defn init-basket!
@@ -64,8 +64,8 @@
 
 
 (defn create-user!
-  [tid phone]
-  (let [user (insert-user! tid phone)]
+  [tid phone name]
+  (let [user (insert-user! tid phone name)]
     (init-basket! (:id user))))
 
 
