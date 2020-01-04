@@ -8,6 +8,10 @@
     [yamfood.core.users.core :as users]))
 
 
+(def order-statuses
+  {:new "new"})
+
+
 (defn- products-from-basket-query
   [basket-id]
   (hs/format {:select [:product_id :count]
@@ -117,4 +121,8 @@
     (-> (products-from-basket! basket-id)
         (prepare-basket-products-to-order (:id order))
         (insert-products!))
+    (jdbc/insert!
+      db/db "order_logs"
+      {:order_id (:id order)
+       :status   (:new order-statuses)})
     (b/clear-basket! basket-id)))

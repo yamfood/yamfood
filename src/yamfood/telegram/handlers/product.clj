@@ -1,10 +1,10 @@
 (ns yamfood.telegram.handlers.product
   (:require
+    [clojure.data.json :as json]
     [yamfood.telegram.dispatcher :as d]
     [yamfood.core.baskets.core :as baskets]
     [yamfood.telegram.handlers.utils :as u]
-    [yamfood.core.products.core :as products]
-    [clojure.data.json :as json]))
+    [yamfood.core.products.core :as products]))
 
 
 (defn want-handler
@@ -28,8 +28,7 @@
         callback-query (:callback_query update)
         callback-data (:data callback-query)
         basket-id (:basket_id (:user ctx))
-        product-id (Integer.
-                     (first (u/callback-params callback-data)))]
+        product-id (Integer. (first (u/callback-params callback-data)))]
     {:run             {:function   baskets/increment-product-in-basket!
                        :args       [basket-id product-id]
                        :next-event :update-markup}
@@ -43,8 +42,7 @@
         callback-query (:callback_query update)
         callback-data (:data callback-query)
         basket-id (:basket_id (:user ctx))
-        product-id (Integer.
-                     (first (u/callback-params callback-data)))]
+        product-id (Integer. (first (u/callback-params callback-data)))]
     {:run             {:function   baskets/decrement-product-in-basket!
                        :args       [basket-id product-id]
                        :next-event :update-markup}

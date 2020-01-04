@@ -65,8 +65,8 @@
 (def to-order-without-location-result
   {:send-text      {:chat-id 79225668,
                     :text    "Куда доставить?",
-                    :options {:resize_keyboard true,
-                              :keyboard        [[{:text "Отправить текущее положение", :request_location true}]]}},
+                    :options {:reply_markup {:resize_keyboard true,
+                                             :keyboard        [[{:text "Отправить текущее положение", :request_location true}]]}},}
    :delete-message {:chat-id 79225668, :message-id 10199}})
 
 

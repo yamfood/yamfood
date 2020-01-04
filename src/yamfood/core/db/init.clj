@@ -9,4 +9,4 @@
 
 
 ;(init)
-;(migratus/create m/config "user_name")
+;(migratus/create m/config "order_logs")
