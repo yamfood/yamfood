@@ -1,16 +1,17 @@
 (ns yamfood.telegram.handlers.start
   (:require
-    [yamfood.core.users.core :as users]
     [environ.core :refer [env]]
-    [yamfood.telegram.dispatcher :as d]))
+    [yamfood.telegram.dispatcher :as d]
+    [yamfood.core.users.core :as users]
+    [yamfood.telegram.handlers.utils :as u]))
 
 
 (def menu-markup
   {:inline_keyboard
    [[{:text                             "Что поесть?"
       :switch_inline_query_current_chat ""}]
-    [{:text          "Куда доставляете?"
-      :callback_data "location-check"}]]})
+    [{:text "Куда доставляете?"
+      :url  u/map-url}]]})
 
 
 (defn menu-message

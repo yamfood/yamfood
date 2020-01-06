@@ -69,3 +69,7 @@
     (cond
       message (:id (:from message))
       query (:id (:from query)))))
+
+
+(def map-url "https://gentle-mesa-91027.herokuapp.com/regions")
+

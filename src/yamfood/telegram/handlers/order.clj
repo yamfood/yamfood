@@ -4,7 +4,8 @@
     [yamfood.core.orders.core :as ord]
     [yamfood.telegram.dispatcher :as d]
     [yamfood.core.baskets.core :as bsk]
-    [yamfood.telegram.handlers.utils :as u]))
+    [yamfood.telegram.handlers.utils :as u]
+    [yamfood.core.regions.core :as regions]))
 
 
 (def markup-for-request-location
@@ -81,6 +82,33 @@
 
 
 (defn location-handler
+  ([ctx]
+   (let [update (:update ctx)
+         message (:message update)
+         location (:location message)]
+     {:run {:function   regions/region-by-location!
+            :args       [(:longitude location)
+                         (:latitude location)]
+            :next-event :location}}))
+  ([ctx region]
+   (let [message (:message (:update ctx))
+         chat-id (:id (:from message))]
+     (if region
+       {:dispatch {:args [:update-location]}}
+       {:send-text [{:chat-id chat-id
+                     :text    "Ждите..."
+                     :options {:reply_markup {:remove_keyboard true}}}
+                    {:chat-id chat-id
+                     :text    "К сожалению, мы не обслуживаем данный регион"
+                     :options {:reply_markup
+                               {:inline_keyboard
+                                [[{:text "Карта обслуживания"
+                                   :url  u/map-url}]
+                                 [{:text          "К корзине"
+                                   :callback_data "basket"}]]}}}]}))))
+
+
+(defn update-location
   [ctx]
   (let [update (:update ctx)
         message (:message update)
@@ -94,6 +122,7 @@
                   :args     [(:id (:user ctx))
                              (:longitude location)
                              (:latitude location)]}]}))
+
 
 
 (defn create-order-handler
@@ -225,6 +254,11 @@
 (d/register-event-handler!
   :location
   location-handler)
+
+
+(d/register-event-handler!
+  :update-location
+  update-location)
 
 
 (d/register-event-handler!
