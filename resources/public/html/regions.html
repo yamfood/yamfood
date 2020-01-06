@@ -22,26 +22,32 @@
         zoom: 11
     });
 
+    function httpGet(theUrl)
+    {
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.open( "GET", theUrl, false); // false for synchronous request
+        xmlHttp.send( null );
+        return xmlHttp.responseText;
+    }
+
+    var regions = JSON.parse(httpGet("/api/regions"));
+
     map.on('load', function() {
-        map.addLayer({
-            'id': 'maine',
-            'type': 'fill',
-            'source': {
-                'type': 'geojson',
-                'data': {
-                    'type': 'Feature',
-                    'geometry': {
-                        'type': 'Polygon',
-                        'coordinates': []
-                    }
+        for (i in regions) {
+            map.addLayer({
+                'id': i,
+                'type': 'fill',
+                'source': {
+                    'type': 'geojson',
+                    'data': regions[i].polygon
+                },
+                'layout': {},
+                'paint': {
+                    'fill-color': '#883838',
+                    'fill-opacity': 0.5
                 }
-            },
-            'layout': {},
-            'paint': {
-                'fill-color': '#088',
-                'fill-opacity': 0.8
-            }
-        });
+            });
+        }
     });
 </script>
 

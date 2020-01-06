@@ -70,4 +70,4 @@
   {:body "OK"})
 
 
-;(morse.api/set-webhook (env :bot-token) "https://3bccbdc7.ngrok.io/updates")
+;(morse.api/set-webhook (env :bot-token) "https://0957d4e4.ngrok.io/updates")

@@ -1,6 +1,6 @@
 (ns yamfood.web.core
-  (:require [compojure.core :as c]
-            [hiccup.core :as h]))
+  (:require
+    [compojure.core :as c]))
 
 
 (def regions-html
@@ -8,7 +8,7 @@
 
 
 (defn regions-view
-  [request]
+  [_]
   {:body regions-html})
 
 
