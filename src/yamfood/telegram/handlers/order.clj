@@ -81,6 +81,14 @@
                            :parse_mode   "markdown"}}}))
 
 
+(def invalid-location-markup
+  {:inline_keyboard
+   [[{:text "Карта обслуживания"
+      :url  u/map-url}]
+    [{:text          (str u/basket-emoji " Корзина")
+      :callback_data "basket"}]]})
+
+
 (defn location-handler
   ([ctx]
    (let [update (:update ctx)
@@ -100,12 +108,7 @@
                      :options {:reply_markup {:remove_keyboard true}}}
                     {:chat-id chat-id
                      :text    "К сожалению, мы не обслуживаем данный регион"
-                     :options {:reply_markup
-                               {:inline_keyboard
-                                [[{:text "Карта обслуживания"
-                                   :url  u/map-url}]
-                                 [{:text          "К корзине"
-                                   :callback_data "basket"}]]}}}]}))))
+                     :options {:reply_markup invalid-location-markup}}]}))))
 
 
 (defn update-location

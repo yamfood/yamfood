@@ -1,10 +1,11 @@
 (ns yamfood.telegram.handlers.order-test
   (:require
     [clojure.test :refer :all]
-    [yamfood.core.baskets.core :as basket]
-    [yamfood.telegram.handlers.order :as order]
+    [yamfood.core.orders.core :as ord]
     [yamfood.core.users.core :as users]
-    [yamfood.core.orders.core :as ord]))
+    [yamfood.core.baskets.core :as basket]
+    [yamfood.core.regions.core :as regions]
+    [yamfood.telegram.handlers.order :as order]))
 
 
 (def default-ctx
@@ -74,7 +75,7 @@
   (testing "Test to-order"
     (is (= (order/to-order-handler to-order-ctx)
            to-order-result)))
-  (testing "Test to-order with context without location"
+  (testing "Test to-order without location"
     (is (= (order/to-order-handler to-order-ctx-without-location)
            to-order-without-location-result))))
 
@@ -189,6 +190,12 @@
 
 
 (def location-result
+  {:run {:function   regions/region-by-location!,
+         :args       [34.740309 32.020991],
+         :next-event :location}})
+
+
+(def valid-location-result
   {:send-text {:chat-id 79225668, :text "Локация обновлена", :options {:reply_markup {:remove_keyboard true}}},
    :run       [{:function   basket/order-confirmation-state!
                 :args       [4],
@@ -197,10 +204,32 @@
                 :args     [10 34.740309 32.020991]}]})
 
 
+(def region-location-result
+  {:dispatch {:args [:update-location]}})
+
+
+(def nil-region-location-result
+  {:send-text [{:chat-id 79225668, :text "Ждите...", :options {:reply_markup {:remove_keyboard true}}}
+               {:chat-id 79225668,
+                :text    "К сожалению, мы не обслуживаем данный регион",
+                :options {:reply_markup {:inline_keyboard [[{:text "Карта обслуживания",
+                                                             :url  "https://gentle-mesa-91027.herokuapp.com/regions"}]
+                                                           [{:text "🧺 Корзина", :callback_data "basket"}]]}}}]})
+
+
 (deftest location-handler-test
   (testing "Testing location handler"
     (is (= (order/location-handler location-ctx)
-           location-result))))
+           location-result)))
+  (testing "Location with region"
+    (is (= (order/location-handler location-ctx {:id 1})
+           region-location-result)))
+  (testing "Location with nil region"
+    (is (= (order/location-handler location-ctx nil)
+           nil-region-location-result)))
+  (testing "Testing valid location"
+    (is (= (order/update-location location-ctx)
+           valid-location-result))))
 
 
 (def change-comment-upd

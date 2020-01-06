@@ -48,7 +48,8 @@
 (def existing-user-result
   {:send-text {:chat-id 79225668,
                :options {:reply_markup {:inline_keyboard [[{:text "Что поесть?", :switch_inline_query_current_chat ""}]
-                                                          [{:text "Куда доставляете?", :callback_data "location-check"}]]}},
+                                                          [{:text "Куда доставляете?",
+                                                            :url  "https://gentle-mesa-91027.herokuapp.com/regions"}]]}},
                :text    "Готовим и бесплатно доставляем за 30 минут"}})
 
 
