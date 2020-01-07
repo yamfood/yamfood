@@ -9,4 +9,4 @@
 
 
 ;(init)
-;(migratus/create m/config "regions_is_active")
+;(migratus/create m/config "riders")
