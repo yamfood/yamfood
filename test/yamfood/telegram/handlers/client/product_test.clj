@@ -1,8 +1,8 @@
-(ns yamfood.telegram.handlers.product-test
+(ns yamfood.telegram.handlers.client.product-test
   (:require
     [clojure.test :refer :all]
     [yamfood.core.products.core :as products]
-    [yamfood.telegram.handlers.product :as product]))
+    [yamfood.telegram.handlers.client.product :as product]))
 
 
 (def default-ctx
@@ -86,7 +86,7 @@
   {:run {:function   products/product-detail-state-by-name!
          :args       [(:basket_id (:user default-ctx))
                       (:text (:message (:update ctx-with-product-name)))]
-         :next-event :text}})
+         :next-event :c/text}})
 
 
 (def result-with-product-not-in-basket-state

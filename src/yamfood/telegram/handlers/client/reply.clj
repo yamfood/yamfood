@@ -1,4 +1,4 @@
-(ns yamfood.telegram.handlers.reply
+(ns yamfood.telegram.handlers.client.reply
   (:require
     [yamfood.core.users.core :as users]
     [yamfood.telegram.dispatcher :as d]))
@@ -28,5 +28,5 @@
 
 
 (d/register-event-handler!
-  :reply
+  :c/reply
   message-with-reply-handler)

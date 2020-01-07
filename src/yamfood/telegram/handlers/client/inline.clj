@@ -1,4 +1,4 @@
-(ns yamfood.telegram.handlers.inline
+(ns yamfood.telegram.handlers.client.inline
   (:require
     [environ.core :refer [env]]
     [yamfood.core.products.core :as p]
@@ -26,7 +26,7 @@
 (defn inline-query-handler
   ([_]
    {:run {:function   p/all-products!
-          :next-event :inline}})
+          :next-event :c/inline}})
   ([ctx products]
    (let [update (:update ctx)]
      {:answer-inline
@@ -36,5 +36,5 @@
 
 
 (d/register-event-handler!
-  :inline
+  :c/inline
   inline-query-handler)

@@ -1,4 +1,4 @@
-(ns yamfood.telegram.handlers.product
+(ns yamfood.telegram.handlers.client.product
   (:require
     [clojure.data.json :as json]
     [yamfood.telegram.dispatcher :as d]
@@ -17,7 +17,7 @@
         product-id (Integer. (first callback-params))]
     {:run             {:function   baskets/add-product-to-basket!
                        :args       [(:basket_id user) product-id]
-                       :next-event :update-markup}
+                       :next-event :c/update-markup}
      :answer-callback {:callback_query_id (:id query)
                        :text              "Добавлено в корзину"}}))
 
@@ -31,7 +31,7 @@
         product-id (Integer. (first (u/callback-params callback-data)))]
     {:run             {:function   baskets/increment-product-in-basket!
                        :args       [basket-id product-id]
-                       :next-event :update-markup}
+                       :next-event :c/update-markup}
      :answer-callback {:callback_query_id (:id callback-query)
                        :text              " "}}))
 
@@ -45,7 +45,7 @@
         product-id (Integer. (first (u/callback-params callback-data)))]
     {:run             {:function   baskets/decrement-product-in-basket!
                        :args       [basket-id product-id]
-                       :next-event :update-markup}
+                       :next-event :c/update-markup}
      :answer-callback {:callback_query_id (:id callback-query)
                        :text              " "}}))
 
@@ -81,7 +81,7 @@
          message (:message update)]
      {:run {:function   products/product-detail-state-by-name!
             :args       [(:basket_id (:user ctx)) (:text message)]
-            :next-event :text}}))
+            :next-event :c/text}}))
   ([ctx product-detail-state]
    (let [update (:update ctx)
          message (:message update)
@@ -99,25 +99,25 @@
 
 
 (d/register-event-handler!
-  :text
+  :c/text
   product-detail-handler)
 
 
 (d/register-event-handler!
-  :detail-want
+  :c/detail-want
   want-handler)
 
 
 (d/register-event-handler!
-  :detail-inc
+  :c/detail-inc
   detail-inc-handler)
 
 
 (d/register-event-handler!
-  :detail-dec
+  :c/detail-dec
   detail-dec-handler)
 
 
 (d/register-event-handler!
-  :update-markup
+  :c/update-markup
   update-detail-markup)

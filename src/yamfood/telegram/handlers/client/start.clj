@@ -1,4 +1,4 @@
-(ns yamfood.telegram.handlers.start
+(ns yamfood.telegram.handlers.client.start
   (:require
     [environ.core :refer [env]]
     [yamfood.telegram.dispatcher :as d]
@@ -68,10 +68,10 @@
 
 
 (d/register-event-handler!
-  :start
+  :c/start
   start-handler)
 
 
 (d/register-event-handler!
-  :contact
+  :c/contact
   contact-handler)

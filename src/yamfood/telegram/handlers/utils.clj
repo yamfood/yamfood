@@ -11,6 +11,18 @@
 (def energy-emoji "\uD83D\uDD0B")
 
 
+; TODO: Make it work with all updates!
+(defn tid-from-update
+  [update]
+  (let [message (:message update)
+        callback (:callback_query update)
+        inline (:inline_query update)]
+    (cond
+      message (:id (:from message))
+      callback (:id (:from callback))
+      inline (:id (:from inline)))))
+
+
 (defn fmt-values
   [amount]
   (str/replace (format "%,d" amount) "," " "))

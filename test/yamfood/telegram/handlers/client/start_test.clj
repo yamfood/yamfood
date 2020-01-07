@@ -1,7 +1,7 @@
-(ns yamfood.telegram.handlers.start-test
+(ns yamfood.telegram.handlers.client.start-test
   (:require
     [clojure.test :refer :all]
-    [yamfood.telegram.handlers.start :as start]))
+    [yamfood.telegram.handlers.client.start :as start]))
 
 
 (def upd

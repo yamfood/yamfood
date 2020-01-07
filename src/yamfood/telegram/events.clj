@@ -1,9 +1,11 @@
 (ns yamfood.telegram.events
   (:require
-    [yamfood.telegram.handlers.start]
-    [yamfood.telegram.handlers.order]
-    [yamfood.telegram.handlers.reply]
-    [yamfood.telegram.handlers.basket]
-    [yamfood.telegram.handlers.inline]
-    [yamfood.telegram.handlers.product]
-    [yamfood.telegram.handlers.callback]))
+    [yamfood.telegram.handlers.client.start]
+    [yamfood.telegram.handlers.client.order]
+    [yamfood.telegram.handlers.client.reply]
+    [yamfood.telegram.handlers.client.basket]
+    [yamfood.telegram.handlers.client.inline]
+    [yamfood.telegram.handlers.client.product]
+    [yamfood.telegram.handlers.client.callback]
+
+    [yamfood.telegram.handlers.rider.text]))

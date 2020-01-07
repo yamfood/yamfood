@@ -1,4 +1,4 @@
-(ns yamfood.telegram.handlers.basket
+(ns yamfood.telegram.handlers.client.basket
   (:require
     [yamfood.telegram.dispatcher :as d]
     [yamfood.core.baskets.core :as baskets]
@@ -17,7 +17,7 @@
                         :args     [basket-id product-id]}
                        {:function   baskets/basket-state!
                         :args       [basket-id]
-                        :next-event :update-basket-markup}]
+                        :next-event :c/update-basket-markup}]
      :answer-callback {:callback_query_id (:id callback-query)
                        :text              " "}}))
 
@@ -34,7 +34,7 @@
                         :args     [basket-id product-id]}
                        {:function   baskets/basket-state!
                         :args       [basket-id]
-                        :next-event :update-basket-markup}]
+                        :next-event :c/update-basket-markup}]
      :answer-callback {:callback_query_id (:id callback-query)
                        :text              " "}}))
 
@@ -43,7 +43,7 @@
   [ctx]
   {:run {:function   baskets/basket-state!
          :args       [(:basket_id (:user ctx))]
-         :next-event :send-basket}})
+         :next-event :c/send-basket}})
 
 
 (defn basket-product-markup
@@ -106,25 +106,25 @@
 
 
 (d/register-event-handler!
-  :basket
+  :c/basket
   basket-handler)
 
 
 (d/register-event-handler!
-  :inc-basket-product
+  :c/inc-basket-product
   basket-inc-handler)
 
 
 (d/register-event-handler!
-  :dec-basket-product
+  :c/dec-basket-product
   basket-dec-handler)
 
 
 (d/register-event-handler!
-  :send-basket
+  :c/send-basket
   send-basket)
 
 
 (d/register-event-handler!
-  :update-basket-markup
+  :c/update-basket-markup
   update-basket-markup)

@@ -1,8 +1,8 @@
-(ns yamfood.telegram.handlers.inline-test
+(ns yamfood.telegram.handlers.client.inline-test
   (:require
     [clojure.test :refer :all]
-    [yamfood.telegram.handlers.inline :as inline]
-    [yamfood.core.products.core :as products]))
+    [yamfood.core.products.core :as products]
+    [yamfood.telegram.handlers.client.inline :as inline]))
 
 
 (def upd
@@ -98,7 +98,7 @@
 
 (def inline-handler-result
   {:run {:function   products/all-products!,
-         :next-event :inline}})
+         :next-event :c/inline}})
 
 
 

@@ -1,9 +1,8 @@
-(ns yamfood.telegram.handlers.product-buttons-test
+(ns yamfood.telegram.handlers.client.product-buttons-test
   (:require
     [clojure.test :refer :all]
     [yamfood.core.baskets.core :as baskets]
-    [yamfood.core.products.core :as products]
-    [yamfood.telegram.handlers.product :as product]))
+    [yamfood.telegram.handlers.client.product :as product]))
 
 
 (def default-ctx
@@ -52,7 +51,7 @@
 (def want-result
   {:run             {:function   baskets/add-product-to-basket!
                      :args       [4 2]
-                     :next-event :update-markup}
+                     :next-event :c/update-markup}
    :answer-callback {:callback_query_id "340271653139032468" :text "Добавлено в корзину"}})
 
 
@@ -97,7 +96,7 @@
 (def detail-inc-result
   {:run             {:function   baskets/increment-product-in-basket!
                      :args       [4 2]
-                     :next-event :update-markup}
+                     :next-event :c/update-markup}
    :answer-callback {:callback_query_id "340271653863261773", :text " "}})
 
 
@@ -119,7 +118,7 @@
 (def detail-dec-result
   {:run             {:function   baskets/decrement-product-in-basket!
                      :args       [4 2]
-                     :next-event :update-markup}
+                     :next-event :c/update-markup}
    :answer-callback {:callback_query_id "340271653863261773", :text " "}})
 
 

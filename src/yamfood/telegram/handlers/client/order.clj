@@ -1,4 +1,4 @@
-(ns yamfood.telegram.handlers.order
+(ns yamfood.telegram.handlers.client.order
   (:require
     [yamfood.core.users.core :as usr]
     [yamfood.core.orders.core :as ord]
@@ -32,7 +32,7 @@
   (let [user (:user ctx)]
     {:run {:function   bsk/order-confirmation-state!
            :args       [(:basket_id user)]
-           :next-event :send-order-detail}}))
+           :next-event :c/send-order-detail}}))
 
 
 (defn to-order-handler
@@ -97,7 +97,7 @@
      {:run {:function   regions/region-by-location!
             :args       [(:longitude location)
                          (:latitude location)]
-            :next-event :location}}))
+            :next-event :c/location}}))
   ([ctx region]
    (let [message (:message (:update ctx))
          chat-id (:id (:from message))]
@@ -198,7 +198,7 @@
   ([ctx]
    {:run {:function   ord/user-active-order!
           :args       [(:id (:user ctx))]
-          :next-event :order-status}})
+          :next-event :c/order-status}})
   ([ctx order]
    (let [update (:update ctx)
          chat-id (u/chat-id update)]
@@ -222,7 +222,7 @@
   ([ctx]
    {:run {:function   ord/user-active-order!
           :args       [(:id (:user ctx))]
-          :next-event :send-invoice}})
+          :next-event :c/send-invoice}})
   ([ctx order]
    (let [update (:update ctx)
          chat-id (u/chat-id update)
@@ -250,55 +250,55 @@
 
 
 (d/register-event-handler!
-  :to-order
+  :c/to-order
   to-order-handler)
 
 
 (d/register-event-handler!
-  :location
+  :c/location
   location-handler)
 
 
 (d/register-event-handler!
-  :update-location
+  :c/update-location
   update-location)
 
 
 (d/register-event-handler!
-  :order-confirmation-state
+  :c/order-confirmation-state
   order-confirmation-state)
 
 
 (d/register-event-handler!
-  :request-location
+  :c/request-location
   request-location-handler)
 
 
 (d/register-event-handler!
-  :send-order-detail
+  :c/send-order-detail
   order-detail-handler)
 
 
 (d/register-event-handler!
-  :create-order
+  :c/create-order
   create-order-handler)
 
 
 (d/register-event-handler!
-  :change-comment
+  :c/change-comment
   change-comment-handler)
 
 
 (d/register-event-handler!
-  :order-status
+  :c/order-status
   order-status)
 
 
 (d/register-event-handler!
-  :send-invoice
+  :c/send-invoice
   send-invoice)
 
 
 (d/register-event-handler!
-  :cancel-invoice
+  :c/cancel-invoice
   cancel-invoice-handler)

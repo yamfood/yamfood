@@ -1,8 +1,8 @@
-(ns yamfood.telegram.handlers.basket-test
+(ns yamfood.telegram.handlers.client.basket-test
   (:require
     [clojure.test :refer :all]
     [yamfood.core.baskets.core :as baskets]
-    [yamfood.telegram.handlers.basket :as basket]))
+    [yamfood.telegram.handlers.client.basket :as basket]))
 
 
 (def upd
@@ -119,7 +119,7 @@
 (def basket-handler-result
   {:run {:function   baskets/basket-state!
          :args       [4]
-         :next-event :send-basket}})
+         :next-event :c/send-basket}})
 
 
 (deftest basket-test

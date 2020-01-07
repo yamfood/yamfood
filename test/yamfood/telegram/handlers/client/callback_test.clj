@@ -1,7 +1,7 @@
-(ns yamfood.telegram.handlers.callback-test
+(ns yamfood.telegram.handlers.client.callback-test
   (:require
     [clojure.test :refer :all]
-    [yamfood.telegram.handlers.callback :as callback]))
+    [yamfood.telegram.handlers.client.callback :as callback]))
 
 
 
@@ -19,33 +19,33 @@
 
 (def want
   {:ctx    (assoc ctx :update {:callback_query {:data "want/1"}})
-   :result {:dispatch {:args [:detail-want]}}})
+   :result {:dispatch {:args [:c/detail-want]}}})
 
 
 (def detail-inc
   {:ctx    (assoc ctx :update {:callback_query {:data "detail+/1"}})
-   :result {:dispatch {:args [:detail-inc]}}})
+   :result {:dispatch {:args [:c/detail-inc]}}})
 
 
 (def detail-dec
   {:ctx    (assoc ctx :update {:callback_query {:data "detail-/1"}})
-   :result {:dispatch {:args [:detail-dec]}}})
+   :result {:dispatch {:args [:c/detail-dec]}}})
 
 
 (def basket
   {:ctx    (assoc ctx :update {:callback_query {:data "basket"}})
-   :result {:dispatch {:args [:basket]}}})
+   :result {:dispatch {:args [:c/basket]}}})
 
 
 
 (def basket-inc
   {:ctx    (assoc ctx :update {:callback_query {:data "basket+/1"}})
-   :result {:dispatch {:args [:inc-basket-product]}}})
+   :result {:dispatch {:args [:c/inc-basket-product]}}})
 
 
 (def basket-dec
   {:ctx    (assoc ctx :update {:callback_query {:data "basket-/1"}})
-   :result {:dispatch {:args [:dec-basket-product]}}})
+   :result {:dispatch {:args [:c/dec-basket-product]}}})
 
 
 (def unknown

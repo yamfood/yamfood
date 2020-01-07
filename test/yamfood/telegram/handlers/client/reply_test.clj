@@ -1,8 +1,8 @@
-(ns yamfood.telegram.handlers.reply-test
+(ns yamfood.telegram.handlers.client.reply-test
   (:require
     [clojure.test :refer :all]
     [yamfood.core.users.core :as users]
-    [yamfood.telegram.handlers.reply :as reply]))
+    [yamfood.telegram.handlers.client.reply :as reply]))
 
 
 (def comment-upd

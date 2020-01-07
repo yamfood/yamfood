@@ -1,11 +1,11 @@
-(ns yamfood.telegram.handlers.order-test
+(ns yamfood.telegram.handlers.client.order-test
   (:require
     [clojure.test :refer :all]
     [yamfood.core.orders.core :as ord]
     [yamfood.core.users.core :as users]
     [yamfood.core.baskets.core :as basket]
     [yamfood.core.regions.core :as regions]
-    [yamfood.telegram.handlers.order :as order]))
+    [yamfood.telegram.handlers.client.order :as order]))
 
 
 (def default-ctx
@@ -59,7 +59,7 @@
 (def to-order-result
   {:run            {:function   basket/order-confirmation-state!,
                     :args       [4],
-                    :next-event :send-order-detail},
+                    :next-event :c/send-order-detail},
    :delete-message {:chat-id 79225668, :message-id 10199}})
 
 
@@ -192,14 +192,14 @@
 (def location-result
   {:run {:function   regions/region-by-location!,
          :args       [34.740309 32.020991],
-         :next-event :location}})
+         :next-event :c/location}})
 
 
 (def valid-location-result
   {:send-text {:chat-id 79225668, :text "Локация обновлена", :options {:reply_markup {:remove_keyboard true}}},
    :run       [{:function   basket/order-confirmation-state!
                 :args       [4],
-                :next-event :send-order-detail}
+                :next-event :c/send-order-detail}
                {:function users/update-location!
                 :args     [10 34.740309 32.020991]}]})
 
@@ -316,7 +316,7 @@
 (def raw-order-status-result
   {:run {:function   ord/user-active-order!
          :args       [10],
-         :next-event :order-status}})
+         :next-event :c/order-status}})
 
 
 (def active-order
@@ -378,7 +378,7 @@
 (def raw-send-invoice-result
   {:run {:function   ord/user-active-order!,
          :args       [10],
-         :next-event :send-invoice}})
+         :next-event :c/send-invoice}})
 
 
 (def send-invoice-result

@@ -1,8 +1,8 @@
-(ns yamfood.telegram.handlers.basket-buttons-test
+(ns yamfood.telegram.handlers.client.basket-buttons-test
   (:require
     [clojure.test :refer :all]
     [yamfood.core.baskets.core :as baskets]
-    [yamfood.telegram.handlers.basket :as basket]))
+    [yamfood.telegram.handlers.client.basket :as basket]))
 
 
 (def default-ctx
@@ -50,7 +50,7 @@
                       :args     [4 1]}
                      {:function   baskets/basket-state!
                       :args       [4]
-                      :next-event :update-basket-markup}]
+                      :next-event :c/update-basket-markup}]
    :answer-callback {:callback_query_id "340271655032893460" :text " "}})
 
 
@@ -59,7 +59,7 @@
                       :args     [4 1]}
                      {:function   baskets/basket-state!
                       :args       [4]
-                      :next-event :update-basket-markup}]
+                      :next-event :c/update-basket-markup}]
    :answer-callback {:callback_query_id "340271655032893460" :text " "}})
 
 

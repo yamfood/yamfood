@@ -17,7 +17,7 @@
   (c/context "/" [] web/web-routes)
   (c/context "/api" [] api/api-routes)
 
-  (c/POST "/updates" request (telegram/telegram-handler! request))
+  (c/context "/updates" [] telegram/telegram-routes)
 
   (route/not-found "Not Found"))
 
