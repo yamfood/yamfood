@@ -20,8 +20,21 @@
      (-> resp :body))))
 
 
+(defn send-location
+  "Sends location to the chat
+  (https://core.telegram.org/bots/api#sendlocation)"
+  ([token chat-id longitude latitude] (send-location token chat-id longitude latitude {}))
+  ([token chat-id longitude latitude options]
+   (let [url (str base-url token "/sendLocation")
+         query (into {:chat_id chat-id :longitude longitude :latitude latitude} options)
+         resp (http/post url {:content-type :json
+                              :as           :json
+                              :form-params  query})]
+     (-> resp :body))))
+
+
 (defn send-invoice
-  "Edits only the reply markup of message
+  "Sends invoice to the chat
   (https://core.telegram.org/bots/api#editmessagereplymarkup)"
   ([token provider-token
     chat-id title description

@@ -64,6 +64,17 @@
 
 
 (d/register-effect-handler!
+  :send-location
+  (fn [ctx effect]
+    (-t/send-location
+      (:token ctx)
+      (:chat-id effect)
+      (:longitude effect)
+      (:latitude effect)
+      (:options effect))))
+
+
+(d/register-effect-handler!
   :delete-message
   (fn [ctx effect]
     (t/delete-text
