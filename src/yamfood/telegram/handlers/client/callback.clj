@@ -28,5 +28,5 @@
 
 
 (d/register-event-handler!
-  :client/callback
+  :c/callback
   callback-handler)

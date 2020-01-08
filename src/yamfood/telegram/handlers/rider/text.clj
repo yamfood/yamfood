@@ -1,14 +1,67 @@
 (ns yamfood.telegram.handlers.rider.text
-  (:require [yamfood.telegram.dispatcher :as d]))
+  (:require
+    [yamfood.core.orders.core :as o]
+    [yamfood.telegram.dispatcher :as d]
+    [yamfood.telegram.handlers.utils :as u]))
+
+
+(defn rider-start-handler
+  [ctx]
+  (let [update (:update ctx)
+        message (:message update)
+        chat-id (:id (:from message))]
+    {:send-text {:chat-id chat-id
+                 :text    "Hello, Rider!"}}))
+
+
+(defn- order-detail-text
+  [order]
+  (format
+    (str "*Заказ №%s*\n\n"
+         u/comment-emoji " %s\n"
+         u/money-emoji " %s сум")
+    (:id order)
+    (:comment order)
+    (u/fmt-values (:total_cost order))))
+
+
+(defn- order-detail-markup
+  [order]
+  {:inline_keyboard
+   [[{:text "Локация" :callback_data "order-location"}]]})
 
 
 (defn rider-text-handler
   [ctx]
   (let [update (:update ctx)
         message (:message update)
-        chat-id (:id (:from message))]
-    {:send-text {:chat-id chat-id
-                 :text "Hello, Rider!"}}))
+        text (:text message)
+        chat-id (:id (:from message))
+        order-id (u/parse-int text)]
+    (if order-id
+      (let [order (o/order-by-id! order-id)]
+        (if order
+          {:send-location {:chat-id   chat-id
+                           :longitude (:longitude (:location order))
+                           :latitude  (:latitude (:location order))}
+           :send-text     {:chat-id chat-id
+                           :text    (order-detail-text order)
+                           :options {:parse_mode   "markdown"
+                                     :reply_markup (order-detail-markup order)}}}
+
+          {:send-text {:chat-id chat-id
+                       :text    "Такого заказа не существует"}}))
+
+      {:send-text {:chat-id chat-id
+                   :text    "Отправьте номер заказа"}})))
+
+
+(o/order-by-id! 36)
+
+
+(d/register-event-handler!
+  :r/start
+  rider-start-handler)
 
 
 (d/register-event-handler!

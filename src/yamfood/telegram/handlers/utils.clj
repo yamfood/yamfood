@@ -85,3 +85,7 @@
 
 (def map-url "https://gentle-mesa-91027.herokuapp.com/regions")
 
+
+(defn parse-int [s]
+  (let [r (re-find #"\d+" s)]
+    (when r (Integer. r))))
