@@ -17,18 +17,24 @@
 (defn- order-detail-text
   [order]
   (format
-    (str "*Заказ №%s*\n\n"
-         u/comment-emoji " %s\n"
-         u/money-emoji " %s сум")
-    (:id order)
-    (:comment order)
-    (u/fmt-values (:total_cost order))))
+    (str "*---------- Заказ №%s ----------*\n\n"
+         u/client-emoji " %s\n"
+         u/phone-emoji " %s\n"
+         u/money-emoji " %s сум\n\n"
+         u/comment-emoji " %s\n")
+    3445
+    "Бабаджанов Рустам"
+    "+998909296339"
+    (u/fmt-values (:total_cost order))
+    (:comment order)))
 
 
 (defn- order-detail-markup
   [order]
   {:inline_keyboard
-   [[{:text "Локация" :callback_data "order-location"}]]})
+   [[{:text (str u/food-emoji " Продукты") :callback_data "cancel-order"}]
+    [{:text (str u/finish-emoji " Завершить") :callback_data "cancel-order"}
+     {:text (str u/cancel-emoji " Отменить") :callback_data "cancel-order"}]]})
 
 
 (defn rider-text-handler

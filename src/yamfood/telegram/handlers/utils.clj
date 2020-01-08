@@ -9,6 +9,10 @@
 (def basket-emoji "\uD83E\uDDFA")
 (def food-emoji "\uD83E\uDD57")
 (def energy-emoji "\uD83D\uDD0B")
+(def cancel-emoji "❌")
+(def phone-emoji "\uD83D\uDCDE")
+(def finish-emoji "✅")
+(def client-emoji "\uD83D\uDE03")
 
 
 ; TODO: Make it work with all updates!
