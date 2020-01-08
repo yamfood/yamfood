@@ -12,6 +12,31 @@
   {:new "new"})
 
 
+(defn fmt-order-location
+  [order]
+  (assoc order
+    :location
+    (db/point->clj (:location order))))
+
+
+(defn- order-totals-query
+  [order-id]
+  (format "
+    select
+      coalesce(sum(order_products.count * products.price), 0) as total_cost,
+      coalesce(sum(order_products.count * products.energy), 0) as total_energy
+    from order_products, products
+    where order_products.order_id = %d and
+          products.id = order_products.product_id", order-id))
+
+
+(defn order-totals!
+  [order-id]
+  (->> (order-totals-query order-id)
+       (jdbc/query db/db)
+       (first)))
+
+
 (defn- products-from-basket-query
   [basket-id]
   (hs/format {:select [:product_id :count]
@@ -48,16 +73,30 @@
        (jdbc/query db/db)))
 
 
+(defn add-products
+  [order]
+  (assoc order :products (products-by-order-id! (:id order))))
+
+
 (defn orders-by-user-id-query
   [user-id]
   (hs/format (hh/merge-where order-detail-query [:= :orders.user_id user-id])))
 
 
-(defn fmt-order-location
-  [order]
-  (assoc order
-    :location
-    (db/point->clj (:location order))))
+(defn order-by-id-query
+  [order-id]
+  (hs/format (hh/merge-where order-detail-query [:= :orders.id order-id])))
+
+
+(defn order-by-id!
+  [order-id]
+  (let [order (->> (order-by-id-query order-id)
+                   (jdbc/query db/db)
+                   (map fmt-order-location)
+                   (first))]
+    (when order
+      (merge (order-totals! order-id)
+             (add-products order)))))
 
 
 (defn orders-by-user-id!
@@ -65,11 +104,6 @@
   (->> (orders-by-user-id-query user-id)
        (jdbc/query db/db)
        (map fmt-order-location)))
-
-
-(defn add-products
-  [order]
-  (assoc order :products (products-by-order-id! (:id order))))
 
 
 (defn user-active-order!
@@ -91,7 +125,7 @@
 
 
 (defn insert-order-query
-  [user-id lat lon comment]
+  [user-id lon lat comment]
   ["insert into orders (user_id, location, comment) values (?, POINT(?, ?), ?);"
    user-id
    lon lat
