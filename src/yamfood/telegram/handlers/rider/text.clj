@@ -62,9 +62,6 @@
                    :text    "Отправьте номер заказа"}})))
 
 
-(o/order-by-id! 36)
-
-
 (d/register-event-handler!
   :r/start
   rider-start-handler)
