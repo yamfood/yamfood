@@ -12,7 +12,7 @@
         user-id (:id (:user ctx))]
     {:run      {:function users/update-comment!
                 :args     [user-id text]}
-     :dispatch {:args [:order-confirmation-state]}}))
+     :dispatch {:args [:c/order-confirmation-state]}}))
 
 
 (def write-comment-text "Напишите свой комментарий к заказу")
