@@ -106,3 +106,11 @@
 (defn parse-int [s]
   (let [r (re-find #"\d+" s)]
     (when r (Integer. r))))
+
+
+(defn order-products-text
+  [products]
+  (doall
+    (map
+      #(format (str food-emoji " %d x %s\n") (:count %) (:name %))
+      products)))

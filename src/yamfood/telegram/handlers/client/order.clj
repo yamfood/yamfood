@@ -161,18 +161,10 @@
                       :message-id message-id}}))
 
 
-(defn order-products-text
-  [products]
-  (doall
-    (map
-      #(format (str u/food-emoji " %d x %s\n") (:count %) (:name %))
-      products)))
-
-
 (defn order-status-text
   [order]
   (format (str "*Заказ №1334:*\n\n"
-               (apply str (order-products-text (:products order)))
+               (apply str (u/order-products-text (:products order)))
                "\n"
                u/money-emoji " 53 200 сум (Не оплачено)\n\n"
                "Ожидает подтверждения оператором")))
@@ -210,7 +202,7 @@
 
 (defn invoice-description
   [order]
-  (format (str (apply str (order-products-text (:products order))))))
+  (format (str (apply str (u/order-products-text (:products order))))))
 
 
 (def invoice-reply-markup

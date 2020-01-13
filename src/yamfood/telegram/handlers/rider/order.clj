@@ -1,4 +1,4 @@
-(ns yamfood.telegram.handlers.rider.text
+(ns yamfood.telegram.handlers.rider.order
   (:require
     [yamfood.core.orders.core :as o]
     [yamfood.telegram.dispatcher :as d]
@@ -38,7 +38,7 @@
      {:text (str u/cancel-emoji " Отменить") :callback_data "send-menu"}]]})
 
 
-(defn rider-text-handler
+(defn rider-assign-order-handler
   [ctx]
   (let [update (:update ctx)
         message (:message update)
@@ -63,6 +63,24 @@
                    :text    "Отправьте номер заказа"}})))
 
 
+(defn order-products
+  ([ctx]
+   (let [update (:update ctx)
+         query (:callback_query update)
+         callback-params (u/callback-params (:data query))
+         order-id (u/parse-int (first callback-params))]
+     {:run {:function   o/products-by-order-id!
+            :args       [order-id]
+            :next-event :r/order-products}}))
+  ([ctx products]
+   (let [update (:update ctx)
+         query (:callback_query update)]
+     {:answer-callback {:callback_query_id (:id query)
+                        :text              (apply str (u/order-products-text products))
+                        :show_alert        true}})))
+
+
+
 (d/register-event-handler!
   :r/start
   rider-start-handler)
@@ -70,7 +88,9 @@
 
 (d/register-event-handler!
   :r/text
-  rider-text-handler)
+  rider-assign-order-handler)
 
 
-
+(d/register-event-handler!
+  :r/order-products
+  order-products)
