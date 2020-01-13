@@ -19,7 +19,6 @@
    :description           (order-description order)})
 
 
-
 (defn rider-inline-handler
   ([ctx]
    (let [update (:update ctx)

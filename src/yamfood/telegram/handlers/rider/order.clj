@@ -80,7 +80,6 @@
                         :show_alert        true}})))
 
 
-
 (d/register-event-handler!
   :r/start
   rider-start-handler)

@@ -1,7 +1,7 @@
 (ns yamfood.telegram.handlers.rider.menu
   (:require
-    [yamfood.telegram.handlers.utils :as u]
-    [yamfood.telegram.dispatcher :as d]))
+    [yamfood.telegram.dispatcher :as d]
+    [yamfood.telegram.handlers.utils :as u]))
 
 
 (defn rider-menu-text
