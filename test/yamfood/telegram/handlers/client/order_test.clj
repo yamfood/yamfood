@@ -309,7 +309,7 @@
    :answer-callback {:callback_query_id "340271655591288140",
                      :text              "Ваш заказ успешно создан! Мы будем держать вас в курсе его статуса.",
                      :show_alert        true},
-   :dispatch        {:args [:order-status]},
+   :dispatch        {:args [:c/order-status]},
    :delete-message  {:chat-id 79225668, :message-id 10208}})
 
 
@@ -437,7 +437,7 @@
 
 
 (def cancel-invoice-result
-  {:dispatch       {:args [:order-status]},
+  {:dispatch       {:args [:c/order-status]},
    :delete-message {:chat-id 79225668, :message-id 10210}})
 
 

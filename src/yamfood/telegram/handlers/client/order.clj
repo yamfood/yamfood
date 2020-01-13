@@ -142,7 +142,7 @@
      :answer-callback {:callback_query_id (:id query)
                        :text              "Ваш заказ успешно создан! Мы будем держать вас в курсе его статуса."
                        :show_alert        true}
-     :dispatch        {:args [:order-status]}
+     :dispatch        {:args [:c/order-status]}
      :delete-message  {:chat-id    chat-id
                        :message-id message-id}}))
 
@@ -236,7 +236,7 @@
         query (:callback_query update)
         chat-id (:id (:from query))
         message-id (:message_id (:message query))]
-    {:dispatch       {:args [:order-status]}
+    {:dispatch       {:args [:c/order-status]}
      :delete-message {:chat-id    chat-id
                       :message-id message-id}}))
 
