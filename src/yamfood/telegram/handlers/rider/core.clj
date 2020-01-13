@@ -17,7 +17,9 @@
   [ctx update]
   (let [message (:message update)
         text (:text message)]
-    (d/dispatch! ctx [:r/text])))
+    (cond
+      (= text "/start") (d/dispatch! ctx [:r/menu])
+      text (d/dispatch! ctx [:r/text]))))
 
 
 (defn rider-update-handler!

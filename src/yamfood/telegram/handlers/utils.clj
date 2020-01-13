@@ -13,6 +13,8 @@
 (def phone-emoji "\uD83D\uDCDE")
 (def finish-emoji "✅")
 (def client-emoji "\uD83D\uDE03")
+(def order-emoji "\uD83D\uDDD2️")
+(def refresh-emoji "\uD83D\uDD04️")
 
 
 ; TODO: Make it work with all updates!
