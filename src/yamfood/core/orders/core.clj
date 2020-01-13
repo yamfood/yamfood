@@ -47,8 +47,11 @@
 (def order-detail-query
   {:select   [:orders.id
               :orders.location
+              :users.name
+              :users.phone
               :orders.comment]
-   :from     [:orders]
+   :from     [:orders :users]
+   :where [:= :orders.user_id :users.id]
    :order-by [:id]})
 
 
@@ -88,15 +91,22 @@
   (hs/format (hh/merge-where order-detail-query [:= :orders.id order-id])))
 
 
+(def order-by-id-options {:products? true :totals? true})
 (defn order-by-id!
-  [order-id]
-  (let [order (->> (order-by-id-query order-id)
-                   (jdbc/query db/db)
-                   (map fmt-order-location)
-                   (first))]
-    (when order
-      (merge (order-totals! order-id)
-             (add-products order)))))
+  ([order-id]
+   (order-by-id! order-id order-by-id-options))
+  ([order-id options]
+   (let [options (merge options order-by-id-options)
+         order (->> (order-by-id-query order-id)
+                    (jdbc/query db/db)
+                    (map fmt-order-location)
+                    (first))
+         products? (:products? options)
+         totals? (:totals? options)]
+     (when order
+       (merge (if totals? (order-totals! order-id) {})
+              (if products? (add-products order) {})
+              order)))))
 
 
 (defn orders-by-user-id!

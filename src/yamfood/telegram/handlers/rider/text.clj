@@ -19,12 +19,12 @@
   (format
     (str "*---------- Заказ №%s ----------*\n\n"
          u/client-emoji " %s\n"
-         u/phone-emoji " %s\n"
+         u/phone-emoji " +%s\n"
          u/money-emoji " %s сум\n\n"
          u/comment-emoji " %s\n")
-    3445
-    "Бабаджанов Рустам"
-    "+998909296339"
+    (:id order)
+    (:name order)
+    (:phone order)
     (u/fmt-values (:total_cost order))
     (:comment order)))
 
@@ -32,9 +32,10 @@
 (defn- order-detail-markup
   [order]
   {:inline_keyboard
-   [[{:text (str u/food-emoji " Продукты") :callback_data "cancel-order"}]
-    [{:text (str u/finish-emoji " Завершить") :callback_data "cancel-order"}
-     {:text (str u/cancel-emoji " Отменить") :callback_data "cancel-order"}]]})
+   [[{:text          (str u/food-emoji " Продукты")
+      :callback_data (str "order-products/" (:id order))}]
+    [{:text (str u/finish-emoji " Завершить") :callback_data "send-menu"}
+     {:text (str u/cancel-emoji " Отменить") :callback_data "send-menu"}]]})
 
 
 (defn rider-text-handler
@@ -45,7 +46,7 @@
         chat-id (:id (:from message))
         order-id (u/parse-int text)]
     (if order-id
-      (let [order (o/order-by-id! order-id)]
+      (let [order (o/order-by-id! order-id {:products? false})]
         (if order
           {:send-location {:chat-id   chat-id
                            :longitude (:longitude (:location order))

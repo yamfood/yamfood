@@ -25,7 +25,11 @@
 (defn rider-update-handler!
   [update]
   (let [message (:message update)
+        inline_query (:inline_query update)
+        callback_query (:callback_query update)
         ctx (build-ctx! update)]
     (when (:rider ctx)
-      (if message
-        (process-message ctx update)))))
+      (cond
+        message (process-message ctx update)
+        callback_query (d/dispatch! ctx [:r/callback])
+        inline_query (d/dispatch! ctx [:r/inline])))))

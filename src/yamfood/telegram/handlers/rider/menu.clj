@@ -23,11 +23,17 @@
   [ctx]
   (let [update (:update ctx)
         rider (:rider ctx)
-        chat-id (u/chat-id update)]
-    {:send-text {:chat-id chat-id
-                 :text (rider-menu-text rider)
-                 :options {:reply_markup (rider-menu-markup rider)
-                           :parse_mode "markdown"}}}))
+        chat-id (u/chat-id update)
+        utype (u/update-type update)]
+    (merge
+      {:send-text {:chat-id chat-id
+                   :text    (rider-menu-text rider)
+                   :options {:reply_markup (rider-menu-markup rider)
+                             :parse_mode   "markdown"}}}
+      (if (= utype :callback_query) {:delete-message
+                                     {:chat-id    chat-id
+                                      :message-id (:message_id (:message (:callback_query update)))}}
+                                    {}))))
 
 
 (d/register-event-handler!

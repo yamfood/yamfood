@@ -89,6 +89,17 @@
       query (:id (:from query)))))
 
 
+(defn update-type
+  [update]
+  (let [message (:message update)
+        callback-query (:callback_query update)
+        inline-query (:inline_query update)]
+    (cond
+      message :message
+      callback-query :callback_query
+      inline-query :inline_query)))
+
+
 (def map-url "https://gentle-mesa-91027.herokuapp.com/regions")
 
 
