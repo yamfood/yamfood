@@ -48,7 +48,9 @@
     (if order-id
       (let [order (o/order-by-id! order-id {:products? false})]
         (if order
-          {:send-location {:chat-id   chat-id
+          {:run           {:function o/assign-rider-to-order!
+                           :args     [order-id (:id (:rider ctx))]}
+           :send-location {:chat-id   chat-id
                            :longitude (:longitude (:location order))
                            :latitude  (:latitude (:location order))}
            :send-text     {:chat-id chat-id

@@ -9,7 +9,10 @@
 
 
 (def order-statuses
-  {:new "new"})
+  {:new        "new"
+   :on-kitchen "on-kitchen"
+   :ready      "ready"
+   :on-way     "on-way"})
 
 
 (defn fmt-order-location
@@ -51,7 +54,7 @@
               :users.phone
               :orders.comment]
    :from     [:orders :users]
-   :where [:= :orders.user_id :users.id]
+   :where    [:= :orders.user_id :users.id]
    :order-by [:id]})
 
 
@@ -170,3 +173,9 @@
       {:order_id (:id order)
        :status   (:new order-statuses)})
     (b/clear-basket! basket-id)))
+
+
+(defn assign-rider-to-order!
+  ; TODO: Log to order_logs and check order statuses before assigning
+  [order-id rider-id]
+  (jdbc/update! db/db "orders" {:rider_id rider-id} ["id = ?" order-id]))
