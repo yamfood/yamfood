@@ -7,7 +7,10 @@
 
 (defn order-description
   [order]
-  (str order))
+  (format (str u/client-emoji " %s\n"
+               u/comment-emoji " %s")
+          (:name order)
+          (:comment order)))
 
 
 (defn query-result-from-order
@@ -16,7 +19,8 @@
    :id                    (:id order)
    :input_message_content {:message_text (:id order)}
    :title                 (str "Заказ №" (:id order))
-   :description           (order-description order)})
+   :description           (order-description order)
+   :thumb_url             "http://www.globalorderingandlogistics.com/ic/110631467/_T2P9976.jpg"})
 
 
 (defn rider-inline-handler
@@ -36,7 +40,8 @@
      {:answer-inline
       {:inline-query-id (:id (:inline_query update))
        :options         {:cache_time 0}
-       :results         [(query-result-from-order order)]}})))
+       :results         (if order [(query-result-from-order order)]
+                                  [])}})))
 
 
 (d/register-event-handler!

@@ -19,4 +19,3 @@
 (d/register-event-handler!
   :r/callback
   callback-handler)
-
