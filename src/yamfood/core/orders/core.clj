@@ -47,11 +47,22 @@
               :where  [:= :basket_id basket-id]}))
 
 
+(defn order-current-status-query
+  [order-id]
+  {:select   [:order_logs.status]
+   :from     [:order_logs]
+   :where    [:= :order_logs.order_id order-id]
+   :order-by [[:order_logs.created_at :desc]]
+   :limit    1})
+
+
+
 (def order-detail-query
   {:select   [:orders.id
               :orders.location
               :users.name
               :users.phone
+              [(order-current-status-query :orders.id) :status]
               :orders.comment]
    :from     [:orders :users]
    :where    [:= :orders.user_id :users.id]
@@ -87,6 +98,26 @@
 (defn orders-by-user-id-query
   [user-id]
   (hs/format (hh/merge-where order-detail-query [:= :orders.user_id user-id])))
+
+
+(defn active-order-by-rider-id-query
+  [rider-id]
+  (hs/format
+    {:with   [[:cte_orders (hh/merge-where
+                             order-detail-query
+                             [:= :orders.rider_id rider-id])]]
+     :select [:*]
+     :from   [:cte_orders]
+     :where  [:= :cte_orders.status "on-way"]}))
+
+
+(defn active-order-by-rider-id!
+  [rider-id]
+  (let [order (->> (active-order-by-rider-id-query rider-id)
+                   (jdbc/query db/db)
+                   (first))]
+    (when order
+      (fmt-order-location order))))
 
 
 (defn order-by-id-query

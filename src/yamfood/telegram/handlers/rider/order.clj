@@ -5,15 +5,6 @@
     [yamfood.telegram.handlers.utils :as u]))
 
 
-(defn rider-start-handler
-  [ctx]
-  (let [update (:update ctx)
-        message (:message update)
-        chat-id (:id (:from message))]
-    {:send-text {:chat-id chat-id
-                 :text    "Hello, Rider!"}}))
-
-
 (defn- order-detail-text
   [order]
   (format
@@ -38,28 +29,38 @@
      {:text (str u/cancel-emoji " Отменить") :callback_data "send-menu"}]]})
 
 
+
+(defn- find-order
+  [ctx chat-id order-id]
+  (let [order (o/order-by-id! order-id {:products? false})]
+    (if order
+      {:run           {:function o/assign-rider-to-order!
+                       :args     [order-id (:id (:rider ctx))]}
+       :send-location {:chat-id   chat-id
+                       :longitude (:longitude (:location order))
+                       :latitude  (:latitude (:location order))}
+       :send-text     {:chat-id chat-id
+                       :text    (order-detail-text order)
+                       :options {:parse_mode   "markdown"
+                                 :reply_markup (order-detail-markup order)}}}
+
+      {:send-text {:chat-id chat-id
+                   :text    "Такого заказа не существует"}})))
+
+
 (defn rider-assign-order-handler
   [ctx]
   (let [update (:update ctx)
         message (:message update)
         text (:text message)
         chat-id (:id (:from message))
+        rider (:rider ctx)
         order-id (u/parse-int text)]
     (if order-id
-      (let [order (o/order-by-id! order-id {:products? false})]
-        (if order
-          {:run           {:function o/assign-rider-to-order!
-                           :args     [order-id (:id (:rider ctx))]}
-           :send-location {:chat-id   chat-id
-                           :longitude (:longitude (:location order))
-                           :latitude  (:latitude (:location order))}
-           :send-text     {:chat-id chat-id
-                           :text    (order-detail-text order)
-                           :options {:parse_mode   "markdown"
-                                     :reply_markup (order-detail-markup order)}}}
-
-          {:send-text {:chat-id chat-id
-                       :text    "Такого заказа не существует"}}))
+      (if (= (:active-order rider) nil)
+        (find-order ctx chat-id order-id)
+        {:send-text {:chat-id chat-id
+                     :text    "У вас уже есть активный заказ"}})
 
       {:send-text {:chat-id chat-id
                    :text    "Отправьте номер заказа"}})))
@@ -80,11 +81,6 @@
      {:answer-callback {:callback_query_id (:id query)
                         :text              (apply str (u/order-products-text products))
                         :show_alert        true}})))
-
-
-(d/register-event-handler!
-  :r/start
-  rider-start-handler)
 
 
 (d/register-event-handler!
