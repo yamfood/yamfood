@@ -12,7 +12,8 @@
   {:new        "new"
    :on-kitchen "on-kitchen"
    :ready      "ready"
-   :on-way     "on-way"})
+   :on-way     "on-way"
+   :finished   "finished"})
 
 
 (defn fmt-order-location
@@ -127,6 +128,7 @@
 
 (def order-by-id-options {:products? true :totals? true})
 (defn order-by-id!
+  ; TODO: Write docs for this function!
   ([order-id]
    (order-by-id! order-id order-by-id-options))
   ([order-id options]

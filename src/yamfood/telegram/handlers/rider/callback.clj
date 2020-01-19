@@ -12,6 +12,7 @@
     (case action
       "send-menu" {:dispatch {:args [:r/menu]}}
       "order-products" {:dispatch {:args [:r/order-products]}}
+      "finish-order" {:dispatch {:args [:r/finish-order]}}
       {:answer-callback {:callback_query_id (:id query)
                          :text              " "}})))
 

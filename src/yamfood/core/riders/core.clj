@@ -4,9 +4,7 @@
     [honeysql.helpers :as hh]
     [clojure.java.jdbc :as jdbc]
     [yamfood.core.db.core :as db]
-    [clj-postgresql.types :as pgt]
-    [yamfood.core.orders.core :as o]
-    [clojure.data.json :as json]))
+    [yamfood.core.orders.core :as o]))
 
 
 (def rider-query
@@ -43,4 +41,10 @@
     (jdbc/update! t-con "orders" {:rider_id rider-id} ["id = ?" order-id])))
 
 
-;(assign-rider-to-order! 69 1)
+(defn finish-order!
+  [order-id rider-id]
+  (jdbc/with-db-transaction
+    [t-con db/db]
+    (jdbc/insert! t-con "order_logs" {:order_id order-id
+                                      :status   (:finished o/order-statuses)
+                                      :payload  (db/map->jsonb {:rider_id rider-id})})))
