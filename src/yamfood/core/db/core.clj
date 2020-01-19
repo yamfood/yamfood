@@ -1,6 +1,7 @@
 (ns yamfood.core.db.core
   (:require
     [environ.core :refer [env]]
+    [clj-postgresql.core :as pg]
     [clj-postgresql.types :as pgt]))
 
 
@@ -10,8 +11,9 @@
 
 (defn point->clj
   [point]
-  {:longitude (.x point)
-   :latitude  (.y point)})
+  (let [point (pg/point point)]
+    {:longitude (.x point)
+     :latitude  (.y point)}))
 
 
 (defn map->jsonb
