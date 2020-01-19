@@ -190,6 +190,7 @@
 
 
 (defn create-order-and-clear-basket!
+  ; TODO: Use transaction!
   [basket-id location comment]
   (let [user (users/user-with-basket-id! basket-id)
         order (insert-order! (:id user)
@@ -204,9 +205,3 @@
       {:order_id (:id order)
        :status   (:new order-statuses)})
     (b/clear-basket! basket-id)))
-
-
-(defn assign-rider-to-order!
-  ; TODO: Log to order_logs and check order statuses before assigning
-  [order-id rider-id]
-  (jdbc/update! db/db "orders" {:rider_id rider-id} ["id = ?" order-id]))

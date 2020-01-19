@@ -1,6 +1,7 @@
 (ns yamfood.core.db.core
   (:require
-    [environ.core :refer [env]]))
+    [environ.core :refer [env]]
+    [clj-postgresql.types :as pgt]))
 
 
 (def db {:classname      "org.postgresql.Driver"
@@ -11,3 +12,8 @@
   [point]
   {:longitude (.x point)
    :latitude  (.y point)})
+
+
+(defn map->jsonb
+  [map]
+  (pgt/map->parameter map :jsonb))

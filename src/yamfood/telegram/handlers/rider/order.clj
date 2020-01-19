@@ -1,6 +1,7 @@
 (ns yamfood.telegram.handlers.rider.order
   (:require
     [yamfood.core.orders.core :as o]
+    [yamfood.core.riders.core :as r]
     [yamfood.telegram.dispatcher :as d]
     [yamfood.telegram.handlers.utils :as u]))
 
@@ -34,7 +35,7 @@
   [ctx chat-id order-id]
   (let [order (o/order-by-id! order-id {:products? false})]
     (if order
-      {:run           {:function o/assign-rider-to-order!
+      {:run           {:function r/assign-rider-to-order!
                        :args     [order-id (:id (:rider ctx))]}
        :send-location {:chat-id   chat-id
                        :longitude (:longitude (:location order))
