@@ -48,3 +48,12 @@
     (jdbc/insert! t-con "order_logs" {:order_id order-id
                                       :status   (:finished o/order-statuses)
                                       :payload  (db/map->jsonb {:rider_id rider-id})})))
+
+
+(defn cancel-order!
+  [order-id rider-id]
+  (jdbc/with-db-transaction
+    [t-con db/db]
+    (jdbc/insert! t-con "order_logs" {:order_id order-id
+                                      :status   (:canceled-by-rider o/order-statuses)
+                                      :payload  (db/map->jsonb {:rider_id rider-id})})))

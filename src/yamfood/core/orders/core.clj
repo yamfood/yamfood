@@ -9,11 +9,13 @@
 
 
 (def order-statuses
-  {:new        "new"
-   :on-kitchen "on-kitchen"
-   :ready      "ready"
-   :on-way     "on-way"
-   :finished   "finished"})
+  {:new                "new"
+   :on-kitchen         "on-kitchen"
+   :ready              "ready"
+   :on-way             "on-way"
+   :canceled-by-rider  "canceled-by-rider"
+   :canceled-by-client "canceled-by-client"
+   :finished           "finished"})
 
 
 (defn fmt-order-location

@@ -13,6 +13,7 @@
       "send-menu" {:dispatch {:args [:r/menu]}}
       "order-products" {:dispatch {:args [:r/order-products]}}
       "finish-order" {:dispatch {:args [:r/finish-order]}}
+      "cancel-order" {:dispatch {:args [:r/cancel-order]}}
       {:answer-callback {:callback_query_id (:id query)
                          :text              " "}})))
 

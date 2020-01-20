@@ -29,7 +29,7 @@
     [{:text          (str u/finish-emoji " Завершить")
       :callback_data (str "finish-order/" (:id order))}
      {:text          (str u/cancel-emoji " Отменить")
-      :callback_data "send-menu"}]]})
+      :callback_data (str "cancel-order/" (:id order))}]]})
 
 
 (defn- find-order
@@ -85,7 +85,7 @@
                         :show_alert        true}})))
 
 
-(defn finish-order
+(defn finish-order!
   ([ctx]
    (let [update (:update ctx)
          query (:callback_query update)
@@ -110,6 +110,31 @@
                         :message-id message-id}})))
 
 
+(defn cancel-order!
+  ([ctx]
+   (let [update (:update ctx)
+         query (:callback_query update)
+         callback_params (u/callback-params (:data query))
+         order-id (u/parse-int (first callback_params))]
+     {:run {:function   o/order-by-id!
+            :args       [order-id {:products? false :totals? false}]
+            :next-event :r/cancel-order}}))
+  ([ctx order]
+   (let [update (:update ctx)
+         query (:callback_query update)
+         chat-id (u/chat-id update)
+         message-id (:message_id (:message query))
+         rider (:rider ctx)]
+     {:run             {:function r/cancel-order!
+                        :args     [(:id order) (:id rider)]}
+      :answer-callback {:callback_query_id (:id query)
+                        :text              "Заказ отменен!"
+                        :show_alert        true}
+      :dispatch        {:args [:r/menu]}
+      :delete-message  {:chat-id    chat-id
+                        :message-id message-id}})))
+
+
 (d/register-event-handler!
   :r/text
   rider-assign-order-handler)
@@ -122,4 +147,9 @@
 
 (d/register-event-handler!
   :r/finish-order
-  finish-order)
+  finish-order!)
+
+
+(d/register-event-handler!
+  :r/cancel-order
+  cancel-order!)
