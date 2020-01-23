@@ -16,6 +16,9 @@
     },
     "PAYMENTS_TOKEN": {
       "description": "Payments token"
+    },
+    "APP_NAME": {
+      "description": "Copy app name here"
     }
   },
   "scripts": {
