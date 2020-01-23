@@ -17,5 +17,8 @@
     "PAYMENTS_TOKEN": {
       "description": "Payments token"
     }
+  },
+  "scripts": {
+    "postdeploy": "./setup_webhooks.sh"
   }
 }
