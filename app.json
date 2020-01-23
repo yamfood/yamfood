@@ -1,0 +1,21 @@
+{
+  "name": "YamFood Template",
+  "description": "Food delivery service",
+  "repository": "https://github.com/kensay98/yamfood",
+  "logo": "https://node-js-sample.herokuapp.com/node.png",
+  "keywords": [],
+  "addons": [
+    "heroku-postgresql:hobby-dev"
+  ],
+  "env": {
+    "BOT_TOKEN": {
+      "description": "Client's bot token"
+    },
+    "RIDER_BOT_TOKEN": {
+      "description": "Rider's bot token"
+    },
+    "PAYMENTS_TOKEN": {
+      "description": "Payments token"
+    }
+  }
+}
