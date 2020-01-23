@@ -102,7 +102,7 @@
    (let [message (:message (:update ctx))
          chat-id (:id (:from message))]
      (if region
-       {:dispatch {:args [:update-location]}}
+       {:dispatch {:args [:c/update-location]}}
        {:send-text [{:chat-id chat-id
                      :text    "Ждите..."
                      :options {:reply_markup {:remove_keyboard true}}}

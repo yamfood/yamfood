@@ -205,7 +205,7 @@
 
 
 (def region-location-result
-  {:dispatch {:args [:update-location]}})
+  {:dispatch {:args [:c/update-location]}})
 
 
 (def nil-region-location-result
