@@ -1,6 +1,7 @@
 (ns yamfood.telegram.handlers.utils
   (:require
-    [clojure.string :as str]))
+    [clojure.string :as str]
+    [environ.core :refer [env]]))
 
 
 (def location-emoji "\uD83D\uDCCD")
@@ -100,7 +101,9 @@
       inline-query :inline_query)))
 
 
-(def map-url "https://gentle-mesa-91027.herokuapp.com/regions")
+(def map-url
+  (format "https://%s.herokuapp.com/regions"
+          (env :app-name)))
 
 
 (defn parse-int [s]
