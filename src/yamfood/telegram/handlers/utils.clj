@@ -40,9 +40,9 @@
   (let [basket-cost (:basket_cost state)]
     {:inline_keyboard
      [[{:text "Хочу" :callback_data (str "want/" (:id state))}]
-      [{:text (format "Корзина (%s сум)" (fmt-values basket-cost)) :callback_data "basket"}]
-      [{:text                             "Еще!"
-        :switch_inline_query_current_chat ""}]]}))
+      [{:text "Еще!" :switch_inline_query_current_chat ""}]
+      [{:text (format "Корзина (%s сум)" (fmt-values basket-cost)) :callback_data "basket"}]]}))
+
 
 
 (defn basket-product-controls
@@ -57,9 +57,9 @@
   (let [basket-cost (:basket_cost state)]
     {:inline_keyboard
      [(basket-product-controls "detail" (:id state) (:count_in_basket state))
-      [{:text (format "Корзина (%s сум)" (fmt-values basket-cost)) :callback_data "basket"}]
-      [{:text                             "Еще!"
-        :switch_inline_query_current_chat ""}]]}))
+      [{:text "Еще!" :switch_inline_query_current_chat ""}]
+      [{:text (format "Корзина (%s сум)" (fmt-values basket-cost)) :callback_data "basket"}]]}))
+
 
 
 (defn product-detail-markup

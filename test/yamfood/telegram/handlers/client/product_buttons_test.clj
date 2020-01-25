@@ -67,15 +67,13 @@
 
 
 (def update-detail-markup-result
-  {:edit-reply-markup
-   {:chat_id      79225668
-    :message_id   10193
-    :reply_markup {:inline_keyboard
-                   [[{:text "-" :callback_data "detail-/2"}
-                     {:text "1" :callback_data "nothing"}
-                     {:text "+" :callback_data "detail+/2"}]
-                    [{:text "Корзина (43 800 сум)" :callback_data "basket"}]
-                    [{:text "Еще!" :switch_inline_query_current_chat ""}]]}}})
+  {:edit-reply-markup {:chat_id      79225668,
+                       :message_id   10193,
+                       :reply_markup {:inline_keyboard [[{:text "-", :callback_data "detail-/2"}
+                                                         {:text "1", :callback_data "nothing"}
+                                                         {:text "+", :callback_data "detail+/2"}]
+                                                        [{:text "Еще!", :switch_inline_query_current_chat ""}]
+                                                        [{:text "Корзина (43 800 сум)", :callback_data "basket"}]]}}})
 
 
 (def detail-inc-ctx
