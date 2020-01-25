@@ -88,10 +88,11 @@
          chat (:chat message)
          chat-id (:id chat)]
      (if product-detail-state
-       {:send-photo
-        {:chat-id chat-id
-         :options (product-detail-options product-detail-state)
-         :photo   (:photo product-detail-state)}}
+       {:send-photo     {:chat-id chat-id
+                         :options (product-detail-options product-detail-state)
+                         :photo   (:photo product-detail-state)}
+        :delete-message {:chat-id    chat-id
+                         :message-id (:message_id message)}}
 
        {:send-text
         {:chat-id chat-id
