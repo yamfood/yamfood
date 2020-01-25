@@ -5,19 +5,21 @@
     [yamfood.core.users.core :as users]
     [yamfood.core.baskets.core :as basket]
     [yamfood.core.regions.core :as regions]
-    [yamfood.telegram.handlers.client.order :as order]))
+    [yamfood.telegram.handlers.client.order :as order]
+    [yamfood.core.orders.core :as o]))
 
 
 (def default-ctx
   {:token          "488312680:AAGsKHKufV9TQEAB8-g6INps-W82G_noRP8",
    :payments-token "371317599:TEST:79225668",
    :update         {}
-   :user           {:id        10,
-                    :phone     998909296339,
-                    :tid       79225668,
-                    :location  {:longitude 34.74037, :latitude 32.020955},
-                    :comment   "Comment #1",
-                    :basket_id 4}})
+   :user           {:id              10,
+                    :phone           998909296339,
+                    :tid             79225668,
+                    :active_order_id 1
+                    :location        {:longitude 34.74037, :latitude 32.020955},
+                    :comment         "Comment #1",
+                    :basket_id       4}})
 
 
 (def to-order-upd
@@ -314,8 +316,8 @@
 
 
 (def raw-order-status-result
-  {:run {:function   ord/user-active-order!
-         :args       [10],
+  {:run {:function   o/order-by-id!,
+         :args       [1],
          :next-event :c/order-status}})
 
 

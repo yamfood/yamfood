@@ -192,9 +192,11 @@
 
 (defn order-status
   ([ctx]
-   {:run {:function   ord/user-active-order!
-          :args       [(:id (:user ctx))]
-          :next-event :c/order-status}})
+   (let [user (:user ctx)
+         order-id (:active_order_id user)]
+     {:run {:function   o/order-by-id!
+            :args       [order-id]
+            :next-event :c/order-status}}))
   ([ctx order]
    (let [update (:update ctx)
          chat-id (u/chat-id update)]
