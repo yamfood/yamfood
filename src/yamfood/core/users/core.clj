@@ -6,12 +6,25 @@
     [yamfood.core.db.core :as db]))
 
 
+(defn user-active-order-query
+  [user-id]
+  {:select   [:orders.id]
+   :from     [:orders :order_logs]
+   :where    [:and
+              [:= :orders.user_id user-id]
+              [:= :orders.id :order_logs.order_id]
+              [:= :order_logs.status "new"]]
+   :order-by [[:orders.created_at :desc]]
+   :limit    1})
+
+
 (def user-query
   {:select [:users.id
             :users.phone
             :users.tid
             :users.location
             :users.comment
+            [(user-active-order-query :users.id) :active_order_id]
             [:baskets.id :basket_id]]
    :from   [:users :baskets]
    :where  [:= :baskets.user_id :users.id]})
