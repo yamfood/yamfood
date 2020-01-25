@@ -5,7 +5,9 @@
     [yamfood.telegram.dispatcher :as d]
     [yamfood.core.baskets.core :as bsk]
     [yamfood.telegram.handlers.utils :as u]
-    [yamfood.core.regions.core :as regions]))
+    [yamfood.core.regions.core :as regions]
+    [environ.core :refer [env]]
+    [yamfood.core.orders.core :as o]))
 
 
 (def markup-for-request-location
@@ -163,11 +165,13 @@
 
 (defn order-status-text
   [order]
-  (format (str "*Заказ №1334:*\n\n"
+  (format (str "*Заказ №%s:*\n\n"
                (apply str (u/order-products-text (:products order)))
                "\n"
-               u/money-emoji " 53 200 сум (Не оплачено)\n\n"
-               "Ожидает подтверждения оператором")))
+               u/money-emoji " %s сум (Наличными)\n\n"
+               "Ваш заказ готовится, курьер приедет через 30 минут")
+          (:id order)
+          (:total_cost order)))
 
 
 (defn order-reply-markup
