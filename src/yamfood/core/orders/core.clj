@@ -93,7 +93,7 @@
        (jdbc/query db/db)))
 
 
-(defn add-products
+(defn add-products!
   [order]
   (assoc order :products (products-by-order-id! (:id order))))
 
@@ -143,7 +143,7 @@
          totals? (:totals? options)]
      (when order
        (merge (if totals? (order-totals! order-id) {})
-              (if products? (add-products order) {})
+              (if products? (add-products! order) {})
               order)))))
 
 
@@ -158,7 +158,7 @@
   [user-id]
   (-> (orders-by-user-id! user-id)
       (last)
-      (add-products)))
+      (#(order-by-id! (:id %)))))
 
 
 (defn products-from-basket!
