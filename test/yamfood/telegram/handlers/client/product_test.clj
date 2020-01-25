@@ -90,19 +90,21 @@
 
 
 (def result-with-product-not-in-basket-state
-  {:send-photo {:chat-id 79225668,
-                :options {:caption      "🥗 *Глазунья с болгарским перцем и паштетом* \n\n💰15 000 сум  🔋360 кКал",
-                          :parse_mode   "markdown",
-                          :reply_markup "{\"inline_keyboard\":[[{\"text\":\"\\u0425\\u043e\\u0447\\u0443\",\"callback_data\":\"want\\/1\"}],[{\"text\":\"\\u041a\\u043e\\u0440\\u0437\\u0438\\u043d\\u0430 (0 \\u0441\\u0443\\u043c)\",\"callback_data\":\"basket\"}],[{\"text\":\"\\u0415\\u0449\\u0435!\",\"switch_inline_query_current_chat\":\"\"}]]}"},
-                :photo   "https://i.ibb.co/T8TRNm3/image.png"}})
+  {:send-photo     {:chat-id 79225668,
+                    :options {:caption      "🥗 *Глазунья с болгарским перцем и паштетом* \n\n💰15 000 сум  🔋360 кКал",
+                              :parse_mode   "markdown",
+                              :reply_markup "{\"inline_keyboard\":[[{\"text\":\"\\u0425\\u043e\\u0447\\u0443\",\"callback_data\":\"want\\/1\"}],[{\"text\":\"\\u041a\\u043e\\u0440\\u0437\\u0438\\u043d\\u0430 (0 \\u0441\\u0443\\u043c)\",\"callback_data\":\"basket\"}],[{\"text\":\"\\u0415\\u0449\\u0435!\",\"switch_inline_query_current_chat\":\"\"}]]}"},
+                    :photo   "https://i.ibb.co/T8TRNm3/image.png"},
+   :delete-message {:chat-id 79225668, :message-id 10146}})
 
 
 (def result-with-product-in-basket-state
-  {:send-photo {:chat-id 79225668,
-                :options {:caption      "🥗 *Глазунья с болгарским перцем и паштетом* \n\n💰15 000 сум  🔋360 кКал",
-                          :parse_mode   "markdown",
-                          :reply_markup "{\"inline_keyboard\":[[{\"text\":\"-\",\"callback_data\":\"detail-\\/1\"},{\"text\":\"2\",\"callback_data\":\"nothing\"},{\"text\":\"+\",\"callback_data\":\"detail+\\/1\"}],[{\"text\":\"\\u041a\\u043e\\u0440\\u0437\\u0438\\u043d\\u0430 (0 \\u0441\\u0443\\u043c)\",\"callback_data\":\"basket\"}],[{\"text\":\"\\u0415\\u0449\\u0435!\",\"switch_inline_query_current_chat\":\"\"}]]}"},
-                :photo   "https://i.ibb.co/T8TRNm3/image.png"}})
+  {:send-photo     {:chat-id 79225668,
+                    :options {:caption      "🥗 *Глазунья с болгарским перцем и паштетом* \n\n💰15 000 сум  🔋360 кКал",
+                              :parse_mode   "markdown",
+                              :reply_markup "{\"inline_keyboard\":[[{\"text\":\"-\",\"callback_data\":\"detail-\\/1\"},{\"text\":\"2\",\"callback_data\":\"nothing\"},{\"text\":\"+\",\"callback_data\":\"detail+\\/1\"}],[{\"text\":\"\\u041a\\u043e\\u0440\\u0437\\u0438\\u043d\\u0430 (0 \\u0441\\u0443\\u043c)\",\"callback_data\":\"basket\"}],[{\"text\":\"\\u0415\\u0449\\u0435!\",\"switch_inline_query_current_chat\":\"\"}]]}"},
+                    :photo   "https://i.ibb.co/T8TRNm3/image.png"},
+   :delete-message {:chat-id 79225668, :message-id 10146}})
 
 
 (def result-with-random-text

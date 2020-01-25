@@ -213,7 +213,7 @@
                {:chat-id 79225668,
                 :text    "К сожалению, мы не обслуживаем данный регион",
                 :options {:reply_markup {:inline_keyboard [[{:text "Карта обслуживания",
-                                                             :url  "https://gentle-mesa-91027.herokuapp.com/regions"}]
+                                                             :url  "https://test.herokuapp.com/regions"}]
                                                            [{:text "🧺 Корзина", :callback_data "basket"}]]}}}]})
 
 

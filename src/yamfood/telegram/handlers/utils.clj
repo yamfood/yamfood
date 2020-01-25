@@ -103,7 +103,7 @@
 
 (def map-url
   (format "https://%s.herokuapp.com/regions"
-          (env :app-name)))
+          (or (env :app-name) "test")))
 
 
 (defn parse-int [s]
