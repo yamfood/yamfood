@@ -162,7 +162,7 @@
                       :message-id message-id}}))
 
 
-(defn order-status-text
+(defn active-order-text
   [order]
   (format (str "*Заказ №%s:*\n\n"
                (apply str (u/order-products-text (:products order)))
@@ -170,10 +170,10 @@
                u/money-emoji " %s сум (Наличными)\n\n"
                "Ваш заказ готовится, курьер приедет через 30 минут")
           (:id order)
-          (:total_cost order)))
+          (u/fmt-values (:total_cost order))))
 
 
-(defn order-reply-markup
+(defn active-order-reply-markup
   [order]
   {:inline_keyboard [[{:text "Оплатить картой" :callback_data (str "invoice/" (:id order))}]]})
 
@@ -200,9 +200,9 @@
    (let [update (:update ctx)
          chat-id (u/chat-id update)]
      {:send-text {:chat-id chat-id
-                  :text    (order-status-text order)
+                  :text    (active-order-text order)
                   :options {:parse_mode   "markdown"
-                            :reply_markup (order-reply-markup order)}}})))
+                            :reply_markup (active-order-reply-markup order)}}})))
 
 
 (defn invoice-description

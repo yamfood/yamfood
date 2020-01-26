@@ -331,7 +331,7 @@
 
 (def order-status-result
   {:send-text {:chat-id 79225668,
-               :text    (order/order-status-text active-order)
+               :text    (order/active-order-text active-order)
                :options {:parse_mode   "markdown",
                          :reply_markup {:inline_keyboard [[{:text "Оплатить картой", :callback_data "invoice/24"}]]}}}})
 
