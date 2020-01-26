@@ -7,6 +7,7 @@
     [yamfood.telegram.handlers.utils :as u]
     [yamfood.core.regions.core :as regions]
     [environ.core :refer [env]]
+    [yamfood.telegram.handlers.client.core :as c]
     [yamfood.core.orders.core :as o]))
 
 
@@ -139,14 +140,13 @@
         basket-id (:basket_id (:user ctx))
         location (:location (:user ctx))
         comment (:comment (:user ctx))]
-    {:run             {:function ord/create-order-and-clear-basket!
-                       :args     [basket-id location comment]}
-     :answer-callback {:callback_query_id (:id query)
-                       :text              "Ваш заказ успешно создан! Мы будем держать вас в курсе его статуса."
-                       :show_alert        true}
-     :dispatch        {:args [:c/order-status]}
-     :delete-message  {:chat-id    chat-id
-                       :message-id message-id}}))
+    {:run            {:function ord/create-order-and-clear-basket!
+                      :args     [basket-id location comment]}
+     :dispatch       {:args        [:c/active-order]
+                      :rebuild-ctx {:function c/build-ctx!
+                                    :args     [(:update ctx)]}}
+     :delete-message {:chat-id    chat-id
+                      :message-id message-id}}))
 
 
 (def write-comment-text "Напишите свой комментарий к заказу")
@@ -190,13 +190,13 @@
   (map product-price (:products order)))
 
 
-(defn order-status
+(defn active-order
   ([ctx]
    (let [user (:user ctx)
          order-id (:active_order_id user)]
      {:run {:function   o/order-by-id!
             :args       [order-id]
-            :next-event :c/order-status}}))
+            :next-event :c/active-order}}))
   ([ctx order]
    (let [update (:update ctx)
          chat-id (u/chat-id update)]
@@ -242,7 +242,7 @@
         query (:callback_query update)
         chat-id (:id (:from query))
         message-id (:message_id (:message query))]
-    {:dispatch       {:args [:c/order-status]}
+    {:dispatch       {:args [:c/active-order]}
      :delete-message {:chat-id    chat-id
                       :message-id message-id}}))
 
@@ -288,8 +288,8 @@
 
 
 (d/register-event-handler!
-  :c/order-status
-  order-status)
+  :c/active-order
+  active-order)
 
 
 (d/register-event-handler!

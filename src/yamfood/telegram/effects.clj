@@ -9,7 +9,14 @@
 (d/register-effect-handler!
   :dispatch
   (fn [ctx effect]
-    (d/dispatch! ctx (:args effect))))
+    (let [rebuild-ctx (:rebuild-ctx effect)
+          dispatch-args (:args effect)]
+      (if rebuild-ctx
+        (let [rebuild-fn! (:function rebuild-ctx)
+              args (:args rebuild-ctx)
+              new-ctx (rebuild-fn! args)]
+          (d/dispatch! new-ctx dispatch-args))
+        (d/dispatch! ctx dispatch-args)))))
 
 
 (d/register-effect-handler!

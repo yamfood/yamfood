@@ -6,7 +6,8 @@
     [yamfood.core.baskets.core :as basket]
     [yamfood.core.regions.core :as regions]
     [yamfood.telegram.handlers.client.order :as order]
-    [yamfood.core.orders.core :as o]))
+    [yamfood.core.orders.core :as o]
+    [yamfood.telegram.handlers.client.core :as c]))
 
 
 (def default-ctx
@@ -306,19 +307,18 @@
 
 
 (def create-order-result
-  {:run             {:function ord/create-order-and-clear-basket!
-                     :args     [4 {:longitude 34.74037, :latitude 32.020955} "Comment #1"]},
-   :answer-callback {:callback_query_id "340271655591288140",
-                     :text              "Ваш заказ успешно создан! Мы будем держать вас в курсе его статуса.",
-                     :show_alert        true},
-   :dispatch        {:args [:c/order-status]},
-   :delete-message  {:chat-id 79225668, :message-id 10208}})
+  {:run            {:function o/create-order-and-clear-basket!,
+                    :args     [4 {:longitude 34.74037, :latitude 32.020955} "Comment #1"]},
+   :dispatch       {:args        [:c/active-order],
+                    :rebuild-ctx {:function c/build-ctx!,
+                                  :args     [(:update create-order-ctx)]}},
+   :delete-message {:chat-id 79225668, :message-id 10208}})
 
 
 (def raw-order-status-result
   {:run {:function   o/order-by-id!,
          :args       [1],
-         :next-event :c/order-status}})
+         :next-event :c/active-order}})
 
 
 (def active-order
@@ -341,10 +341,10 @@
     (is (= (order/create-order-handler create-order-ctx)
            create-order-result)))
   (testing "raw order-status"
-    (is (= (order/order-status create-order-ctx)
+    (is (= (order/active-order create-order-ctx)
            raw-order-status-result)))
   (testing "order-status with active order"
-    (is (= (order/order-status create-order-ctx active-order)
+    (is (= (order/active-order create-order-ctx active-order)
            order-status-result))))
 
 
@@ -439,7 +439,7 @@
 
 
 (def cancel-invoice-result
-  {:dispatch       {:args [:c/order-status]},
+  {:dispatch       {:args [:c/active-order]},
    :delete-message {:chat-id 79225668, :message-id 10210}})
 
 
