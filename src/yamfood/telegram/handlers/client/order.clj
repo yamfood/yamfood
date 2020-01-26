@@ -1,14 +1,13 @@
 (ns yamfood.telegram.handlers.client.order
   (:require
+    [yamfood.core.orders.core :as o]
     [yamfood.core.users.core :as usr]
     [yamfood.core.orders.core :as ord]
     [yamfood.telegram.dispatcher :as d]
     [yamfood.core.baskets.core :as bsk]
     [yamfood.telegram.handlers.utils :as u]
     [yamfood.core.regions.core :as regions]
-    [environ.core :refer [env]]
-    [yamfood.telegram.handlers.client.core :as c]
-    [yamfood.core.orders.core :as o]))
+    [yamfood.telegram.handlers.client.core :as c]))
 
 
 (def markup-for-request-location
@@ -144,7 +143,7 @@
                       :args     [basket-id location comment]}
      :dispatch       {:args        [:c/active-order]
                       :rebuild-ctx {:function c/build-ctx!
-                                    :args     [(:update ctx)]}}
+                                    :update   (:update ctx)}}
      :delete-message {:chat-id    chat-id
                       :message-id message-id}}))
 

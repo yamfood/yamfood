@@ -13,8 +13,8 @@
           dispatch-args (:args effect)]
       (if rebuild-ctx
         (let [rebuild-fn! (:function rebuild-ctx)
-              args (:args rebuild-ctx)
-              new-ctx (rebuild-fn! args)]
+              update (:update rebuild-ctx)
+              new-ctx (rebuild-fn! update)]
           (d/dispatch! new-ctx dispatch-args))
         (d/dispatch! ctx dispatch-args)))))
 

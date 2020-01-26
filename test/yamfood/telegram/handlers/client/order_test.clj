@@ -311,7 +311,7 @@
                     :args     [4 {:longitude 34.74037, :latitude 32.020955} "Comment #1"]},
    :dispatch       {:args        [:c/active-order],
                     :rebuild-ctx {:function c/build-ctx!,
-                                  :args     [(:update create-order-ctx)]}},
+                                  :update   (:update create-order-ctx)}},
    :delete-message {:chat-id 79225668, :message-id 10208}})
 
 
