@@ -129,7 +129,6 @@
                              (:latitude location)]}]}))
 
 
-
 (defn create-order-handler
   [ctx]
   (let [update (:update ctx)

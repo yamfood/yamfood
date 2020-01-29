@@ -16,7 +16,9 @@
 (defn rider-menu-markup
   [rider]
   {:inline_keyboard
-   [[{:text (str u/order-emoji " Взять заказ") :switch_inline_query_current_chat ""}]
+   [(if (:active-order rider)
+      [{:text (str u/order-emoji " Текущий заказ") :callback_data (str "order-detail/" (:id (:active-order rider)))}]
+      [{:text (str u/order-emoji " Взять заказ") :switch_inline_query_current_chat ""}])
     [{:text (str u/refresh-emoji " Обновить") :callback_data "refresh-menu"}]]})
 
 

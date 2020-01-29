@@ -32,19 +32,34 @@
       :callback_data (str "cancel-order/" (:id order))}]]})
 
 
-(defn- find-order
-  [ctx chat-id order-id]
-  (let [order (o/order-by-id! order-id {:products? false})]
+(defn send-order-detail
+  ([ctx]
+   (let [update (:update ctx)
+         query (:callback_query update)
+         data (:data query)
+         order-id (u/parse-int (first (u/callback-params data)))]
+     {:run {:function   o/order-by-id!
+            :args       [order-id]
+            :next-event :r/order-detail}}))
+  ([ctx order]
+   (let [chat-id (u/chat-id (:update ctx))]
+     {:send-location {:chat-id   chat-id
+                      :longitude (:longitude (:location order))
+                      :latitude  (:latitude (:location order))}
+      :send-text     {:chat-id chat-id
+                      :text    (order-detail-text order)
+                      :options {:parse_mode   "markdown"
+                                :reply_markup (order-detail-markup order)}}})))
+
+
+(defn- assign-order
+  [ctx order-id]
+  (let [chat-id (u/chat-id (:update ctx))
+        order (o/order-by-id! order-id {:products? false})]
     (if order
-      {:run           {:function r/assign-rider-to-order!
-                       :args     [order-id (:id (:rider ctx))]}
-       :send-location {:chat-id   chat-id
-                       :longitude (:longitude (:location order))
-                       :latitude  (:latitude (:location order))}
-       :send-text     {:chat-id chat-id
-                       :text    (order-detail-text order)
-                       :options {:parse_mode   "markdown"
-                                 :reply_markup (order-detail-markup order)}}}
+      (merge {:run {:function r/assign-rider-to-order!
+                    :args     [order-id (:id (:rider ctx))]}}
+             (send-order-detail ctx order))
 
       {:send-text {:chat-id chat-id
                    :text    "Такого заказа не существует"}})))
@@ -60,7 +75,7 @@
         order-id (u/parse-int text)]
     (if order-id
       (if (= (:active-order rider) nil)
-        (find-order ctx chat-id order-id)
+        (assign-order ctx order-id)
         {:send-text {:chat-id chat-id
                      :text    "У вас уже есть активный заказ"}})
 
@@ -153,3 +168,8 @@
 (d/register-event-handler!
   :r/cancel-order
   cancel-order!)
+
+
+(d/register-event-handler!
+  :r/order-detail
+  send-order-detail)
