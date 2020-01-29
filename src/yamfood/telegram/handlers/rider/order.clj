@@ -121,7 +121,9 @@
       :answer-callback {:callback_query_id (:id query)
                         :text              "Заказ успешно завершен!"
                         :show_alert        true}
-      :dispatch        {:args [:r/menu]}
+      :dispatch        {:args        [:r/menu]
+                        :rebuild-ctx {:function c/build-ctx!
+                                      :update   update}}
       :delete-message  {:chat-id    chat-id
                         :message-id message-id}})))
 

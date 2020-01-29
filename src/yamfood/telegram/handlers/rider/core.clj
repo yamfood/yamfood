@@ -28,7 +28,7 @@
         inline_query (:inline_query update)
         callback_query (:callback_query update)
         ctx (build-ctx! update)]
-    (when (:rider ctx)
+    (when (:id (:rider ctx))
       (cond
         message (process-message ctx update)
         callback_query (d/dispatch! ctx [:r/callback])
