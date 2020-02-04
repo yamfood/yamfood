@@ -12,5 +12,5 @@
                      :else (handler request))]
       (-> response
           (assoc-in [:headers "Access-Control-Allow-Origin"] "*")
-          (assoc-in [:headers "Access-Control-Allow-Headers"] "x-requested-with, content-type")
+          (assoc-in [:headers "Access-Control-Allow-Headers"] "x-requested-with, content-type, token")
           (assoc-in [:headers "Access-Control-Allow-Methods"] "*")))))
