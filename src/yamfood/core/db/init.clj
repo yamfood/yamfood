@@ -9,4 +9,4 @@
 
 
 ;(init)
-;(migratus/create m/config "riders")
+;(migratus/create m/config "admins")

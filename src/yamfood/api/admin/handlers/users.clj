@@ -1,7 +1,7 @@
-(ns yamfood.api.admin.users
+(ns yamfood.api.admin.handlers.users
   (:require
-    [yamfood.core.users.core :as users]
-    [compojure.core :as c]))
+    [compojure.core :as c]
+    [yamfood.core.users.core :as users]))
 
 
 (defn users-list

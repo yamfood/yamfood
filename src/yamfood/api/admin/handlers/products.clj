@@ -1,7 +1,7 @@
-(ns yamfood.api.admin.products
+(ns yamfood.api.admin.handlers.products
   (:require
-    [yamfood.core.products.core :as products]
-    [compojure.core :as c]))
+    [compojure.core :as c]
+    [yamfood.core.products.core :as products]))
 
 
 (defn products-list
