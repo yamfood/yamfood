@@ -66,6 +66,28 @@
       nil)))
 
 
+(defn users-list-query
+  [offset limit]
+  (hs/format
+    {:select [:users.id
+              :users.tid
+              :users.comment
+              :users.name
+              :users.phone
+              :users.location]
+     :from   [:users]
+     :offset offset
+     :limit  limit}))
+
+
+(defn users-list!
+  ([]
+   (users-list! 0 100))
+  ([offset limit]
+   (->> (users-list-query offset limit)
+        (jdbc/query db/db))))
+
+
 (defn insert-user!
   [tid phone name]
   (first (jdbc/insert! db/db "users" {:tid tid :phone phone :name name})))
