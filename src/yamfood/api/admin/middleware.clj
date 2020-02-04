@@ -10,7 +10,7 @@
           admin (adm/admin-by-token! token)
           request (assoc request :admin admin)]
       (cond
-        (not token) {:body "Auth required" :status 401}
-        (not admin) {:body "Auth failed" :status 403}
+        (not token) {:body {:error "Auth required"} :status 401}
+        (not admin) {:body {:error "Auth failed"} :status 403}
         admin (handler request)))))
 

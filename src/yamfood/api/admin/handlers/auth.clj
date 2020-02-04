@@ -1,6 +1,7 @@
 (ns yamfood.api.admin.handlers.auth
   (:require
     [compojure.core :as c]
+    [compojure.route :as route]
     [yamfood.core.admin.core :as adm]))
 
 

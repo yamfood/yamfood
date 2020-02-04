@@ -15,7 +15,8 @@
 (c/defroutes
   *api-routes
   (c/context "/admin" [] admin/admin-api-routes)
-  (c/GET "/regions" [] regions-list))
+  (c/GET "/regions" [] regions-list)
+  (c/OPTIONS "/" [] "OK"))
 
 
 (def api-routes

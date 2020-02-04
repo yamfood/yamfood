@@ -6,9 +6,11 @@
   allow connections from the web app."
   [handler]
   (fn [request]
-    (let [response (handler request)]
+    (let [method (:request-method request)
+          response (cond
+                     (= (compare method :options) 0) {:body "OK!"}
+                     :else (handler request))]
       (-> response
           (assoc-in [:headers "Access-Control-Allow-Origin"] "*")
-          (assoc-in [:headers "Access-Control-Allow-Headers"] "x-requested-with")
+          (assoc-in [:headers "Access-Control-Allow-Headers"] "x-requested-with, content-type")
           (assoc-in [:headers "Access-Control-Allow-Methods"] "*")))))
-
