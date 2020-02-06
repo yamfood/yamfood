@@ -17,5 +17,5 @@
 
 
 (d/register-event-handler!
-  :c/ttext
+  :c/no-product-text
   text-handler)

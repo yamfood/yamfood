@@ -1,5 +1,6 @@
 (ns yamfood.telegram.events
   (:require
+    [yamfood.telegram.handlers.client.text]
     [yamfood.telegram.handlers.client.start]
     [yamfood.telegram.handlers.client.order]
     [yamfood.telegram.handlers.client.reply]

@@ -94,7 +94,7 @@
         :delete-message {:chat-id    chat-id
                          :message-id (:message_id message)}}
 
-       {:dispatch {:args [:c/ttext]}}))))
+       {:dispatch {:args [:c/no-product-text]}}))))
 
 
 (d/register-event-handler!
