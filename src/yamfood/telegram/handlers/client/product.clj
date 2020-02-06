@@ -81,7 +81,7 @@
          message (:message update)]
      {:run {:function   products/product-detail-state-by-name!
             :args       [(:basket_id (:user ctx)) (:text message)]
-            :next-event :c/text}}))
+            :next-event :c/ttext}}))
   ([ctx product-detail-state]
    (let [update (:update ctx)
          message (:message update)

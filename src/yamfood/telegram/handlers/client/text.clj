@@ -17,5 +17,5 @@
 
 
 (d/register-event-handler!
-  :c/text
+  :c/ttext
   text-handler)
