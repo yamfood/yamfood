@@ -81,7 +81,7 @@
          message (:message update)]
      {:run {:function   products/product-detail-state-by-name!
             :args       [(:basket_id (:user ctx)) (:text message)]
-            :next-event :c/ttext}}))
+            :next-event :c/text}}))
   ([ctx product-detail-state]
    (let [update (:update ctx)
          message (:message update)
@@ -94,7 +94,7 @@
         :delete-message {:chat-id    chat-id
                          :message-id (:message_id message)}}
 
-       {:dispatch {:args [:c/text]}}))))
+       {:dispatch {:args [:c/ttext]}}))))
 
 
 (d/register-event-handler!
