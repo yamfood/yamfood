@@ -9,13 +9,21 @@
 
 
 (def order-statuses
-  {:new                "new"
-   :on-kitchen         "on-kitchen"
-   :ready              "ready"
-   :on-way             "on-way"
-   :canceled-by-rider  "canceled-by-rider"
-   :canceled-by-client "canceled-by-client"
-   :finished           "finished"})
+  {:new                  "new"
+   :on-kitchen           "onKitchen"
+   :ready                "ready"
+   :on-way               "onWay"
+   :finished             "finished"
+   :canceled-by-rider    "canceledByRider"
+   :canceled-by-client   "canceledByClient"
+   :canceled-by-operator "canceledByOperator"})
+
+
+(def active-order-statuses
+  [(:new order-statuses)
+   (:on-kitchen order-statuses)
+   (:ready order-statuses)
+   (:on-way order-statuses)])
 
 
 (defn fmt-order-location
@@ -27,18 +35,29 @@
 
 (defn- order-totals-query
   [order-id]
-  (format "
-    select
-      coalesce(sum(order_products.count * products.price), 0) as total_cost,
-      coalesce(sum(order_products.count * products.energy), 0) as total_energy
-    from order_products, products
-    where order_products.order_id = %d and
-          products.id = order_products.product_id", order-id))
+  {:select [(hs/raw "coalesce(sum(order_products.count * products.price), 0) as total_cost")
+            (hs/raw "coalesce(sum(order_products.count * products.energy), 0) as total_energy")]
+   :from   [:order_products :products]
+   :where  [:and
+            [:= :order_products.order_id order-id]
+            [:= :products.id :order_products.product_id]]})
+
+
+
+(defn- order-total-sum-query
+  [order-id]
+  {:select [(hs/raw "coalesce(sum(order_products.count * products.price), 0) as total_cost")]
+   :from   [:order_products :products]
+   :where  [:and
+            [:= :order_products.order_id order-id]
+            [:= :products.id :order_products.product_id]]})
+
 
 
 (defn order-totals!
   [order-id]
   (->> (order-totals-query order-id)
+       (hs/format)
        (jdbc/query db/db)
        (first)))
 
@@ -63,8 +82,10 @@
 (def order-detail-query
   {:select   [:orders.id
               :orders.location
+              :orders.created_at
               :users.name
               :users.phone
+              [(order-total-sum-query :orders.id) :total_sum]
               [(order-current-status-query :orders.id) :status]
               :orders.comment]
    :from     [:orders :users]
@@ -103,6 +124,24 @@
   (hs/format (hh/merge-where order-detail-query [:= :orders.user_id user-id])))
 
 
+(def active-orders-query
+  {:with   [[:cte_orders order-detail-query]]
+   :select [:*]
+   :from   [:cte_orders]
+   :where  [:in :cte_orders.status active-order-statuses]})
+
+
+(defn active-orders!
+  []
+  (->> active-orders-query
+       (hs/format)
+       (jdbc/query db/db)
+       (map fmt-order-location)))
+
+
+(active-orders!)
+
+
 (defn active-order-by-rider-id-query
   [rider-id]
   (hs/format
@@ -111,7 +150,7 @@
                              [:= :orders.rider_id rider-id])]]
      :select [:*]
      :from   [:cte_orders]
-     :where  [:= :cte_orders.status "on-way"]}))
+     :where  [:= :cte_orders.status " on-way "]}))
 
 
 (defn active-order-by-rider-id!
@@ -174,7 +213,7 @@
 
 (defn insert-order-query
   [user-id lon lat comment]
-  ["insert into orders (user_id, location, comment) values (?, POINT(?, ?), ?);"
+  [" insert into orders (user_id, location, comment) values (?, POINT (?, ?), ?) ;"
    user-id
    lon lat
    comment])
