@@ -20,13 +20,14 @@
   [ctx]
   (let [update (:update ctx)
         query (:callback_query update)
-        chat-id (:id (:from query))
+        chat-id (u/chat-id update)
         message-id (:message_id (:message query))]
-    {:send-text      {:chat-id chat-id
-                      :text    "Куда доставить?"
-                      :options {:reply_markup markup-for-request-location}}
-     :delete-message {:chat-id    chat-id
-                      :message-id message-id}}))
+    (merge {:send-text {:chat-id chat-id
+                        :text    "Куда доставить?"
+                        :options {:reply_markup markup-for-request-location}}}
+           (when query
+             {:delete-message {:chat-id    chat-id
+                               :message-id message-id}}))))
 
 
 (defn order-confirmation-state

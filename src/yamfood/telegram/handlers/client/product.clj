@@ -94,9 +94,7 @@
         :delete-message {:chat-id    chat-id
                          :message-id (:message_id message)}}
 
-       {:send-text
-        {:chat-id chat-id
-         :text    "Если у вас возникли какие-то вопросы обратитесь к @kensay."}}))))
+       {:dispatch {:args [:c/text]}}))))
 
 
 (d/register-event-handler!
