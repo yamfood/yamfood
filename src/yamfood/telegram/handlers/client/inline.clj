@@ -23,6 +23,15 @@
    :thumb_url             (:thumbnail product)})
 
 
+(def current-location-inline-result
+  {:type                  "article"
+   :id                    99999
+   :input_message_content {:message_text "Обновить локацию"}
+   :title                 "ул. Богишамол, 127"
+   :description           "Коснитесь чтобы обновить\n"
+   :thumb_url             "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/320/apple/114/round-pushpin_1f4cd.png"})
+
+
 (defn inline-query-handler
   ([_]
    {:run {:function   p/all-products!
@@ -32,7 +41,9 @@
      {:answer-inline
       {:inline-query-id (:id (:inline_query update))
        :options         {:cache_time 0}
-       :results         (map query-result-from-product products)}})))
+       :results         (into
+                          [current-location-inline-result]
+                          (map query-result-from-product products))}})))
 
 
 (d/register-event-handler!
