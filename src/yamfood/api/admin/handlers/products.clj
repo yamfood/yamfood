@@ -10,5 +10,5 @@
 
 
 (c/defroutes
-  products-routes
+  routes
   (c/GET "/" [] products-list))

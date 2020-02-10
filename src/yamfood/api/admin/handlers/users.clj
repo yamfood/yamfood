@@ -10,5 +10,5 @@
 
 
 (c/defroutes
-  user-routes
+  routes
   (c/GET "/" [] users-list))

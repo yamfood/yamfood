@@ -31,6 +31,13 @@
       (o/active-order-by-rider-id! (:id rider)))))
 
 
+(defn all-riders!
+  []
+  (->> rider-query
+      (hs/format)
+      (jdbc/query db/db)))
+
+
 (defn assign-rider-to-order!
   [order-id rider-id]
   (jdbc/with-db-transaction

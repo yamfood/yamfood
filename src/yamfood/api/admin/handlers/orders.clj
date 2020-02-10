@@ -16,10 +16,13 @@
   {:body
    (reduce
      reduce-active-orders
-     (apply merge (map #(hash-map (keyword %) []) ord/active-order-statuses))
+     (apply
+       merge
+       (map #(hash-map (keyword %) [])
+            ord/active-order-statuses))
      (ord/active-orders!))})
 
 
 (c/defroutes
-  orders-routes
+  routes
   (c/GET "/active/" [] active-orders-list))

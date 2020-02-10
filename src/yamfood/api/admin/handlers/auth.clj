@@ -20,5 +20,5 @@
 
 
 (c/defroutes
-  auth-routes
+  routes
   (c/POST "/login/" [] login))
