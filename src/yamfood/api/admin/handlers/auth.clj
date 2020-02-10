@@ -1,8 +1,7 @@
 (ns yamfood.api.admin.handlers.auth
   (:require
     [compojure.core :as c]
-    [compojure.route :as route]
-    [yamfood.core.admin.core :as adm]))
+    [yamfood.core.admin.core :as a]))
 
 
 (defn login
@@ -10,9 +9,9 @@
   (let [body (:body request)
         login (:login body)
         password (:password body)
-        admin (adm/admin-by-credentials! login password)]
+        admin (a/admin-by-credentials! login password)]
     (if admin
-      (let [token (adm/update-admin-token! (:id admin))]
+      (let [token (a/update-admin-token! (:id admin))]
         {:body {:token token}})
       {:body   {:request (str request)
                 :error   "Incorrect credentials"}

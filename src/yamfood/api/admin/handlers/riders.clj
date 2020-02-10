@@ -5,7 +5,7 @@
 
 
 (defn riders-list
-  [request]
+  [_]
   {:body (r/all-riders!)})
 
 

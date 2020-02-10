@@ -5,7 +5,7 @@
 
 
 (defn products-list
-  [request]
+  [_]
   {:body (products/all-products!)})
 
 

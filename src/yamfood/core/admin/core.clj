@@ -54,3 +54,10 @@
       {:token token}
       ["admins.id = ?" admin-id])
     token))
+
+
+(defn all-admins!
+  []
+  (->> admin-query
+       (hs/format)
+       (jdbc/query db/db)))

@@ -5,7 +5,7 @@
 
 
 (defn users-list
-  [request]
+  [_]
   {:body (users/users-list!)})
 
 
