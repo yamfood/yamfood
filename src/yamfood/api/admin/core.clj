@@ -7,6 +7,7 @@
     [yamfood.api.admin.handlers.admins :as admins]
     [yamfood.api.admin.handlers.orders :as orders]
     [yamfood.api.admin.middleware :refer [wrap-auth]]
+    [yamfood.api.admin.handlers.kitchens :as kitchens]
     [yamfood.api.admin.handlers.products :as products]))
 
 
@@ -19,5 +20,6 @@
       (c/context "/users" [] users/routes)
       (c/context "/riders" [] riders/routes)
       (c/context "/orders" [] orders/routes)
+      (c/context "/kitchens" [] kitchens/routes)
       (c/context "/products" [] products/routes))))
 
