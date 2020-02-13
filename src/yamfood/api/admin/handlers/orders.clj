@@ -31,7 +31,13 @@
     {:body (o/order-by-id! order-id)}))
 
 
+(defn finished-orders ; TODO: Use pagination!!!
+  [_]
+  {:body (o/finished-orders!)})
+
+
 (c/defroutes
   routes
   (c/GET "/:id{[0-9]+}/" [] order-details)
-  (c/GET "/active/" [] active-orders-list))
+  (c/GET "/active/" [] active-orders-list)
+  (c/GET "/finished/" [] finished-orders))

@@ -9,14 +9,12 @@
 
 
 (def order-statuses
-  {:new                  "new"
-   :on-kitchen           "onKitchen"
-   :ready                "ready"
-   :on-way               "onWay"
-   :finished             "finished"
-   :canceled-by-rider    "canceledByRider"
-   :canceled-by-client   "canceledByClient"
-   :canceled-by-operator "canceledByOperator"})
+  {:new        "new"
+   :on-kitchen "onKitchen"
+   :ready      "ready"
+   :on-way     "onWay"
+   :finished   "finished"
+   :canceled   "canceled"})
 
 
 (def active-order-statuses
@@ -24,6 +22,11 @@
    (:on-kitchen order-statuses)
    (:ready order-statuses)
    (:on-way order-statuses)])
+
+
+(def finished-order-statuses
+  [(:canceled order-statuses)
+   (:finished order-statuses)])
 
 
 (defn fmt-order-location
@@ -139,7 +142,19 @@
        (map fmt-order-location)))
 
 
-(active-orders!)
+(def finished-orders-query
+  {:with   [[:cte_orders order-detail-query]]
+   :select [:*]
+   :from   [:cte_orders]
+   :where  [:in :cte_orders.status finished-order-statuses]})
+
+
+(defn finished-orders!
+  []
+  (->> finished-orders-query
+       (hs/format)
+       (jdbc/query db/db)
+       (map fmt-order-location)))
 
 
 (defn active-order-by-rider-id-query
