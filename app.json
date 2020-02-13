@@ -11,6 +11,9 @@
     "BOT_TOKEN": {
       "description": "Client's bot token"
     },
+    "LIQ_TOKEN": {
+      "description": "Token for reverse geocoding on LocationIQ"
+    },
     "RIDER_BOT_TOKEN": {
       "description": "Rider's bot token"
     },

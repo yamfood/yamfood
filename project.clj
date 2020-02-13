@@ -12,6 +12,7 @@
 
                  [environ "1.1.0"]
 
+                 [clj-http "3.10.0"]
                  [morse "0.4.3"]
 
                  [migratus "1.2.4"]
