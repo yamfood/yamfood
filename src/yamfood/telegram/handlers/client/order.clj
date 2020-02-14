@@ -227,7 +227,7 @@
      {:send-invoice   {:chat-id     chat-id
                        :title       (str "Оплатить заказ №" (:id order))
                        :description (invoice-description order)
-                       :payload     {}
+                       :payload     {:order_id (:id order)}
                        :currency    "UZS"
                        :prices      (order-prices order)
                        :options     {:reply_markup invoice-reply-markup}}
