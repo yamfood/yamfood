@@ -9,4 +9,4 @@
 
 
 ;(init)
-;(migratus/create m/config "admins")
+;(migratus/create m/config "order_kitchen")

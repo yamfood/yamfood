@@ -5,7 +5,8 @@
     [clojure.java.jdbc :as jdbc]
     [yamfood.core.db.core :as db]
     [yamfood.core.baskets.core :as b]
-    [yamfood.core.users.core :as users]))
+    [yamfood.core.users.core :as users]
+    [yamfood.core.kitchens.core :as kitchens]))
 
 
 (def order-statuses
@@ -227,18 +228,20 @@
 
 
 (defn insert-order-query
-  [user-id lon lat comment]
-  [" insert into orders (user_id, location, comment) values (?, POINT (?, ?), ?) ;"
+  [user-id lon lat comment kitchen-id]
+  ["insert into orders (user_id, location, comment, kitchen_id) values (?, POINT (?, ?), ?, ?) ;"
    user-id
    lon lat
-   comment])
+   comment
+   kitchen-id])
 
 
 (defn insert-order!
-  [user-id lon lat comment]
+  [user-id lon lat comment kitchen-id]
   (let [query (insert-order-query user-id
                                   lon lat
-                                  comment)]
+                                  comment
+                                  kitchen-id)]
     (jdbc/execute! db/db query {:return-keys ["id"]})))
 
 
@@ -251,10 +254,13 @@
   ; TODO: Use transaction!
   [basket-id location comment]
   (let [user (users/user-with-basket-id! basket-id)
+        kitchen (kitchens/nearest-kitchen! (:longitude location)
+                                           (:latitude location))
         order (insert-order! (:id user)
                              (:longitude location)
                              (:latitude location)
-                             comment)]
+                             comment
+                             (:id kitchen))]
     (-> (products-from-basket! basket-id)
         (prepare-basket-products-to-order (:id order))
         (insert-products!))
