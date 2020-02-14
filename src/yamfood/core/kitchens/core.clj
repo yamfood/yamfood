@@ -26,3 +26,27 @@
        (hs/format)
        (jdbc/query db/db)
        (map fmt-location)))
+
+
+(def kitchens-distance-function-query
+  "ST_Distance(geometry(kitchens.location), geometry(point(%s, %s)))")
+
+
+(defn nearest-kitchen-query
+  [lon lat]
+  (assoc
+    kitchen-query
+    :order-by
+    [(hs/raw
+       (format
+         kitchens-distance-function-query
+         lon lat))]))
+
+
+(defn nearest-kitchen!
+  [lon lat]
+  (->> (nearest-kitchen-query lon lat)
+       (hs/format)
+       (jdbc/query db/db)
+       (first)
+       (fmt-location)))
