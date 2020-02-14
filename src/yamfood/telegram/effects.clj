@@ -113,3 +113,13 @@
       (:currency effect)
       (:prices effect)
       (:options effect))))
+
+
+(d/register-effect-handler!
+  :answer-pre-checkout-query
+  (fn [ctx effect]
+    (-t/answer-pre-checkout-query
+      (:token ctx)
+      (:pre_checkout_query_id effect)
+      (:ok effect)
+      (:options effect))))

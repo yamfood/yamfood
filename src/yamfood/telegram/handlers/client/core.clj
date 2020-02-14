@@ -21,10 +21,12 @@
         text (:text message)
         contact (:contact message)
         location (:location message)
-        reply-to (:reply_to_message message)]
+        reply-to (:reply_to_message message)
+        successful_payment (:successful_payment message)]
     (cond
       (= text "/start") (d/dispatch! ctx [:c/start])
       location (d/dispatch! ctx [:c/location])
+      successful_payment (d/dispatch! ctx [:c/successful-payment])
       contact (d/dispatch! ctx [:c/contact])
       reply-to (d/dispatch! ctx [:c/reply])
       text (d/dispatch! ctx [:c/text]))))
@@ -35,10 +37,13 @@
   (let [message (:message update)
         inline-query (:inline_query update)
         callback-query (:callback_query update)
+        pre-checkout-query (:pre_checkout_query update)
         ctx (build-ctx! update)]
     (if message
       (process-message ctx update))
     (if inline-query
       (d/dispatch! ctx [:c/inline]))
+    (if pre-checkout-query
+      (d/dispatch! ctx [:c/pre-checkout]))
     (if callback-query
       (d/dispatch! ctx [:c/callback]))))

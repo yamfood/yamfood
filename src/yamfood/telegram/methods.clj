@@ -60,3 +60,19 @@
                               :as           :json
                               :form-params  query})]
      (-> resp :body))))
+
+
+(defn answer-pre-checkout-query
+  "Once the user has confirmed their payment and shipping details,
+   the Bot API sends the final confirmation in the form of an Update
+   with the field pre_checkout_query.
+  (https://core.telegram.org/bots/api#answerPreCheckoutQuery)"
+  ([token pre_checkout_query_id ok options]
+   (let [url (str base-url token "/answerPreCheckoutQuery")
+         query (into {:pre_checkout_query_id pre_checkout_query_id
+                      :ok                    ok}
+                     options)
+         resp (http/post url {:content-type :json
+                              :as           :json
+                              :form-params  query})]
+     (-> resp :body))))
