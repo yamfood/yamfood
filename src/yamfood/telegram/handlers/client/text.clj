@@ -1,8 +1,9 @@
 (ns yamfood.telegram.handlers.client.text
-  (:require [yamfood.telegram.dispatcher :as d]))
+  (:require
+    [yamfood.telegram.dispatcher :as d]))
+
 
 (def update-location-text "Обновить локацию")
-
 
 (defn text-handler
   [ctx]

@@ -13,6 +13,7 @@
     "https://eu1.locationiq.com/v1/reverse.php?key=%s&lat=%s&lon=%s&format=json&accept-language=native"
     token lat lon))
 
+
 (defn- liq-reverse-geocoding!
   [lon lat]
   (let [url (reverse-geocoding-url LIQ-token lon lat)

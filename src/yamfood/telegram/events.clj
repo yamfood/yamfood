@@ -10,7 +10,7 @@
     [yamfood.telegram.handlers.client.callback]
     [yamfood.telegram.handlers.client.payments]
 
+    [yamfood.telegram.handlers.rider.menu]
     [yamfood.telegram.handlers.rider.order]
     [yamfood.telegram.handlers.rider.inline]
-    [yamfood.telegram.handlers.rider.menu]
     [yamfood.telegram.handlers.rider.callback]))

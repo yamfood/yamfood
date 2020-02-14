@@ -44,7 +44,6 @@
       [{:text (format "Корзина (%s сум)" (fmt-values basket-cost)) :callback_data "basket"}]]}))
 
 
-
 (defn basket-product-controls
   [action-prefix product-id count]
   [{:text "-" :callback_data (str action-prefix "-/" product-id)}
@@ -59,7 +58,6 @@
      [(basket-product-controls "detail" (:id state) (:count_in_basket state))
       [{:text "Еще!" :switch_inline_query_current_chat ""}]
       [{:text (format "Корзина (%s сум)" (fmt-values basket-cost)) :callback_data "basket"}]]}))
-
 
 
 (defn product-detail-markup

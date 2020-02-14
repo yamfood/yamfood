@@ -47,7 +47,6 @@
             [:= :products.id :order_products.product_id]]})
 
 
-
 (defn- order-total-sum-query
   [order-id]
   {:select [(hs/raw "coalesce(sum(order_products.count * products.price), 0) as total_cost")]
@@ -55,7 +54,6 @@
    :where  [:and
             [:= :order_products.order_id order-id]
             [:= :products.id :order_products.product_id]]})
-
 
 
 (defn order-totals!
@@ -80,7 +78,6 @@
    :where    [:= :order_logs.order_id order-id]
    :order-by [[:order_logs.created_at :desc]]
    :limit    1})
-
 
 
 (def order-detail-query

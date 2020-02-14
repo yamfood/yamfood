@@ -1,11 +1,11 @@
 (ns yamfood.core.admin.core
   (:require
     [honeysql.core :as hs]
+    [clojure.string :as str]
     [honeysql.helpers :as hh]
     [clojure.java.jdbc :as jdbc]
     [yamfood.utils :refer [uuid]]
-    [yamfood.core.db.core :as db]
-    [clojure.string :as str]))
+    [yamfood.core.db.core :as db]))
 
 
 (def admin-query

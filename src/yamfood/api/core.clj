@@ -2,8 +2,8 @@
   (:require
     [compojure.core :as c]
     [yamfood.api.admin.core :as admin]
-    [yamfood.api.middleware :refer [wrap-cors]]
     [yamfood.core.regions.core :as regions]
+    [yamfood.api.middleware :refer [wrap-cors]]
     [ring.middleware.json :refer [wrap-json-response]]))
 
 
@@ -23,5 +23,3 @@
   (-> *api-routes
       (wrap-cors)
       (wrap-json-response)))
-
-

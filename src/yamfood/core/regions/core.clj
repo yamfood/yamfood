@@ -1,8 +1,8 @@
 (ns yamfood.core.regions.core
   (:require [honeysql.core :as hs]
             [clojure.java.jdbc :as jdbc]
-            [yamfood.core.db.core :as db]
-            [clojure.data.json :as json]))
+            [clojure.data.json :as json]
+            [yamfood.core.db.core :as db]))
 
 
 (defn- region-by-location-query

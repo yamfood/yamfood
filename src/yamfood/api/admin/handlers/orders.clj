@@ -2,8 +2,8 @@
   (:require
     [yamfood.utils :as u]
     [compojure.core :as c]
-    [yamfood.core.orders.core :as ord]
-    [yamfood.core.orders.core :as o]))
+    [yamfood.core.orders.core :as o]
+    [yamfood.core.orders.core :as ord]))
 
 
 (defn reduce-active-orders
