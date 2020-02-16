@@ -1,6 +1,7 @@
 (ns yamfood.telegram.handlers.client.order
   (:require
     [yamfood.core.orders.core :as o]
+    [yamfood.core.users.core :as usr]
     [yamfood.core.orders.core :as ord]
     [yamfood.telegram.dispatcher :as d]
     [yamfood.core.baskets.core :as bsk]
@@ -28,7 +29,10 @@
         (:location user) {:dispatch {:args [:c/order-confirmation-state]}}
         :else {:dispatch {:args [:c/request-location]}})
       {:delete-message {:chat-id    chat-id
-                        :message-id message-id}})))
+                        :message-id message-id}
+       :run            {:function usr/update-payload!
+                        :args     [(:id user)
+                                   (assoc (:payload user) :step u/order-confirmation-step)]}})))
 
 
 (def order-confirmation-markup

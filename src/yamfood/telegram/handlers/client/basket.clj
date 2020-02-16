@@ -1,5 +1,6 @@
 (ns yamfood.telegram.handlers.client.basket
   (:require
+    [yamfood.core.users.core :as usr]
     [yamfood.telegram.dispatcher :as d]
     [yamfood.core.baskets.core :as baskets]
     [yamfood.telegram.handlers.utils :as u]))
@@ -86,6 +87,7 @@
 (defn send-basket
   [ctx basket-state]
   (let [update (:update ctx)
+        user (:user ctx)
         query (:callback_query update)
         chat-id (:id (:from query))
         message-id (:message_id (:message query))]
@@ -93,7 +95,10 @@
                       :text    "Ваша корзина:"
                       :options {:reply_markup (basket-detail-markup basket-state)}}
      :delete-message {:chat-id    chat-id
-                      :message-id message-id}}))
+                      :message-id message-id}
+     :run            {:function usr/update-payload!
+                      :args     [(:id user)
+                                 (assoc (:payload user) :step u/basket-step)]}}))
 
 
 (defn update-basket-markup

@@ -17,6 +17,11 @@
 (def order-emoji "\uD83D\uDDD2️")
 (def refresh-emoji "\uD83D\uDD04️")
 
+(def menu-step "menu")
+(def browse-step "browse")
+(def basket-step "basket")
+(def order-confirmation-step "order-confirmation")
+
 
 ; TODO: Make it work with all updates!
 (defn tid-from-update

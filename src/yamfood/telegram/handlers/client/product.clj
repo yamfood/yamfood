@@ -4,7 +4,8 @@
     [yamfood.telegram.dispatcher :as d]
     [yamfood.core.baskets.core :as baskets]
     [yamfood.telegram.handlers.utils :as u]
-    [yamfood.core.products.core :as products]))
+    [yamfood.core.products.core :as products]
+    [yamfood.core.users.core :as usr]))
 
 
 (defn want-handler
@@ -84,6 +85,7 @@
             :next-event :c/text}}))
   ([ctx product-detail-state]
    (let [update (:update ctx)
+         user (:user ctx)
          message (:message update)
          chat (:chat message)
          chat-id (:id chat)]
@@ -92,7 +94,10 @@
                          :options (product-detail-options product-detail-state)
                          :photo   (:photo product-detail-state)}
         :delete-message {:chat-id    chat-id
-                         :message-id (:message_id message)}}
+                         :message-id (:message_id message)}
+        :run            {:function usr/update-payload!
+                         :args     [(:id user)
+                                    (assoc (:payload user) :step u/browse-step)]}}
 
        {:dispatch {:args [:c/no-product-text]}}))))
 
