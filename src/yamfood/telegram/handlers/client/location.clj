@@ -79,7 +79,7 @@
                                          :longitude (:longitude location)
                                          :latitude  (:latitude location)})]}
      :send-text {:chat-id chat-id
-                 :text    "Локация обновлена"
+                 :text    (str "Новый адресс: " (u/text-from-address (:address location-info)))
                  :options {:reply_markup {:remove_keyboard true}}}}))
 
 
