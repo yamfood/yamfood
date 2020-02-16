@@ -67,13 +67,16 @@
 (defn update-location
   [ctx]
   (let [update (:update ctx)
+        user (:user ctx)
         message (:message update)
         chat-id (:id (:from message))
         location (:location message)]
-    {:run       {:function usr/update-location!
-                 :args     [(:id (:user ctx))
-                            (:longitude location)
-                            (:latitude location)]}
+    {:run       {:function usr/update-payload!
+                 :args     [(:id user)
+                            (assoc
+                              (:payload user)
+                              :location {:longitude (:longitude location)
+                                         :latitude  (:latitude location)})]}
      :send-text {:chat-id chat-id
                  :text    "Локация обновлена"
                  :options {:reply_markup {:remove_keyboard true}}}}))

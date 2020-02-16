@@ -3,8 +3,7 @@
     [honeysql.core :as hs]
     [honeysql.helpers :as hh]
     [clojure.java.jdbc :as jdbc]
-    [yamfood.core.db.core :as db]
-    [clojure.data.json :as json]))
+    [yamfood.core.db.core :as db]))
 
 
 (defn user-active-order-query
@@ -23,7 +22,6 @@
   {:select [:users.id
             :users.phone
             :users.tid
-            :users.location
             :users.comment
             :users.payload
             [(user-active-order-query :users.id) :active_order_id]
@@ -32,20 +30,18 @@
    :where  [:= :baskets.user_id :users.id]})
 
 
-(defn fmt-location
-  [user]
-  (let [point (:location user)]
-    (if point
-      (assoc user :location (db/point->clj point))
-      user)))
+(defn keywordize
+  [data]
+  (into
+    {}
+    (for [[k v] data]
+      [(keyword k) (if (map? v) (keywordize v) v)])))
 
 
 (defn fmt-payload
   [user]
   (let [payload (:payload user)]
-    (assoc user :payload (into {}
-                               (for [[k v] payload]
-                                 [(keyword k) v])))))
+    (assoc user :payload (keywordize payload))))
 
 
 (defn user-with-tid-query
@@ -62,7 +58,7 @@
   [basket-id]
   (->> (user-with-basket-id-query basket-id)
        (jdbc/query db/db)
-       (map fmt-location)
+       (map fmt-payload)
        (first)))
 
 
@@ -70,7 +66,6 @@
   [tid]                                                     ; TODO: CACHE!
   (->> (user-with-tid-query tid)
        (jdbc/query db/db)
-       (map fmt-location)
        (map fmt-payload)
        (first)))
 

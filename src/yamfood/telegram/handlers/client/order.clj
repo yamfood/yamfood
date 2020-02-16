@@ -26,7 +26,7 @@
         message-id (:message_id (:message query))]
     (into
       (cond
-        (:location user) {:dispatch {:args [:c/order-confirmation-state]}}
+        (:location (:payload user)) {:dispatch {:args [:c/order-confirmation-state]}}
         :else {:dispatch {:args [:c/request-location]}})
       {:delete-message {:chat-id    chat-id
                         :message-id message-id}
