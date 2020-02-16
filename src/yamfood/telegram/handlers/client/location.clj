@@ -48,15 +48,15 @@
    (let [update (:update ctx)
          message (:message update)
          location (:location message)]
-     {:run {:function   regions/region-by-location!
+     {:run {:function   regions/location-info!
             :args       [(:longitude location)
                          (:latitude location)]
             :next-event :c/location}}))
-  ([ctx region]
+  ([ctx location-info]
    (let [user (:user ctx)
          step (:step (:payload user))]
-     (if region
-       {:dispatch [{:args [:c/update-location]}
+     (if (:region location-info)
+       {:dispatch [{:args [:c/update-location location-info]}
                    (cond
                      (= step u/order-confirmation-step) {:args [:c/order-confirmation-state]}
                      (= step u/basket-step) {:args [:c/basket]}
@@ -65,7 +65,7 @@
 
 
 (defn update-location
-  [ctx]
+  [ctx location-info]
   (let [update (:update ctx)
         user (:user ctx)
         message (:message update)
@@ -75,7 +75,8 @@
                  :args     [(:id user)
                             (assoc
                               (:payload user)
-                              :location {:longitude (:longitude location)
+                              :location {:address   (:address location-info)
+                                         :longitude (:longitude location)
                                          :latitude  (:latitude location)})]}
      :send-text {:chat-id chat-id
                  :text    "Локация обновлена"

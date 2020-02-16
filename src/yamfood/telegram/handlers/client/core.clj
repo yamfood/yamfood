@@ -47,3 +47,5 @@
       (d/dispatch! ctx [:c/pre-checkout]))
     (if callback-query
       (d/dispatch! ctx [:c/callback]))))
+
+;(build-ctx! {:update_id 220544587, :message {:message_id 10499, :from {:id 79225668, :is_bot false, :first_name "Рустам", :last_name "Бабаджанов", :username "kensay", :language_code "ru"}, :chat {:id 79225668, :first_name "Рустам", :last_name "Бабаджанов", :username "kensay", :type "private"}, :date 1581846213, :text "/start", :entities [{:offset 0, :length 6, :type "bot_command"}]}})

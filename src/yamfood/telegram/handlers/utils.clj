@@ -120,3 +120,11 @@
     (map
       #(format (str food-emoji " %d x %s\n") (:count %) (:name %))
       products)))
+
+
+(defn text-from-address
+  [address]
+  (let [address (:address address)
+        road (:road address)
+        house (:house_number address)]
+    (str road ", " house)))

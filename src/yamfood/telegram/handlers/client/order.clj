@@ -51,7 +51,8 @@
                u/location-emoji " %s")
           (u/fmt-values (:total_cost (:basket order-state)))
           (:comment (:user order-state))
-          "60, 1st Akkurgan Passage, Mirzo Ulugbek district, Tashkent"))
+          (u/text-from-address
+            (get-in order-state [:user :payload :location :address]))))
 
 
 (defn order-detail-handler

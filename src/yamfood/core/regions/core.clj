@@ -2,7 +2,8 @@
   (:require [honeysql.core :as hs]
             [clojure.java.jdbc :as jdbc]
             [clojure.data.json :as json]
-            [yamfood.core.db.core :as db]))
+            [yamfood.core.db.core :as db]
+            [yamfood.core.external.geocoding :as geo]))
 
 
 (defn- region-by-location-query
@@ -19,6 +20,12 @@
   (->> (region-by-location-query lon lat)
        (jdbc/query db/db)
        (first)))
+
+
+(defn location-info!
+  [lon lat]
+  {:region  (region-by-location! lon lat)
+   :address (geo/get-address! lon lat)})
 
 
 (defn all-regions-query
