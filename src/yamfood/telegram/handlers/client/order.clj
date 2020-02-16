@@ -1,33 +1,11 @@
 (ns yamfood.telegram.handlers.client.order
   (:require
     [yamfood.core.orders.core :as o]
-    [yamfood.core.users.core :as usr]
     [yamfood.core.orders.core :as ord]
     [yamfood.telegram.dispatcher :as d]
     [yamfood.core.baskets.core :as bsk]
     [yamfood.telegram.handlers.utils :as u]
-    [yamfood.core.regions.core :as regions]
     [yamfood.telegram.handlers.client.core :as c]))
-
-
-(def markup-for-request-location
-  {:resize_keyboard true
-   :keyboard        [[{:text             "Отправить текущее положение"
-                       :request_location true}]]})
-
-
-(defn request-location-handler
-  [ctx]
-  (let [update (:update ctx)
-        query (:callback_query update)
-        chat-id (u/chat-id update)
-        message-id (:message_id (:message query))]
-    (merge {:send-text {:chat-id chat-id
-                        :text    "Куда доставить?"
-                        :options {:reply_markup markup-for-request-location}}}
-           (when query
-             {:delete-message {:chat-id    chat-id
-                               :message-id message-id}}))))
 
 
 (defn order-confirmation-state
@@ -47,10 +25,8 @@
         message-id (:message_id (:message query))]
     (into
       (cond
-        (:location user) (order-confirmation-state ctx)
-        :else {:send-text {:chat-id chat-id
-                           :text    "Куда доставить?"
-                           :options {:reply_markup markup-for-request-location}}})
+        (:location user) {:dispatch {:args [:c/order-confirmation-state]}}
+        :else {:dispatch {:args [:c/request-location]}})
       {:delete-message {:chat-id    chat-id
                         :message-id message-id}})))
 
@@ -82,52 +58,6 @@
                  :text    (pre-order-text order-state)
                  :options {:reply_markup order-confirmation-markup
                            :parse_mode   "markdown"}}}))
-
-
-(def invalid-location-markup
-  {:inline_keyboard
-   [[{:text "Карта обслуживания"
-      :url  u/map-url}]
-    [{:text          (str u/basket-emoji " Корзина")
-      :callback_data "basket"}]]})
-
-
-(defn location-handler
-  ([ctx]
-   (let [update (:update ctx)
-         message (:message update)
-         location (:location message)]
-     {:run {:function   regions/region-by-location!
-            :args       [(:longitude location)
-                         (:latitude location)]
-            :next-event :c/location}}))
-  ([ctx region]
-   (let [message (:message (:update ctx))
-         chat-id (:id (:from message))]
-     (if region
-       {:dispatch {:args [:c/update-location]}}
-       {:send-text [{:chat-id chat-id
-                     :text    "Ждите..."
-                     :options {:reply_markup {:remove_keyboard true}}}
-                    {:chat-id chat-id
-                     :text    "К сожалению, мы не обслуживаем данный регион"
-                     :options {:reply_markup invalid-location-markup}}]}))))
-
-
-(defn update-location
-  [ctx]
-  (let [update (:update ctx)
-        message (:message update)
-        chat-id (:id (:from message))
-        location (:location message)]
-    {:send-text {:chat-id chat-id
-                 :text    "Локация обновлена"
-                 :options {:reply_markup {:remove_keyboard true}}}
-     :run       [(:run (order-confirmation-state ctx))
-                 {:function usr/update-location!
-                  :args     [(:id (:user ctx))
-                             (:longitude location)
-                             (:latitude location)]}]}))
 
 
 (defn create-order-handler
@@ -252,23 +182,8 @@
 
 
 (d/register-event-handler!
-  :c/location
-  location-handler)
-
-
-(d/register-event-handler!
-  :c/update-location
-  update-location)
-
-
-(d/register-event-handler!
   :c/order-confirmation-state
   order-confirmation-state)
-
-
-(d/register-event-handler!
-  :c/request-location
-  request-location-handler)
 
 
 (d/register-event-handler!

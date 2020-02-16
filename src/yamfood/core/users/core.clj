@@ -24,6 +24,7 @@
             :users.tid
             :users.location
             :users.comment
+            :users.payload
             [(user-active-order-query :users.id) :active_order_id]
             [:baskets.id :basket_id]]
    :from   [:users :baskets]
@@ -122,3 +123,8 @@
 (defn update-comment!
   [user-id comment]
   (jdbc/update! db/db "users" {:comment comment} ["id = ?" user-id]))
+
+
+(defn update-payload!
+  [user-id payload]
+  (jdbc/update! db/db "users" {:payload payload} ["id = ?" user-id]))
