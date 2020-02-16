@@ -52,10 +52,16 @@
             :args       [(:longitude location)
                          (:latitude location)]
             :next-event :c/location}}))
-  ([_ region]
-   (if region
-     {:dispatch {:args [:c/update-location]}}
-     {:dispatch {:args [:c/invalid-location]}})))
+  ([ctx region]
+   (let [user (:user ctx)
+         step (:step (:payload user))]
+     (if region
+       {:dispatch [{:args [:c/update-location]}
+                   (cond
+                     (= step u/order-confirmation-step) {:args [:c/order-confirmation-state]}
+                     (= step u/basket-step) {:args [:c/basket]}
+                     :else {:args [:c/menu]})]}
+       {:dispatch {:args [:c/invalid-location]}}))))
 
 
 (defn update-location
@@ -70,8 +76,7 @@
                             (:latitude location)]}
      :send-text {:chat-id chat-id
                  :text    "Локация обновлена"
-                 :options {:reply_markup {:remove_keyboard true}}}
-     :dispatch  {:args [:c/order-confirmation-state]}}))
+                 :options {:reply_markup {:remove_keyboard true}}}}))
 
 
 (d/register-event-handler!

@@ -89,7 +89,7 @@
   (let [update (:update ctx)
         user (:user ctx)
         query (:callback_query update)
-        chat-id (:id (:from query))
+        chat-id (u/chat-id update)
         message-id (:message_id (:message query))]
     {:send-text      {:chat-id chat-id
                       :text    "Ваша корзина:"
