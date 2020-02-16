@@ -72,7 +72,7 @@
         chat-id (:id (:from query))
         message-id (:message_id (:message query))
         basket-id (:basket_id (:user ctx))
-        location (:location (:user ctx))
+        location (:location (:payload (:user ctx)))
         comment (:comment (:user ctx))]
     {:run            {:function ord/create-order-and-clear-basket!
                       :args     [basket-id location comment]}
