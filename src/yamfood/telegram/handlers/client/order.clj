@@ -115,7 +115,7 @@
         message-id (:message_id (:message query))
         basket-id (:basket_id (:user ctx))
         location (:location (:payload (:user ctx)))
-        comment (:comment (:user ctx))]
+        comment (:comment (:payload (:user ctx)))]
     {:run            {:function ord/create-order-and-clear-basket!
                       :args     [basket-id location comment]}
      :dispatch       {:args        [:c/active-order]
