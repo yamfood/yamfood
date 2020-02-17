@@ -14,7 +14,7 @@
     (cond
       (= text update-location-text) {:dispatch {:args [:c/request-location]}}
       :else {:send-text {:chat-id chat-id
-                         :text "Не понял"}})))
+                         :text    "Не понял"}})))
 
 
 (d/register-event-handler!
