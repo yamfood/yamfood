@@ -35,21 +35,27 @@
                                    (assoc (:payload user) :step u/order-confirmation-step)]}})))
 
 
-(def order-confirmation-markup
-  {:inline_keyboard
-   [[{:text u/location-emoji :callback_data "request-location"}
-     {:text u/comment-emoji :callback_data "change-comment"}]
-    [{:text (str u/basket-emoji " Корзина") :callback_data "basket"}]
-    [{:text "✅ Подтвердить" :callback_data "create-order"}]]})
+(defn order-confirmation-markup
+  [order-state]
+  (let [payment (get-in order-state [:user :payload :payment])]
+    {:inline_keyboard
+     [[{:text u/location-emoji :callback_data "request-location"}
+       (cond
+         (= payment u/card-payment) {:text u/cash-emoji :callback_data "switch-payment-type"}
+         :else {:text u/card-emoji :callback_data "switch-payment-type"})
+       {:text u/comment-emoji :callback_data "change-comment"}]
+      [{:text (str u/basket-emoji " Корзина") :callback_data "basket"}]
+      [{:text "✅ Подтвердить" :callback_data "create-order"}]]}))
 
 
 (defn pre-order-text
   [order-state]
   (format (str "*Детали вашего заказа:* \n\n"
-               u/money-emoji " %s сум \n"
+               u/money-emoji " %s сум (%s)\n"
                u/comment-emoji " `%s` \n\n"
                u/location-emoji " %s")
           (u/fmt-values (:total_cost (:basket order-state)))
+          (or (get-in order-state [:user :payload :payment :label]) "Наличными")
           (or (:comment (:payload (:user order-state))) "Пусто...")
           (u/text-from-address
             (get-in order-state [:user :payload :location :address]))))
@@ -61,8 +67,44 @@
         chat-id (u/chat-id update)]
     {:send-text {:chat-id chat-id
                  :text    (pre-order-text order-state)
-                 :options {:reply_markup order-confirmation-markup
+                 :options {:reply_markup (order-confirmation-markup order-state)
                            :parse_mode   "markdown"}}}))
+
+
+(defn update-order-confirmation-handler
+  ([ctx]
+   (let [user (:user ctx)]
+     {:run {:function   bsk/order-confirmation-state!
+            :args       [(:basket_id user)]
+            :next-event :c/update-order-confirmation}}))
+  ([ctx order-state]
+   (let [query (:callback_query (:update ctx))
+         chat-id (:id (:from query))
+         message-id (:message_id (:message query))]
+     {:edit-message {:chat-id    chat-id
+                     :message-id message-id
+                     :text       (pre-order-text order-state)
+                     :options    {:reply_markup (order-confirmation-markup order-state)
+                                  :parse_mode   "markdown"}}})))
+
+
+(defn switch-payment-type-handler
+  [ctx]
+  (let [query (:callback_query (:update ctx))
+        user (:user ctx)
+        payload (:payload user)
+        payment (:payment payload)
+        new-payment (cond
+                      (or (= payment nil)
+                          (= payment u/cash-payment)) u/card-payment
+                      (= payment u/card-payment) u/cash-payment)]
+    {:run             {:function usr/update-payload!
+                       :args     [(:id user) (assoc payload :payment new-payment)]}
+     :dispatch        {:args        [:c/update-order-confirmation]
+                       :rebuild-ctx {:function c/build-ctx!
+                                     :update   (:update ctx)}}
+     :answer-callback {:callback_query_id (:id query)
+                       :text              " "}}))
 
 
 (defn create-order-handler
@@ -204,6 +246,16 @@
 (d/register-event-handler!
   :c/change-comment
   change-comment-handler)
+
+
+(d/register-event-handler!
+  :c/switch-payment-type
+  switch-payment-type-handler)
+
+
+(d/register-event-handler!
+  :c/update-order-confirmation
+  update-order-confirmation-handler)
 
 
 (d/register-event-handler!

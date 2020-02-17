@@ -101,6 +101,17 @@
 
 
 (d/register-effect-handler!
+  :edit-message
+  (fn [ctx effect]
+    (t/edit-text
+      (:token ctx)
+      (:chat-id effect)
+      (:message-id effect)
+      (:options effect)
+      (:text effect))))
+
+
+(d/register-effect-handler!
   :send-invoice
   (fn [ctx effect]
     (-t/send-invoice

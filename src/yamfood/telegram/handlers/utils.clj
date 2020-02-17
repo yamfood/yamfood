@@ -6,6 +6,8 @@
 
 (def location-emoji "\uD83D\uDCCD")
 (def money-emoji "\uD83D\uDCB0")
+(def cash-emoji "\uD83D\uDCB5")
+(def card-emoji "\uD83D\uDCB3")
 (def comment-emoji "\uD83D\uDCAC")
 (def basket-emoji "\uD83E\uDDFA")
 (def food-emoji "\uD83E\uDD57")
@@ -21,6 +23,11 @@
 (def browse-step "browse")
 (def basket-step "basket")
 (def order-confirmation-step "order-confirmation")
+
+(def cash-payment {:value "cash"
+                   :label "Наличными"})
+(def card-payment {:value "card"
+                   :label "Картой"})
 
 
 ; TODO: Make it work with all updates!
