@@ -50,7 +50,7 @@
                u/comment-emoji " `%s` \n\n"
                u/location-emoji " %s")
           (u/fmt-values (:total_cost (:basket order-state)))
-          (:comment (:user order-state))
+          (or (:comment (:payload (:user order-state))) "Пусто...")
           (u/text-from-address
             (get-in order-state [:user :payload :location :address]))))
 

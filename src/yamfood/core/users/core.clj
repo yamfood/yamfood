@@ -22,7 +22,6 @@
   {:select [:users.id
             :users.phone
             :users.tid
-            :users.comment
             :users.payload
             [(user-active-order-query :users.id) :active_order_id]
             [:baskets.id :basket_id]]
@@ -121,11 +120,6 @@
   [user-id lon lat]
   (->> (update-location-query user-id lon lat)
        (jdbc/execute! db/db)))
-
-
-(defn update-comment!
-  [user-id comment]
-  (jdbc/update! db/db "users" {:comment comment} ["id = ?" user-id]))
 
 
 (defn update-payload!

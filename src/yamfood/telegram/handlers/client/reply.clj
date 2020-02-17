@@ -9,9 +9,12 @@
   (let [update (:update ctx)
         message (:message update)
         text (:text message)
-        user-id (:id (:user ctx))]
-    {:run      {:function users/update-comment!
-                :args     [user-id text]}
+        user (:user ctx)]
+    {:run      {:function users/update-payload!
+                :args     [(:id user) (assoc
+                                        (:payload user)
+                                        :comment
+                                        text)]}
      :dispatch {:args [:c/order-confirmation-state]}}))
 
 
