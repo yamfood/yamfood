@@ -81,7 +81,9 @@
                                     (u/fmt-values total_cost)
                                     (u/fmt-values total_energy))
              :callback_data "nothing"}]
-           [{:text "✅ Далее" :callback_data "to-order"}])}))
+           (if (not (empty? (:products basket-state)))
+             [{:text "✅ Далее" :callback_data "to-order"}]
+             []))}))
 
 
 (defn send-basket
