@@ -34,8 +34,18 @@
 (defn all-riders!
   []
   (->> rider-query
-      (hs/format)
-      (jdbc/query db/db)))
+       (hs/format)
+       (jdbc/query db/db)))
+
+
+(defn new-rider!
+  [rider]
+  (first
+    (jdbc/insert!
+      db/db
+      "riders"
+      rider
+      {:return-keys ["id"]})))
 
 
 (defn assign-rider-to-order!
