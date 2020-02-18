@@ -30,6 +30,10 @@
    (:finished order-statuses)])
 
 
+(def cancelable-order-statuses
+  [(:new order-statuses)])
+
+
 (defn fmt-order-location
   [order]
   (assoc order
@@ -204,6 +208,14 @@
   (->> (orders-by-user-id-query user-id)
        (jdbc/query db/db)
        (map fmt-order-location)))
+
+
+(defn cancel-order!
+  [order-id]
+  (jdbc/insert!
+    db/db "order_logs"
+    {:order_id order-id
+     :status   (:canceled order-statuses)}))
 
 
 (defn user-active-order!
