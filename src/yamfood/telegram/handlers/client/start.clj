@@ -1,10 +1,19 @@
 (ns yamfood.telegram.handlers.client.start
   (:require
     [environ.core :refer [env]]
+    [yamfood.core.users.core :as usr]
     [yamfood.telegram.dispatcher :as d]
     [yamfood.core.users.core :as users]
     [yamfood.telegram.handlers.utils :as u]
-    [yamfood.core.users.core :as usr]))
+    [yamfood.telegram.handlers.client.core :as c]))
+
+
+(defn start-handler
+  [ctx]
+  (if (and (:user ctx)
+           (:phone (:user ctx)))
+    {:dispatch {:args [:c/menu]}}
+    {:dispatch {:args [:c/registration]}}))
 
 
 (def menu-markup
@@ -28,47 +37,21 @@
                             (assoc (:payload user) :step u/menu-step)]}}))
 
 
-(def registration-markup
-  {:resize_keyboard true
-   :keyboard        [[{:text            "Отправить контакт"
-                       :request_contact true}]]})
-
-
-(defn init-registration
-  [message]
-  {:send-text {:chat-id (:id (:chat message))
-               :options {:reply_markup registration-markup}
-               :text    "Отправьте, пожалуйста, свой контакт"}})
-
-
-(defn parse-int [s]
-  (bigdec (re-find #"\d+" s)))
-
-
-(defn contact-handler
+(defn registration-handler
   [ctx]
   (let [update (:update ctx)
-        message (:message update)
-        contact (:contact message)
-        phone (parse-int (:phone_number contact))
-        from (:from message)
-        tid (:id from)
+        tid (u/chat-id update)
+        from (:from (:message update))
         name (str (:first_name from) " " (:last_name from))]
-    {:run       {:function users/create-user!
-                 :args     [tid phone name]}
-     :send-text [{:chat-id (:id (:chat message))
-                  :options {:reply_markup {:remove_keyboard true}}
-                  :text    "Принято!"}
-                 (:send-text (menu-handler message))]}))
-
-
-(defn start-handler
-  [ctx]
-  (let [update (:update ctx)
-        message (:message update)]
     (if (:user ctx)
-      {:dispatch {:args [:c/menu]}}
-      (init-registration message))))
+      {:dispatch {:args [:c/request-phone]}}
+
+      {:run      {:function users/create-user!
+                  :args     [tid name]}
+       :dispatch {:args        [:c/request-phone]
+                  :rebuild-ctx {:function c/build-ctx!
+                                :update   (:update ctx)}}})))
+
 
 
 (d/register-event-handler!
@@ -77,10 +60,11 @@
 
 
 (d/register-event-handler!
-  :c/menu
-  menu-handler)
+  :c/registration
+  registration-handler)
 
 
 (d/register-event-handler!
-  :c/contact
-  contact-handler)
+  :c/menu
+  menu-handler)
+

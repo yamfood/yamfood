@@ -9,4 +9,4 @@
 
 
 ;(init)
-;(migratus/create m/config "order_kitchen")
+;(migratus/create m/config "user_phone_nullable")

@@ -46,5 +46,5 @@
 
 (deftest contact-handler-test
   (testing "Test contact handler with raw update"
-    (is (= (start/contact-handler ctx)
+    (is (= (start/request-phone-confirmation-handler ctx)
            contact-handler-result))))

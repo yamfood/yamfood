@@ -1,4 +1,4 @@
-(ns yamfood.api.admin.specs.core
+(ns yamfood.core.specs.core
   (:require
     [clojure.spec.alpha :as s]))
 
@@ -13,4 +13,4 @@
     (= c (count (digits num)))))
 
 
-(s/def ::phone (s/and int? (digits-count? 12)))
+(s/def ::phone (s/and number? (digits-count? 12)))

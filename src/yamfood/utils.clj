@@ -7,7 +7,7 @@
 
 (defn parse-int [s]
   (let [r (re-find #"\d+" s)]
-    (when r (Integer. r))))
+    (when r (BigInteger. r))))
 
 
 (defn in?

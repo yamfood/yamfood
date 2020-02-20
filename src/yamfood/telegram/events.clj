@@ -3,6 +3,7 @@
     [yamfood.telegram.handlers.client.text]
     [yamfood.telegram.handlers.client.start]
     [yamfood.telegram.handlers.client.order]
+    [yamfood.telegram.handlers.client.phone]
     [yamfood.telegram.handlers.client.reply]
     [yamfood.telegram.handlers.client.basket]
     [yamfood.telegram.handlers.client.inline]

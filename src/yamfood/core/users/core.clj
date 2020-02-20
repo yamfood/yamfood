@@ -92,8 +92,8 @@
 
 
 (defn insert-user!
-  [tid phone name]
-  (first (jdbc/insert! db/db "users" {:tid tid :phone phone :name name})))
+  [tid name]
+  (first (jdbc/insert! db/db "users" {:tid tid :name name})))
 
 
 (defn init-basket!
@@ -102,8 +102,8 @@
 
 
 (defn create-user!
-  [tid phone name]
-  (let [user (insert-user! tid phone name)]
+  [tid name]
+  (let [user (insert-user! tid name)]
     (init-basket! (:id user))))
 
 
@@ -120,6 +120,11 @@
   [user-id lon lat]
   (->> (update-location-query user-id lon lat)
        (jdbc/execute! db/db)))
+
+
+(defn update-phone!
+  [user-id phone]
+  (jdbc/update! db/db "users" {:phone phone} ["id = ?" user-id]))
 
 
 (defn update-payload!

@@ -18,6 +18,7 @@
       "basket-" {:dispatch {:args [:c/dec-basket-product]}}
       "to-order" {:dispatch {:args [:c/to-order]}}
       "request-location" {:dispatch {:args [:c/request-location]}}
+      "request-phone" {:dispatch {:args [:c/request-phone]}}
       "switch-payment-type" {:dispatch {:args [:c/switch-payment-type]}}
       "change-comment" {:dispatch {:args [:c/change-comment]}}
       "create-order" {:dispatch {:args [:c/create-order]}}

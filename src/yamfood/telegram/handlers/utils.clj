@@ -20,6 +20,8 @@
 (def refresh-emoji "\uD83D\uDD04️")
 
 (def menu-step "menu")
+(def phone-step "phone")
+(def phone-confirmation-step "phone-confirmation")
 (def browse-step "browse")
 (def basket-step "basket")
 (def order-confirmation-step "order-confirmation")
@@ -118,7 +120,7 @@
 
 (defn parse-int [s]
   (let [r (re-find #"\d+" s)]
-    (when r (Integer. r))))
+    (when r (BigInteger. r))))
 
 
 (defn order-products-text
