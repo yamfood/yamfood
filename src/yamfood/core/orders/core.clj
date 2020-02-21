@@ -5,8 +5,8 @@
     [clojure.java.jdbc :as jdbc]
     [yamfood.core.db.core :as db]
     [yamfood.core.users.core :as users]
-    [yamfood.core.kitchens.core :as kitchens]
-    [yamfood.telegram.handlers.utils :as u]))
+    [yamfood.telegram.handlers.utils :as u]
+    [yamfood.core.kitchens.core :as kitchens]))
 
 
 (def order-statuses
@@ -282,3 +282,15 @@
         {:order_id order-id
          :status   (:new order-statuses)}))
     order-id))
+
+
+(defn pay-order!
+  [order-id]
+  (jdbc/with-db-transaction
+    [t-con db/db]
+    (jdbc/update! t-con "orders"
+                  {:is_payed true}
+                  ["id = ?" order-id])
+    (jdbc/insert! t-con "order_logs"
+                  {:order_id order-id
+                   :status   (:new order-statuses)})))
