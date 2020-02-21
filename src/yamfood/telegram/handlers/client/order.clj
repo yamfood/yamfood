@@ -159,7 +159,7 @@
 (defn product-price
   [product]
   {:label  (format "%d x %s" (:count product) (:name product))
-   :amount (* (:price product) 100)})
+   :amount (* (:price product) (:count product) 100)})
 
 
 (defn order-prices
