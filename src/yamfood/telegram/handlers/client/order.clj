@@ -115,14 +115,20 @@
         message-id (:message_id (:message query))
         basket-id (:basket_id (:user ctx))
         location (:location (:payload (:user ctx)))
-        comment (:comment (:payload (:user ctx)))]
-    {:run            {:function ord/create-order-and-clear-basket!
-                      :args     [basket-id location comment]}
-     :dispatch       {:args        [:c/active-order]
-                      :rebuild-ctx {:function c/build-ctx!
-                                    :update   (:update ctx)}}
-     :delete-message {:chat-id    chat-id
-                      :message-id message-id}}))
+        payment (:payment (:payload (:user ctx)))
+        comment (:comment (:payload (:user ctx)))
+        card? (= payment u/card-payment)]
+    (merge
+      {:run            (merge {:function ord/create-order!
+                               :args     [basket-id location comment (:value payment)]}
+                              (if card?
+                                {:next-event :c/send-invoice}
+                                {:next-event :c/active-order}))
+       :delete-message {:chat-id    chat-id
+                        :message-id message-id}}
+      (when (not card?)
+        {:run {:function bsk/clear-basket!
+               :args     [basket-id]}}))))
 
 
 (def write-comment-text "Напишите свой комментарий к заказу")
@@ -150,11 +156,6 @@
           (u/fmt-values (:total_cost order))))
 
 
-(defn active-order-reply-markup
-  [order]
-  {:inline_keyboard [[{:text "Оплатить картой" :callback_data (str "invoice/" (:id order))}]]})
-
-
 (defn product-price
   [product]
   {:label  (format "%d x %s" (:count product) (:name product))
@@ -167,19 +168,16 @@
 
 
 (defn active-order
-  ([ctx]
-   (let [user (:user ctx)
-         order-id (:active_order_id user)]
-     {:run {:function   o/order-by-id!
-            :args       [order-id]
-            :next-event :c/active-order}}))
-  ([ctx order]
-   (let [update (:update ctx)
-         chat-id (u/chat-id update)]
-     {:send-text {:chat-id chat-id
-                  :text    (active-order-text order)
-                  :options {:parse_mode   "markdown"
-                            :reply_markup (active-order-reply-markup order)}}})))
+  [ctx order]
+  (if (int? order)
+    {:run {:function   o/order-by-id!
+           :args       [order]
+           :next-event :c/active-order}}
+    (let [update (:update ctx)
+          chat-id (u/chat-id update)]
+      {:send-text {:chat-id chat-id
+                   :text    (active-order-text order)
+                   :options {:parse_mode "markdown"}}})))
 
 
 (defn invoice-description
@@ -188,28 +186,27 @@
 
 
 (def invoice-reply-markup
-  {:inline_keyboard [[{:text "Оплатить" :pay true}]
-                     [{:text "Отмена" :callback_data "cancel-invoice"}]]})
+  {:inline_keyboard [[{:text "Оплатить" :pay true}]]})
 
 
 (defn send-invoice
-  ([ctx]
-   {:run {:function   ord/user-active-order!
-          :args       [(:id (:user ctx))]
-          :next-event :c/send-invoice}})
-  ([ctx order]
-   (let [update (:update ctx)
-         chat-id (u/chat-id update)
-         message-id (:message_id (:message (:callback_query update)))]
-     {:send-invoice   {:chat-id     chat-id
-                       :title       (str "Оплатить заказ №" (:id order))
-                       :description (invoice-description order)
-                       :payload     {:order_id (:id order)}
-                       :currency    "UZS"
-                       :prices      (order-prices order)
-                       :options     {:reply_markup invoice-reply-markup}}
-      :delete-message {:chat-id    chat-id
-                       :message-id message-id}})))
+  [ctx order]
+  (if (int? order)
+    {:run {:function   o/order-by-id!
+           :args       [order]
+           :next-event :c/send-invoice}}
+    (let [update (:update ctx)
+          chat-id (u/chat-id update)
+          message-id (:message_id (:message (:callback_query update)))]
+      {:send-invoice   {:chat-id     chat-id
+                        :title       (str "Оплатить заказ №" (:id order))
+                        :description (invoice-description order)
+                        :payload     {:order_id (:id order)}
+                        :currency    "UZS"
+                        :prices      (order-prices order)
+                        :options     {:reply_markup invoice-reply-markup}}
+       :delete-message {:chat-id    chat-id
+                        :message-id message-id}})))
 
 
 (defn cancel-invoice-handler

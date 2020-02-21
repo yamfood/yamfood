@@ -22,7 +22,6 @@
       "switch-payment-type" {:dispatch {:args [:c/switch-payment-type]}}
       "change-comment" {:dispatch {:args [:c/change-comment]}}
       "create-order" {:dispatch {:args [:c/create-order]}}
-      "invoice" {:dispatch {:args [:c/send-invoice]}}
       "cancel-invoice" {:dispatch {:args [:c/cancel-invoice]}}
       {:answer-callback {:callback_query_id (:id query)
                          :text              " "}})))

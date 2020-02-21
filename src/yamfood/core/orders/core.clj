@@ -4,9 +4,9 @@
     [honeysql.helpers :as hh]
     [clojure.java.jdbc :as jdbc]
     [yamfood.core.db.core :as db]
-    [yamfood.core.baskets.core :as b]
     [yamfood.core.users.core :as users]
-    [yamfood.core.kitchens.core :as kitchens]))
+    [yamfood.core.kitchens.core :as kitchens]
+    [yamfood.telegram.handlers.utils :as u]))
 
 
 (def order-statuses
@@ -237,20 +237,22 @@
 
 
 (defn insert-order-query
-  [user-id lon lat comment kitchen-id]
-  ["insert into orders (user_id, location, comment, kitchen_id) values (?, POINT (?, ?), ?, ?) ;"
+  [user-id lon lat comment kitchen-id payment]
+  ["insert into orders (user_id, location, comment, kitchen_id, payment) values (?, POINT (?, ?), ?, ?, ?) ;"
    user-id
    lon lat
    comment
-   kitchen-id])
+   kitchen-id
+   payment])
 
 
 (defn insert-order!
-  [user-id lon lat comment kitchen-id]
+  [user-id lon lat comment kitchen-id payment]
   (let [query (insert-order-query user-id
                                   lon lat
                                   comment
-                                  kitchen-id)]
+                                  kitchen-id
+                                  payment)]
     (jdbc/execute! db/db query {:return-keys ["id"]})))
 
 
@@ -259,22 +261,24 @@
   (jdbc/insert-multi! db/db "order_products" products))
 
 
-(defn create-order-and-clear-basket!
+(defn create-order!
   ; TODO: Use transaction!
-  [basket-id location comment]
+  [basket-id location comment payment]
   (let [user (users/user-with-basket-id! basket-id)
         kitchen (kitchens/nearest-kitchen! (:longitude location)
                                            (:latitude location))
-        order (insert-order! (:id user)
-                             (:longitude location)
-                             (:latitude location)
-                             comment
-                             (:id kitchen))]
+        order-id (:id (insert-order! (:id user)
+                                     (:longitude location)
+                                     (:latitude location)
+                                     comment
+                                     (:id kitchen)
+                                     payment))]
     (-> (products-from-basket! basket-id)
-        (prepare-basket-products-to-order (:id order))
+        (prepare-basket-products-to-order order-id)
         (insert-products!))
-    (jdbc/insert!
-      db/db "order_logs"
-      {:order_id (:id order)
-       :status   (:new order-statuses)})
-    (b/clear-basket! basket-id)))
+    (when (= payment (:value u/cash-payment))
+      (jdbc/insert!
+        db/db "order_logs"
+        {:order_id order-id
+         :status   (:new order-statuses)}))
+    order-id))

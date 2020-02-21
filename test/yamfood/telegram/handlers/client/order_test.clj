@@ -307,7 +307,7 @@
 
 
 (def create-order-result
-  {:run            {:function o/create-order-and-clear-basket!,
+  {:run            {:function o/create-order!,
                     :args     [4 {:longitude 34.74037, :latitude 32.020955} "Comment #1"]},
    :dispatch       {:args        [:c/active-order],
                     :rebuild-ctx {:function c/build-ctx!,
