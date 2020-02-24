@@ -146,6 +146,11 @@
               :where  [:= :id user-id]}))
 
 
+(defn update!
+  [user-id row]
+  (jdbc/update! db/db "users" row ["id = ?" user-id]))
+
+
 (defn update-location!
   "Lon - longitude (X)
    Lat - latitude (Y)"

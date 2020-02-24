@@ -3,7 +3,8 @@
     [yamfood.utils :as u]
     [compojure.core :as c]
     [yamfood.api.pagination :as p]
-    [yamfood.core.users.core :as users]))
+    [yamfood.core.users.core :as users]
+    [clojure.spec.alpha :as s]))
 
 
 (defn fmt-user-details
@@ -19,6 +20,23 @@
   (let [user-id (u/str->int (:id (:params request)))]
     {:body (-> (users/user-with-id! user-id)
                (fmt-user-details))}))
+
+
+(s/def ::is_blocked boolean?)
+(s/def ::user-patch
+  (s/keys :opt-un [::is_blocked]))
+
+(defn user-patch
+  [request]
+  (let [user-id (u/str->int (:id (:params request)))
+        data (:body request)
+        valid? (s/valid? ::user-patch data)]
+    (if valid?
+      (do
+        (users/update! user-id data)
+        {:body data})
+      {:body "Invalid input"
+       :code 400})))
 
 
 (defn users-list
@@ -41,4 +59,5 @@
 (c/defroutes
   routes
   (c/GET "/" [] users-list)
-  (c/GET "/:id{[0-9]+}/" [] user-detail))
+  (c/GET "/:id{[0-9]+}/" [] user-detail)
+  (c/PATCH "/:id{[0-9]+}/" [] user-patch))
