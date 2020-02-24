@@ -85,15 +85,14 @@
 
 (defn users-list-query
   [offset limit]
-  (hs/format
-    {:select   [:users.id
-                :users.tid
-                :users.name
-                :users.phone]
-     :from     [:users]
-     :order-by [:users.id]
-     :offset   offset
-     :limit    limit}))
+  {:select   [:users.id
+              :users.tid
+              :users.name
+              :users.phone]
+   :from     [:users]
+   :order-by [:users.id]
+   :offset   offset
+   :limit    limit})
 
 
 (def users-count-query
@@ -114,7 +113,11 @@
   ([]
    (users-list! 0 100))
   ([offset limit]
-   (->> (users-list-query offset limit)
+   (users-list! offset limit nil))
+  ([offset limit where]
+   (->> (-> (users-list-query offset limit)
+            (hh/merge-where where))
+        (hs/format)
         (jdbc/query db/db))))
 
 
