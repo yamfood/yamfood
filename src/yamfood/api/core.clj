@@ -4,6 +4,7 @@
     [yamfood.api.admin.core :as admin]
     [yamfood.core.regions.core :as regions]
     [yamfood.api.middleware :refer [wrap-cors]]
+    [ring.middleware.params :refer [wrap-params]]
     [ring.middleware.json :refer [wrap-json-response]]))
 
 
@@ -22,4 +23,5 @@
 (def api-routes
   (-> *api-routes
       (wrap-cors)
+      (wrap-params)
       (wrap-json-response)))

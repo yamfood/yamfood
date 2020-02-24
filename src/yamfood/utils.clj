@@ -1,13 +1,13 @@
 (ns yamfood.utils
+  (:require [clojure.edn :as edn])
   (:import (java.util UUID)))
 
 
 (defn uuid [] (str (UUID/randomUUID)))
 
 
-(defn parse-int [s]
-  (let [r (re-find #"\d+" s)]
-    (when r (BigInteger. r))))
+(defn str->int [s]
+  (edn/read-string s))
 
 
 (defn in?

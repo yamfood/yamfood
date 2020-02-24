@@ -72,15 +72,28 @@
 (defn users-list-query
   [offset limit]
   (hs/format
-    {:select [:users.id
-              :users.tid
-              :users.comment
-              :users.name
-              :users.phone
-              :users.location]
-     :from   [:users]
-     :offset offset
-     :limit  limit}))
+    {:select   [:users.id
+                :users.tid
+                :users.name
+                :users.phone]
+     :from     [:users]
+     :order-by [:users.id]
+     :offset   offset
+     :limit    limit}))
+
+
+(def users-count-query
+  {:select [[:%count.users.id :count]]
+   :from   [:users]})
+
+
+(defn users-count!
+  []
+  (->> users-count-query
+       (hs/format)
+       (jdbc/query db/db)
+       (first)
+       (:count)))
 
 
 (defn users-list!

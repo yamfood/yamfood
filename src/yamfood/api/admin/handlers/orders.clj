@@ -31,12 +31,12 @@
 
 (defn order-details
   [request]
-  (let [order-id (u/parse-int (:id (:params request)))]
+  (let [order-id (u/str->int (:id (:params request)))]
     {:body (o/order-by-id! order-id)}))
 
 (defn cancel-order
   [request]
-  (let [order-id (u/parse-int (:id (:params request)))
+  (let [order-id (u/str->int (:id (:params request)))
         order (o/order-by-id! order-id)
         cancelable (u/in? o/cancelable-order-statuses
                           (:status order))]

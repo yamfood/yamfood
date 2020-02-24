@@ -17,7 +17,7 @@
   (wrap-auth
     (c/routes
       (c/context "/admins" [] admins/routes)
-      (c/context "/users" [] users/routes)
+      (c/context "/clients" [] users/routes)
       (c/context "/riders" [] riders/routes)
       (c/context "/orders" [] orders/routes)
       (c/context "/kitchens" [] kitchens/routes)
