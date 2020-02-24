@@ -23,6 +23,7 @@
             :users.phone
             :users.tid
             :users.payload
+            :users.is_blocked
             [(user-active-order-query :users.id) :active_order_id]
             [:baskets.id :basket_id]]
    :from   [:users :baskets]
@@ -88,7 +89,8 @@
   {:select   [:users.id
               :users.tid
               :users.name
-              :users.phone]
+              :users.phone
+              :users.is_blocked]
    :from     [:users]
    :order-by [:users.id]
    :offset   offset

@@ -38,14 +38,18 @@
         inline-query (:inline_query update)
         callback-query (:callback_query update)
         pre-checkout-query (:pre_checkout_query update)
-        ctx (build-ctx! update)]
-    (if message
-      (process-message ctx update))
-    (if inline-query
-      (d/dispatch! ctx [:c/inline]))
-    (if pre-checkout-query
-      (d/dispatch! ctx [:c/pre-checkout]))
-    (if callback-query
-      (d/dispatch! ctx [:c/callback]))))
+        ctx (build-ctx! update)
+        blocked? (:is_blocked (:user ctx))]
+    (if (not blocked?)
+      (do
+        (if message
+          (process-message ctx update))
+        (if inline-query
+          (d/dispatch! ctx [:c/inline]))
+        (if pre-checkout-query
+          (d/dispatch! ctx [:c/pre-checkout]))
+        (if callback-query
+          (d/dispatch! ctx [:c/callback])))
+      (d/dispatch! ctx [:c/blocked]))))
 
 ;(build-ctx! {:update_id 220544587, :message {:message_id 10499, :from {:id 79225668, :is_bot false, :first_name "Рустам", :last_name "Бабаджанов", :username "kensay", :language_code "ru"}, :chat {:id 79225668, :first_name "Рустам", :last_name "Бабаджанов", :username "kensay", :type "private"}, :date 1581846213, :text "/start", :entities [{:offset 0, :length 6, :type "bot_command"}]}})

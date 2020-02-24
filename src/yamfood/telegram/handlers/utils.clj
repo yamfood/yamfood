@@ -96,9 +96,11 @@
   "Use when you don't know input update type"
   [update]
   (let [message (:message update)
+        inline (:inline_query update)
         query (:callback_query update)]
     (cond
       message (:id (:from message))
+      inline (:id (:from inline))
       query (:id (:from query)))))
 
 

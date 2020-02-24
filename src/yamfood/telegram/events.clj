@@ -8,6 +8,7 @@
     [yamfood.telegram.handlers.client.basket]
     [yamfood.telegram.handlers.client.inline]
     [yamfood.telegram.handlers.client.product]
+    [yamfood.telegram.handlers.client.blocked]
     [yamfood.telegram.handlers.client.callback]
     [yamfood.telegram.handlers.client.location]
     [yamfood.telegram.handlers.client.payments]
