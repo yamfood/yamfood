@@ -48,6 +48,12 @@
   (hs/format (hh/merge-where user-query [:= :users.tid tid])))
 
 
+
+(defn user-with-id-query
+  [id]
+  (hs/format (hh/merge-where user-query [:= :users.id id])))
+
+
 (defn user-with-basket-id-query
   [basket-id]
   (hs/format (hh/merge-where user-query [:= :baskets.id basket-id])))
@@ -64,6 +70,14 @@
 (defn user-with-tid!
   [tid]                                                     ; TODO: CACHE!
   (->> (user-with-tid-query tid)
+       (jdbc/query db/db)
+       (map fmt-payload)
+       (first)))
+
+
+(defn user-with-id!
+  [id]
+  (->> (user-with-id-query id)
        (jdbc/query db/db)
        (map fmt-payload)
        (first)))
