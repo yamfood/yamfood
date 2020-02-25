@@ -31,11 +31,29 @@
       (o/active-order-by-rider-id! (:id rider)))))
 
 
+(defn limited-rider-query
+  [offset limit]
+  (merge rider-query {:offset offset :limit limit}))
+
+
 (defn all-riders!
+  ([]
+   (all-riders! 0 100))
+  ([offset limit]
+   (->> (limited-rider-query offset limit)
+        (hs/format)
+        (jdbc/query db/db))))
+
+
+(defn riders-count!
   []
-  (->> rider-query
+  (->> (-> rider-query
+           (assoc :select [[:%count.riders.id :count]])
+           (dissoc :order-by))
        (hs/format)
-       (jdbc/query db/db)))
+       (jdbc/query db/db)
+       (first)
+       (:count)))
 
 
 (defn new-rider!
