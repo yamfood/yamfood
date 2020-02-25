@@ -76,9 +76,10 @@
   [order-id rider-id]
   (jdbc/with-db-transaction
     [t-con db/db]
-    (jdbc/insert! t-con "order_logs" {:order_id order-id
-                                      :status   (:on-way o/order-statuses)
-                                      :payload  (db/map->jsonb {:rider_id rider-id})})
+    (jdbc/insert! t-con "order_logs"
+                  {:order_id order-id
+                   :status   (:on-way o/order-statuses)
+                   :payload  (db/map->jsonb {:rider_id rider-id})})
     (jdbc/update! t-con "orders" {:rider_id rider-id} ["id = ?" order-id])))
 
 
@@ -86,9 +87,10 @@
   [order-id rider-id]
   (jdbc/with-db-transaction
     [t-con db/db]
-    (jdbc/insert! t-con "order_logs" {:order_id order-id
-                                      :status   (:finished o/order-statuses)
-                                      :payload  (db/map->jsonb {:rider_id rider-id})})))
+    (jdbc/insert! t-con "order_logs"
+                  {:order_id order-id
+                   :status   (:finished o/order-statuses)
+                   :payload  (db/map->jsonb {:rider_id rider-id})})))
 
 
 (defn cancel-order!
@@ -98,3 +100,38 @@
     (jdbc/insert! t-con "order_logs" {:order_id order-id
                                       :status   (:canceled-by-rider o/order-statuses)
                                       :payload  (db/map->jsonb {:rider_id rider-id})})))
+
+
+(defn make-deposit!
+  [rider-id admin-id amount]
+  (first
+    (jdbc/insert!
+      db/db
+      "rider_deposits"
+      {:rider_id rider-id
+       :admin_id admin-id
+       :amount   amount})))
+
+
+(defn deposits-sum!
+  [rider-id]
+  (->> {:select   [:%sum.rider_deposits.amount]
+        :from     [:rider_deposits]
+        :where    [:= :rider_deposits.rider_id rider-id]
+        :group-by [:rider_deposits.rider_id]}
+       (hs/format)
+       (jdbc/query db/db)
+       (first)
+       (:sum)))
+
+
+(defn orders-sum!                                           ; TODO: Make it work!
+  [rider-id]
+  140000)
+
+
+(defn calculate-deposit!
+  [rider-id]
+  (let []
+    (- (deposits-sum! rider-id)
+       (orders-sum! rider-id))))

@@ -31,7 +31,7 @@
 (defn add-rider
   [request]
   (let [rider (:body request)
-        valid (s/valid? ::rs/rider rider)]
+        valid (s/valid? ::rider rider)]
     (if valid
       {:body (merge rider (r/new-rider! rider))}
       {:body   {:error "Invalid rider"}
