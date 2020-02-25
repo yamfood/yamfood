@@ -7,7 +7,56 @@
     [yamfood.core.orders.core :as o]))
 
 
-(def rider-query
+(defn make-deposit!
+  [rider-id admin-id amount]
+  (first
+    (jdbc/insert!
+      db/db
+      "rider_deposits"
+      {:rider_id rider-id
+       :admin_id admin-id
+       :amount   amount})))
+
+
+(defn deposits-sum-query
+  [rider-id]
+  {:select   [:%sum.rider_deposits.amount]
+   :from     [:rider_deposits]
+   :where    [:= :rider_deposits.rider_id rider-id]
+   :group-by [:rider_deposits.rider_id]})
+
+
+(defn deposits-sum!
+  [rider-id]
+  (->> (deposits-sum-query rider-id)
+       (hs/format)
+       (jdbc/query db/db)
+       (first)
+       (:sum)))
+
+
+(defn orders-sum!                                           ; TODO: Make it work!
+  [rider-id]
+  140000)
+
+
+(defn calculate-deposit!
+  [rider-id]
+  (let []
+    (- (deposits-sum! rider-id)
+       (orders-sum! rider-id))))
+
+
+(def rider-list-query
+  {:select   [:riders.id
+              :riders.tid
+              :riders.name
+              :riders.phone]
+   :from     [:riders]
+   :order-by [:riders.id]})
+
+
+(def rider-detail-query
   {:select   [:riders.id
               :riders.tid
               :riders.name
@@ -18,7 +67,7 @@
 
 (defn rider-by-tid-query
   [tid]
-  (hs/format (hh/merge-where rider-query [:= :riders.tid tid])))
+  (hs/format (hh/merge-where rider-detail-query [:= :riders.tid tid])))
 
 
 (defn rider-by-tid!
@@ -31,9 +80,19 @@
       (o/active-order-by-rider-id! (:id rider)))))
 
 
+(defn rider-by-id!
+  [id]
+  (->> (-> rider-list-query
+           (hh/merge-where [:= :riders.id id]))
+       (hs/format)
+       (jdbc/query db/db)
+       (map #(assoc % :deposit (calculate-deposit! (:id %))))
+       (first)))
+
+
 (defn limited-rider-query
   [offset limit]
-  (merge rider-query {:offset offset :limit limit}))
+  (merge rider-list-query {:offset offset :limit limit}))
 
 
 (defn all-riders!
@@ -52,7 +111,7 @@
   ([]
    (riders-count! nil))
   ([where]
-   (->> (-> rider-query
+   (->> (-> rider-list-query
             (assoc :select [[:%count.riders.id :count]])
             (dissoc :order-by)
             (hh/merge-where where))
@@ -100,38 +159,3 @@
     (jdbc/insert! t-con "order_logs" {:order_id order-id
                                       :status   (:canceled-by-rider o/order-statuses)
                                       :payload  (db/map->jsonb {:rider_id rider-id})})))
-
-
-(defn make-deposit!
-  [rider-id admin-id amount]
-  (first
-    (jdbc/insert!
-      db/db
-      "rider_deposits"
-      {:rider_id rider-id
-       :admin_id admin-id
-       :amount   amount})))
-
-
-(defn deposits-sum!
-  [rider-id]
-  (->> {:select   [:%sum.rider_deposits.amount]
-        :from     [:rider_deposits]
-        :where    [:= :rider_deposits.rider_id rider-id]
-        :group-by [:rider_deposits.rider_id]}
-       (hs/format)
-       (jdbc/query db/db)
-       (first)
-       (:sum)))
-
-
-(defn orders-sum!                                           ; TODO: Make it work!
-  [rider-id]
-  140000)
-
-
-(defn calculate-deposit!
-  [rider-id]
-  (let []
-    (- (deposits-sum! rider-id)
-       (orders-sum! rider-id))))

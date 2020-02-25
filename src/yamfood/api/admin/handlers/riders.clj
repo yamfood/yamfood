@@ -1,11 +1,11 @@
 (ns yamfood.api.admin.handlers.riders
   (:require
+    [yamfood.utils :as u]
     [compojure.core :as c]
     [clojure.spec.alpha :as s]
     [yamfood.api.pagination :as p]
     [yamfood.core.specs.core :as cs]
-    [yamfood.core.riders.core :as r]
-    [yamfood.utils :as u]))
+    [yamfood.core.riders.core :as r]))
 
 
 (defn riders-list
@@ -38,7 +38,14 @@
        :status 400})))
 
 
+(defn rider-detail
+  [request]
+  (let [rider-id (u/str->int (:id (:params request)))]
+    {:body (r/rider-by-id! rider-id)}))
+
+
 (c/defroutes
   routes
   (c/POST "/" [] add-rider)
-  (c/GET "/" [] riders-list))
+  (c/GET "/" [] riders-list)
+  (c/GET "/:id{[0-9]+}/" [] rider-detail))
