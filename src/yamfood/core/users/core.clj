@@ -103,12 +103,15 @@
 
 
 (defn users-count!
-  []
-  (->> users-count-query
-       (hs/format)
-       (jdbc/query db/db)
-       (first)
-       (:count)))
+  ([]
+   (users-count! nil))
+  ([where]
+   (->> (-> users-count-query
+            (hh/merge-where where))
+        (hs/format)
+        (jdbc/query db/db)
+        (first)
+        (:count))))
 
 
 (defn users-list!

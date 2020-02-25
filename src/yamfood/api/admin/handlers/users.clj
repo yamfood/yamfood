@@ -43,8 +43,9 @@
   [request]
   (let [page (p/get-page request)
         per-page (p/get-per-page request)
-        count (users/users-count!)
         phone (u/str->int (get (:params request) "phone" ""))
+        search (when phone [:= :users.phone phone])
+        count (users/users-count! search)
         offset (p/calc-offset page per-page)]
     {:body (p/format-result
              count
@@ -53,7 +54,7 @@
              (users/users-list!
                offset
                per-page
-               (when phone [:= :users.phone phone])))}))
+               search))}))
 
 
 (c/defroutes
