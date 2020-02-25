@@ -38,22 +38,28 @@
 
 (defn all-riders!
   ([]
-   (all-riders! 0 100))
+   (all-riders! 0 100 nil))
   ([offset limit]
-   (->> (limited-rider-query offset limit)
+   (all-riders! offset limit nil))
+  ([offset limit search]
+   (->> (-> (limited-rider-query offset limit)
+            (hh/merge-where search))
         (hs/format)
         (jdbc/query db/db))))
 
 
 (defn riders-count!
-  []
-  (->> (-> rider-query
-           (assoc :select [[:%count.riders.id :count]])
-           (dissoc :order-by))
-       (hs/format)
-       (jdbc/query db/db)
-       (first)
-       (:count)))
+  ([]
+   (riders-count! nil))
+  ([where]
+   (->> (-> rider-query
+            (assoc :select [[:%count.riders.id :count]])
+            (dissoc :order-by)
+            (hh/merge-where where))
+        (hs/format)
+        (jdbc/query db/db)
+        (first)
+        (:count))))
 
 
 (defn new-rider!

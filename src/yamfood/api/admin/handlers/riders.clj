@@ -4,20 +4,23 @@
     [clojure.spec.alpha :as s]
     [yamfood.api.pagination :as p]
     [yamfood.core.specs.core :as cs]
-    [yamfood.core.riders.core :as r]))
+    [yamfood.core.riders.core :as r]
+    [yamfood.utils :as u]))
 
 
 (defn riders-list
   [request]
   (let [page (p/get-page request)
         per-page (p/get-per-page request)
-        count (r/riders-count!)
+        phone (u/str->int (get (:params request) "phone" ""))
+        search (when phone [:= :riders.phone phone])
+        count (r/riders-count! search)
         offset (p/calc-offset page per-page)]
     {:body (p/format-result
              count
              per-page
              page
-             (r/all-riders! offset per-page))}))
+             (r/all-riders! offset per-page search))}))
 
 
 (s/def ::name string?)
