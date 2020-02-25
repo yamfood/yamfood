@@ -44,8 +44,26 @@
     {:body (r/rider-by-id! rider-id)}))
 
 
+(s/def ::amount int?)
+(s/def ::make-deposit
+  (s/keys :req-un [::amount]))
+
+
+(defn make-deposit
+  [request]
+  (let [rider-id (u/str->int (:id (:params request)))
+        admin-id (:id (:admin request))
+        body (:body request)
+        valid? (s/valid? ::make-deposit body)]
+    (if valid?
+      {:body (r/make-deposit! rider-id admin-id (:amount body))}
+      {:body {:error "Incorrect input"}
+       :code 400})))
+
+
 (c/defroutes
   routes
   (c/POST "/" [] add-rider)
   (c/GET "/" [] riders-list)
-  (c/GET "/:id{[0-9]+}/" [] rider-detail))
+  (c/GET "/:id{[0-9]+}/" [] rider-detail)
+  (c/POST "/:id{[0-9]+}/deposit/" [] make-deposit))
