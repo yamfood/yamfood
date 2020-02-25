@@ -1,0 +1,1 @@
+drop table "rider_deposits";
