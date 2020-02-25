@@ -25,6 +25,7 @@
 (defn format-result
   [count per-page page data]
   {:pages (int (Math/ceil (/ count per-page)))
+   :count count
    :page  page
    :data  data})
 

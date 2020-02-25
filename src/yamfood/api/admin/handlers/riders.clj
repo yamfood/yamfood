@@ -24,14 +24,14 @@
 
 
 (s/def ::name string?)
-(s/def ::rider
+(s/def ::add-rider
   (s/keys :req-un [::cs/phone ::name]))
 
 
 (defn add-rider
   [request]
   (let [rider (:body request)
-        valid (s/valid? ::rider rider)]
+        valid (s/valid? ::add-rider rider)]
     (if valid
       {:body (merge rider (r/new-rider! rider))}
       {:body   {:error "Invalid rider"}
