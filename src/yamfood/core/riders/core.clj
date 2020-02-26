@@ -32,7 +32,8 @@
        (hs/format)
        (jdbc/query db/db)
        (first)
-       (:sum)))
+       (:sum)
+       (or 0)))
 
 
 (defn orders-sum!                                           ; TODO: Make it work!
@@ -92,6 +93,20 @@
        (jdbc/query db/db)
        (map #(assoc % :deposit (calculate-deposit! (:id %))))
        (first)))
+
+
+(defn update!
+  [id row]
+  (jdbc/update!
+    db/db
+    "riders"
+    row
+    ["riders.id = ?" id]))
+
+
+
+(update! 2 {:notes "test"})
+
 
 
 (defn limited-rider-query

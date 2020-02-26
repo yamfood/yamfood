@@ -8,6 +8,12 @@
     [yamfood.core.riders.core :as r]))
 
 
+(s/def ::tid number?)
+(s/def ::name string?)
+(s/def ::notes string?)
+(s/def ::is_blocked boolean?)
+
+
 (defn riders-list
   [request]
   (let [page (p/get-page request)
@@ -23,7 +29,6 @@
              (r/all-riders! offset per-page search))}))
 
 
-(s/def ::name string?)
 (s/def ::add-rider
   (s/keys :req-un [::cs/phone ::name]))
 
@@ -40,8 +45,12 @@
 
 (defn rider-detail
   [request]
-  (let [rider-id (u/str->int (:id (:params request)))]
-    {:body (r/rider-by-id! rider-id)}))
+  (let [rider-id (u/str->int (:id (:params request)))
+        rider (r/rider-by-id! rider-id)]
+    (if rider
+      {:body rider}
+      {:body   {:error "Not found"}
+       :status 404})))
 
 
 (s/def ::amount int?)
@@ -61,9 +70,31 @@
        :code 400})))
 
 
+(s/def ::patch-rider
+  (s/keys :otp-un [::tid ::cs/phone ::name ::notes ::is_blocked]))
+
+
+(defn patch-rider
+  [request]
+  (let [rider-id (u/str->int (:id (:params request)))
+        body (:body request)
+        rider (r/rider-by-id! rider-id)
+        valid? (s/valid? ::patch-rider body)]
+    (if rider
+      (if valid?
+        (do
+          (r/update! rider-id body)
+          {:body (r/rider-by-id! rider-id)})
+        {:body {:error "Incorrect input"}
+         :code 400})
+      {:body   {:error "Not found"}
+       :status 404})))
+
+
 (c/defroutes
   routes
   (c/POST "/" [] add-rider)
   (c/GET "/" [] riders-list)
   (c/GET "/:id{[0-9]+}/" [] rider-detail)
+  (c/PATCH "/:id{[0-9]+}/" [] patch-rider)
   (c/POST "/:id{[0-9]+}/deposit/" [] make-deposit))
