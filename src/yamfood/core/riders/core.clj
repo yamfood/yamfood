@@ -51,7 +51,9 @@
   {:select   [:riders.id
               :riders.tid
               :riders.name
-              :riders.phone]
+              :riders.phone
+              :riders.notes
+              :riders.is_blocked]
    :from     [:riders]
    :order-by [:riders.id]})
 
@@ -60,7 +62,9 @@
   {:select   [:riders.id
               :riders.tid
               :riders.name
-              :riders.phone]
+              :riders.phone
+              :riders.notes
+              :riders.is_blocked]
    :from     [:riders]
    :order-by [:riders.id]})
 
