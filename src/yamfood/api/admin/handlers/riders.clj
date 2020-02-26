@@ -74,21 +74,27 @@
   (s/keys :otp-un [::tid ::cs/phone ::name ::notes ::is_blocked]))
 
 
+(defn validate-patch-rider!
+  [rider-id body]
+  (let [rider (r/rider-by-id! rider-id)
+        valid? (s/valid? ::patch-rider body)]
+    (cond
+      (not rider) {:body   {:error "Not found"}
+                   :status 404}
+      (not valid?) {:body {:error "Incorrect input"}
+                    :code 400})))
+
+
 (defn patch-rider
   [request]
   (let [rider-id (u/str->int (:id (:params request)))
         body (:body request)
-        rider (r/rider-by-id! rider-id)
-        valid? (s/valid? ::patch-rider body)]
-    (if rider
-      (if valid?
-        (do
-          (r/update! rider-id body)
-          {:body (r/rider-by-id! rider-id)})
-        {:body {:error "Incorrect input"}
-         :code 400})
-      {:body   {:error "Not found"}
-       :status 404})))
+        error (validate-patch-rider! rider-id body)]
+    (if (not error)
+      (do
+        (r/update! rider-id body)
+        {:body (r/rider-by-id! rider-id)})
+      error)))
 
 
 (c/defroutes
