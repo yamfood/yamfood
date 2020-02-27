@@ -69,3 +69,18 @@
   (->> (product-detail-state-by-id-query basket-id id)
        (jdbc/query db/db)
        (first)))
+
+
+(def categories-list-query
+  {:select   [:categories.id
+              :categories.name
+              :categories.emoji]
+   :from     [:categories]
+   :order-by [:categories.id]})
+
+
+(defn all-categories!
+  []
+  (->> categories-list-query
+       (hs/format)
+       (jdbc/query db/db)))
