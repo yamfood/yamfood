@@ -3,7 +3,8 @@
     [yamfood.core.users.core :as usr]
     [yamfood.telegram.dispatcher :as d]
     [yamfood.telegram.handlers.utils :as u]
-    [yamfood.core.regions.core :as regions]))
+    [yamfood.core.regions.core :as regions]
+    [yamfood.telegram.handlers.client.core :as c]))
 
 
 (def markup-for-request-location
@@ -58,9 +59,15 @@
      (if (:region location-info)
        {:dispatch [{:args [:c/update-location location-info]}
                    (cond
-                     (= step u/order-confirmation-step) {:args [:c/order-confirmation-state]}
-                     (= step u/basket-step) {:args [:c/basket]}
-                     :else {:args [:c/menu]})]}
+                     (= step u/order-confirmation-step) {:args        [:c/order-confirmation-state]
+                                                         :rebuild-ctx {:function c/build-ctx!
+                                                                       :update   (:update ctx)}}
+                     (= step u/basket-step) {:args        [:c/basket]
+                                             :rebuild-ctx {:function c/build-ctx!
+                                                           :update   (:update ctx)}}
+                     :else {:args        [:c/menu]
+                            :rebuild-ctx {:function c/build-ctx!
+                                          :update   (:update ctx)}})]}
        {:dispatch {:args [:c/invalid-location]}}))))
 
 

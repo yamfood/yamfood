@@ -24,10 +24,11 @@
   (fn [ctx effect]
     (let [func (:function effect)
           args (:args effect)
-          next-event (:next-event effect)]
+          next-event (:next-event effect)
+          result (apply func args)]
       (if next-event
-        (d/dispatch! ctx [next-event (apply func args)])
-        (apply func args)))))
+        (d/dispatch! ctx [next-event result])
+        result))))
 
 
 (d/register-effect-handler!
