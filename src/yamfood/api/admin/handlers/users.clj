@@ -11,7 +11,7 @@
   [user]
   (map
     #(hash-map :label (str (first %))
-               :value (second %))
+               :value (str (second %)))
     (seq user)))
 
 
