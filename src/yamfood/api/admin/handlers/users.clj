@@ -4,14 +4,25 @@
     [compojure.core :as c]
     [clojure.spec.alpha :as s]
     [yamfood.api.pagination :as p]
-    [yamfood.core.users.core :as users]))
+    [yamfood.core.users.core :as users]
+    [clojure.data.json :as json]))
+
+
+(def labels
+  {:id              "ID"
+   :phone           "Номер телефона"
+   :tid             "Telegram ID"
+   :payload         "Мета"
+   :is_blocked      "Заблокирован?"
+   :active_order_id "ID активного заказа"
+   :basket_id       "ID корзины"})
 
 
 (defn fmt-user-details
   [user]
   (map
-    #(hash-map :label (str (first %))
-               :value (str (second %)))
+    #(hash-map :label ((first %) labels)
+               :value (json/write-str (second %)))
     (seq user)))
 
 
