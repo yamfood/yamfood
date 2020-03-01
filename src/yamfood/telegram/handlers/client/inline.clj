@@ -32,11 +32,18 @@
    :description           "Коснитесь чтобы обновить\n"
    :thumb_url             "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/320/apple/114/round-pushpin_1f4cd.png"})
 
+{:update_id 220544854, :inline_query {:id "340271653860938823", :from {:id 79225668, :is_bot false, :first_name "Рустам", :last_name "Бабаджанов", :username "kensay", :language_code "ru"}, :query "🍔", :offset ""}}
 
 (defn inline-query-handler
-  ([_]
-   {:run {:function   p/all-products!
-          :next-event :c/inline}})
+  ([ctx]
+   (let [update (:update ctx)
+         query (:inline_query update)]
+     (cond
+       (= (:query query) "") {:run {:function   p/all-products!
+                                    :next-event :c/inline}}
+       :else {:run {:function   p/products-by-category-emoji!
+                    :args       [(:query query)]
+                    :next-event :c/inline}})))
   ([ctx products]
    (let [update (:update ctx)
          address (get-in ctx [:user :payload :location :address])]
