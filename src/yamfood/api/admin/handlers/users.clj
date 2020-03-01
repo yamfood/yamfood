@@ -2,9 +2,9 @@
   (:require
     [yamfood.utils :as u]
     [compojure.core :as c]
+    [clojure.spec.alpha :as s]
     [yamfood.api.pagination :as p]
-    [yamfood.core.users.core :as users]
-    [clojure.spec.alpha :as s]))
+    [yamfood.core.users.core :as users]))
 
 
 (defn fmt-user-details

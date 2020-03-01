@@ -6,15 +6,25 @@
     [yamfood.core.db.core :as db]))
 
 
-(defn- all-products-query []
-  (hs/format {:select   [:id :name :price :photo :thumbnail :energy]
-              :from     [:products]
-              :where    [:= :is_active true]
-              :order-by [:id]}))
+(def all-products-query
+  {:select    [:products.id
+               :products.name
+               :products.price
+               :products.photo
+               :products.thumbnail
+               :products.energy
+               :categories.emoji
+               [:categories.name :category]]
+   :from      [:products]
+   :where     [:= :is_active true]
+   :left-join [:categories
+               [:= :categories.id :products.category_id]]
+   :order-by  [:id]})
 
 
 (defn all-products! []
-  (->> (all-products-query)
+  (->> all-products-query
+       (hs/format)
        (jdbc/query db/db)))
 
 
@@ -82,5 +92,13 @@
 (defn all-categories!
   []
   (->> categories-list-query
+       (hs/format)
+       (jdbc/query db/db)))
+
+
+(defn products-by-category-emoji!
+  [emoji]
+  (->> (-> all-products-query
+           (hh/merge-where [:= :categories.emoji emoji]))
        (hs/format)
        (jdbc/query db/db)))

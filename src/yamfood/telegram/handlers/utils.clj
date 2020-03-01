@@ -18,6 +18,7 @@
 (def client-emoji "\uD83D\uDE03")
 (def order-emoji "\uD83D\uDDD2️")
 (def refresh-emoji "\uD83D\uDD04️")
+(def settings-emoji "⚙️")
 
 (def menu-step "menu")
 (def phone-step "phone")
