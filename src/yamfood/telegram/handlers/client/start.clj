@@ -55,14 +55,19 @@
           :next-event :c/menu}})
   ([ctx categories]
    (let [user (:user ctx)
-         message (:message (:update ctx))
-         chat-id (:id (:from message))]
-     {:send-text {:chat-id chat-id
-                  :options {:reply_markup (menu-markup categories)}
-                  :text    "Готовим и бесплатно доставляем за 30 минут"}
-      :run       {:function usr/update-payload!
-                  :args     [(:id user)
-                             (assoc (:payload user) :step u/menu-step)]}})))
+         update (:update ctx)
+         chat-id (u/chat-id update)
+         query (:callback_query update)]
+     (merge
+       {:send-text {:chat-id chat-id
+                    :options {:reply_markup (menu-markup categories)}
+                    :text    "Готовим и бесплатно доставляем за 30 минут"}
+        :run       {:function usr/update-payload!
+                    :args     [(:id user)
+                               (assoc (:payload user) :step u/menu-step)]}}
+       (when query
+         {:delete-message {:chat-id    chat-id
+                           :message-id (:message_id (:message query))}})))))
 
 
 (defn registration-handler

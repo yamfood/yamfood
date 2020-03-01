@@ -19,6 +19,7 @@
 (def order-emoji "\uD83D\uDDD2️")
 (def refresh-emoji "\uD83D\uDD04️")
 (def settings-emoji "⚙️")
+(def back-emoji "⬅️")
 
 (def menu-step "menu")
 (def phone-step "phone")
@@ -55,8 +56,9 @@
   (let [basket-cost (:basket_cost state)]
     {:inline_keyboard
      [[{:text "Хочу" :callback_data (str "want/" (:id state))}]
-      [{:text "Еще!" :switch_inline_query_current_chat ""}]
-      [{:text (format "Корзина (%s сум)" (fmt-values basket-cost)) :callback_data "basket"}]]}))
+      [{:text (str (:emoji state) " " (:category state)) :switch_inline_query_current_chat (:emoji state)}]
+      [{:text (format (str basket-emoji " Корзина (%s сум)") (fmt-values basket-cost)) :callback_data "basket"}]
+      [{:text (str back-emoji " Назад") :callback_data "menu"}]]}))
 
 
 (defn basket-product-controls
@@ -71,8 +73,9 @@
   (let [basket-cost (:basket_cost state)]
     {:inline_keyboard
      [(basket-product-controls "detail" (:id state) (:count_in_basket state))
-      [{:text "Еще!" :switch_inline_query_current_chat ""}]
-      [{:text (format "Корзина (%s сум)" (fmt-values basket-cost)) :callback_data "basket"}]]}))
+      [{:text (str (:emoji state) " " (:category state)) :switch_inline_query_current_chat (:emoji state)}]
+      [{:text (format (str basket-emoji " Корзина (%s сум)") (fmt-values basket-cost)) :callback_data "basket"}]
+      [{:text (str back-emoji " Назад") :callback_data "menu"}]]}))
 
 
 (defn product-detail-markup

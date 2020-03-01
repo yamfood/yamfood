@@ -102,6 +102,12 @@
        {:dispatch {:args [:c/no-product-text]}}))))
 
 
+;
+;(product-detail-handler
+;  {:update {:update_id 220544865, :message {:message_id 10858, :from {:id 79225668, :is_bot false, :first_name "Рустам", :last_name "Бабаджанов", :username "kensay", :language_code "ru"}, :chat {:id 79225668, :first_name "Рустам", :last_name "Бабаджанов", :username "kensay", :type "private"}, :date 1583066172, :text "Луковый суп с чесночными гренками и сыром"}}}
+;  (products/product-detail-state-by-name! 6 "Луковый суп с чесночными гренками и сыром"))
+;
+
 (d/register-event-handler!
   :c/text
   product-detail-handler)

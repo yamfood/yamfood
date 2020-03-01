@@ -10,6 +10,7 @@
         query (:callback_query update)
         action (u/callback-action (:data query))]
     (case action
+      "menu" {:dispatch {:args [:c/menu]}}
       "want" {:dispatch {:args [:c/detail-want]}}
       "detail+" {:dispatch {:args [:c/detail-inc]}}
       "detail-" {:dispatch {:args [:c/detail-dec]}}

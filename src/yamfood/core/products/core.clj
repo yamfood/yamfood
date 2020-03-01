@@ -42,12 +42,15 @@
   {:select    [:products.id :products.name :products.price
                :products.photo :products.thumbnail
                :products.energy
+               :categories.emoji
+               [:categories.name :category]
                (hs/raw (format basket-cost-query basket-id))
                (hs/raw "coalesce(basket_products.count, 0) as count_in_basket")]
    :from      [:products]
    :where     [:= :products.is_active true]
    :order-by  [:id]
-   :left-join [:basket_products [:and
+   :left-join [:categories [:= :categories.id :products.category_id]
+               :basket_products [:and
                                  [:= :basket_products.basket_id basket-id]
                                  [:= :products.id :basket_products.product_id]]]
    :limit     1})
