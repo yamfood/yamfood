@@ -86,7 +86,7 @@
               :categories.name
               :categories.emoji]
    :from     [:categories]
-   :order-by [:categories.id]})
+   :order-by [:categories.position]})
 
 
 (defn all-categories!
