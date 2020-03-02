@@ -11,6 +11,7 @@
 (def admin-query
   {:select [:admins.id
             :admins.login
+            :admins.password
             :admins.token
             :admins.payload]
    :from   [:admins]})
