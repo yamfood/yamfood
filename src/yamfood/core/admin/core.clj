@@ -56,6 +56,11 @@
     token))
 
 
+(defn update-admin!
+  [admin-id row]
+  (jdbc/update! db/db "admins" row ["admins.id = ?" admin-id]))
+
+
 (defn all-admins!
   []
   (->> admin-query
