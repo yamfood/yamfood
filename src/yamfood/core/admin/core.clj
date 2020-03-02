@@ -61,3 +61,9 @@
   (->> admin-query
        (hs/format)
        (jdbc/query db/db)))
+
+
+(defn create-admin!
+  [admin]
+  (-> (jdbc/insert! db/db "admins" admin)
+      (first)))
