@@ -5,6 +5,17 @@
     [yamfood.core.admin.core :as a]))
 
 
+(def permissions
+  {:can-see-products "can_see_products"
+   :can-see-clients  "can_see_clients"
+   :can-see-riders   "can_see_riders"})
+
+
+(defn permissions-list
+  [_]
+  {:body (map #(second %) (seq permissions))})
+
+
 (defn admins-list
   [_]
   {:body (a/all-admins!)})
@@ -31,4 +42,6 @@
 (c/defroutes
   routes
   (c/GET "/" [] admins-list)
-  (c/POST "/" [] create-admin))
+  (c/POST "/" [] create-admin)
+  (c/GET "/permissions/" [] permissions-list))
+
