@@ -55,7 +55,9 @@
                  [:in :order_products.order_id (finished-orders-query rider-id)]
                  [:= :products.id :order_products.product_id]]}
        (hs/format)
-       (jdbc/query db/db)))
+       (jdbc/query db/db)
+       (first)
+       (:total_cost)))
 
 
 (defn calculate-deposit!
