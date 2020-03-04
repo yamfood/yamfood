@@ -5,8 +5,8 @@
     [clojure.java.jdbc :as jdbc]
     [yamfood.core.db.core :as db]
     [yamfood.core.orders.core :as o])
-  (:import (java.util Date)
-           (java.time LocalDateTime)))
+  (:import
+    (java.time LocalDateTime)))
 
 
 (defn make-deposit!

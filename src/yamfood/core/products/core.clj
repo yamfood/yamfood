@@ -22,10 +22,26 @@
    :order-by  [:id]})
 
 
-(defn all-products! []
-  (->> all-products-query
-       (hs/format)
-       (jdbc/query db/db)))
+(defn disabled-products-query
+  [kitchen-id]
+  {:select [:disabled_products.product_id]
+   :from   [:disabled_products]
+   :where  [:= :disabled_products.kitchen_id kitchen-id]})
+
+
+(defn all-products!
+  ([]
+   (->> all-products-query
+        (hs/format)
+        (jdbc/query db/db)))
+  ([kitchen-id]
+   (->> (-> all-products-query
+            (hh/merge-where
+              [:not [:in
+                     :products.id
+                     (disabled-products-query kitchen-id)]]))
+        (hs/format)
+        (jdbc/query db/db))))
 
 
 (def basket-cost-query "
