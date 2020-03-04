@@ -148,7 +148,7 @@
   {:with   [[:cte_orders order-detail-query]]
    :select [:*]
    :from   [:cte_orders]
-   :where  [:in :cte_orders.status finished-order-statuses]})
+   :where  [:= :cte_orders.status (:finished order-statuses)]})
 
 
 (defn finished-orders!

@@ -4,7 +4,9 @@
     [honeysql.helpers :as hh]
     [clojure.java.jdbc :as jdbc]
     [yamfood.core.db.core :as db]
-    [yamfood.core.orders.core :as o]))
+    [yamfood.core.orders.core :as o])
+  (:import (java.util Date)
+           (java.time LocalDateTime)))
 
 
 (defn make-deposit!
@@ -102,6 +104,30 @@
        (hs/format)
        (jdbc/query db/db)
        (first)))
+
+
+(defn finished-orders-today!
+  [rider-id]
+  (let [today (.toLocalDate (LocalDateTime/now))]
+
+    (->> {:select [:%count.order_logs.id]
+          :from   [:order_logs]
+          :where  [:and
+                   [:= :status (:finished o/order-statuses)]
+                   [:> :created_at today]
+                   [:= (hs/raw "(payload->>'rider_id')::numeric") rider-id]]}
+         (hs/format)
+         (jdbc/query db/db)
+         (first)
+         (:count))))
+
+
+(defn menu-state!
+  [rider-id]
+  (let [rider (rider-by-id! rider-id)
+        finished-orders-today (finished-orders-today! rider-id)]
+    (merge rider {:finished-orders-today finished-orders-today
+                  :earned-money-today    (* finished-orders-today 10000)})))
 
 
 (defn update!

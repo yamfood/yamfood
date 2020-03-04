@@ -7,41 +7,49 @@
 
 
 (defn rider-menu-text
-  [rider]
-  (str "*[3312]* Бабаджанов Рустам\n\n"
-       "*Сегодня:*\n"
-       "  Завершил: 13 заказов\n"
-       "  Заработал: 35 000 сум\n\n"
-       "*Должен сдать:* 167 000 сум"))
+  [state]
+  (format (str "*[%s]* %s\n\n"
+               "*Сегодня:*\n"
+               "  Завершил: %s заказов\n"
+               "  Заработал: %s сум\n\n"
+               "*Депозит:* %s сум")
+          (:id state)
+          (:name state)
+          (:finished-orders-today state)
+          (u/fmt-values (:earned-money-today state))
+          (u/fmt-values (:deposit state))))
 
 
 (defn rider-menu-markup
   [rider]
   {:inline_keyboard
-   [(if (:active-order rider)
-      [{:text (str u/order-emoji " Текущий заказ") :callback_data (str "order-detail/" (:id (:active-order rider)))}]
-      [{:text (str u/order-emoji " Взять заказ") :switch_inline_query_current_chat ""}])
-    [{:text (str u/refresh-emoji " Обновить") :callback_data "refresh-menu"}]]})
+   [[{:text (str u/refresh-emoji " Обновить") :callback_data "refresh-menu"}]]})
 
 
 (defn rider-menu-handler
-  [ctx]
-  (let [update (:update ctx)
-        rider (:rider ctx)
-        chat-id (u/chat-id update)
-        utype (u/update-type update)]
-    (if (:id rider)
-      (merge
-        {:send-text {:chat-id chat-id
-                     :text    (rider-menu-text rider)
-                     :options {:reply_markup (rider-menu-markup rider)
-                               :parse_mode   "markdown"}}}
-        (if (= utype :callback_query)
-          {:delete-message
-           {:chat-id    chat-id
-            :message-id (:message_id (:message (:callback_query update)))}}
-          {}))
-      {:dispatch {:args [:r/registration]}})))
+  ([ctx]
+   (let [rider (:rider ctx)]
+     (if (:id rider)
+       {:run {:function   r/menu-state!
+              :args       [(:id rider)]
+              :next-event :r/menu}}
+       {:dispatch {:args [:r/registration]}})))
+  ([ctx menu-state]
+   (let [update (:update ctx)
+         rider (:rider ctx)
+         chat-id (u/chat-id update)
+         utype (u/update-type update)]
+     (merge
+       {:send-text {:chat-id chat-id
+                    :text    (rider-menu-text menu-state)
+                    :options {:reply_markup (rider-menu-markup rider)
+                              :parse_mode   "markdown"}}}
+       (if (= utype :callback_query)
+         {:delete-message
+          {:chat-id    chat-id
+           :message-id (:message_id (:message (:callback_query update)))}}
+         {})))))
+
 
 
 (def registration-markup
