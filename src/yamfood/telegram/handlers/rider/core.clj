@@ -16,9 +16,11 @@
 (defn process-message
   [ctx update]
   (let [message (:message update)
+        contact (:contact message)
         text (:text message)]
     (cond
       (= text "/start") (d/dispatch! ctx [:r/menu])
+      contact (d/dispatch! ctx [:r/contact])
       text (d/dispatch! ctx [:r/text]))))
 
 
@@ -28,8 +30,7 @@
         inline_query (:inline_query update)
         callback_query (:callback_query update)
         ctx (build-ctx! update)]
-    (when (:id (:rider ctx))
-      (cond
-        message (process-message ctx update)
-        callback_query (d/dispatch! ctx [:r/callback])
-        inline_query (d/dispatch! ctx [:r/inline])))))
+    (cond
+      message (process-message ctx update)
+      callback_query (d/dispatch! ctx [:r/callback])
+      inline_query (d/dispatch! ctx [:r/inline]))))

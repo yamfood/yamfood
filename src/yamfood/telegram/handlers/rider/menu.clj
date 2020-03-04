@@ -1,7 +1,9 @@
 (ns yamfood.telegram.handlers.rider.menu
   (:require
     [yamfood.telegram.dispatcher :as d]
-    [yamfood.telegram.handlers.utils :as u]))
+    [yamfood.telegram.handlers.utils :as u]
+    [yamfood.core.riders.core :as r]
+    [yamfood.telegram.handlers.rider.core :as c]))
 
 
 (defn rider-menu-text
@@ -28,17 +30,62 @@
         rider (:rider ctx)
         chat-id (u/chat-id update)
         utype (u/update-type update)]
-    (merge
-      {:send-text {:chat-id chat-id
-                   :text    (rider-menu-text rider)
-                   :options {:reply_markup (rider-menu-markup rider)
-                             :parse_mode   "markdown"}}}
-      (if (= utype :callback_query) {:delete-message
-                                     {:chat-id    chat-id
-                                      :message-id (:message_id (:message (:callback_query update)))}}
-                                    {}))))
+    (if (:id rider)
+      (merge
+        {:send-text {:chat-id chat-id
+                     :text    (rider-menu-text rider)
+                     :options {:reply_markup (rider-menu-markup rider)
+                               :parse_mode   "markdown"}}}
+        (if (= utype :callback_query)
+          {:delete-message
+           {:chat-id    chat-id
+            :message-id (:message_id (:message (:callback_query update)))}}
+          {}))
+      {:dispatch {:args [:r/registration]}})))
+
+
+(def registration-markup
+  {:keyboard        [[{:text "Отправить контакт" :request_contact true}]]
+   :resize_keyboard true})
+
+
+(defn registration-handler
+  [ctx]
+  (let [update (:update ctx)
+        chat-id (u/chat-id update)]
+    {:send-text {:chat-id chat-id
+                 :text    "Отправьте свой контакт"
+                 :options {:reply_markup registration-markup}}}))
+
+
+(defn contact-handler
+  [ctx]
+  (let [update (:update ctx)
+        chat-id (u/chat-id update)
+        contact (:contact (:message update))
+        phone (u/parse-int (:phone_number contact))
+        rider (r/rider-by-phone! phone)]
+    (if rider
+      (do
+        (r/update! (:id rider) {:tid chat-id})
+        {:send-text {:chat-id chat-id
+                     :text    "Принято"
+                     :options {:reply_markup {:remove_keyboard true}}}
+         :dispatch  {:args        [:r/menu]
+                     :rebuild-ctx {:function c/build-ctx!
+                                   :update   update}}}))))
 
 
 (d/register-event-handler!
   :r/menu
   rider-menu-handler)
+
+
+(d/register-event-handler!
+  :r/registration
+  registration-handler)
+
+
+(d/register-event-handler!
+  :r/contact
+  contact-handler)

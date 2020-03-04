@@ -1,7 +1,8 @@
 (ns yamfood.telegram.handlers.utils
   (:require
     [clojure.string :as str]
-    [environ.core :refer [env]]))
+    [environ.core :refer [env]]
+    [clojure.edn :as edn]))
 
 
 (def location-emoji "\uD83D\uDCCD")
@@ -125,8 +126,7 @@
 
 
 (defn parse-int [s]
-  (let [r (re-find #"\d+" s)]
-    (when r (BigInteger. r))))
+  (edn/read-string s))
 
 
 (defn order-products-text

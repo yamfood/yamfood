@@ -95,6 +95,15 @@
        (first)))
 
 
+(defn rider-by-phone!
+  [phone]
+  (->> (-> rider-detail-query
+           (hh/merge-where [:= :riders.phone phone]))
+       (hs/format)
+       (jdbc/query db/db)
+       (first)))
+
+
 (defn update!
   [id row]
   (jdbc/update!
