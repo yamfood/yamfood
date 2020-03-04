@@ -38,9 +38,24 @@
        (or 0)))
 
 
-(defn orders-sum!                                           ; TODO: Make it work!
+(defn finished-orders-query
   [rider-id]
-  140000)
+  {:select [:order_logs.order_id]
+   :from   [:order_logs]
+   :where  [:and
+            [:= :order_logs.status (:finished o/order-statuses)]
+            [:= (hs/raw "(order_logs.payload->>'rider_id')::numeric") rider-id]]})
+
+
+(defn orders-sum!
+  [rider-id]
+  (->> {:select [(hs/raw "coalesce(sum(order_products.count * products.price), 0) as total_cost")]
+        :from   [:order_products :products]
+        :where  [:and
+                 [:in :order_products.order_id (finished-orders-query rider-id)]
+                 [:= :products.id :order_products.product_id]]}
+       (hs/format)
+       (jdbc/query db/db)))
 
 
 (defn calculate-deposit!
@@ -106,16 +121,17 @@
        (first)))
 
 
-(defn finished-orders-today!
+(defn finished-orders-count-query
+  [rider-id]
+  (-> (finished-orders-query rider-id)
+      (assoc :select [:%count.order_logs.id])))
+
+
+(defn finished-orders-today-count!
   [rider-id]
   (let [today (.toLocalDate (LocalDateTime/now))]
-
-    (->> {:select [:%count.order_logs.id]
-          :from   [:order_logs]
-          :where  [:and
-                   [:= :status (:finished o/order-statuses)]
-                   [:> :created_at today]
-                   [:= (hs/raw "(payload->>'rider_id')::numeric") rider-id]]}
+    (->> (-> (finished-orders-count-query rider-id)
+             (hh/merge-where [:> :created_at today]))
          (hs/format)
          (jdbc/query db/db)
          (first)
@@ -125,7 +141,7 @@
 (defn menu-state!
   [rider-id]
   (let [rider (rider-by-id! rider-id)
-        finished-orders-today (finished-orders-today! rider-id)]
+        finished-orders-today (finished-orders-today-count! rider-id)]
     (merge rider {:finished-orders-today finished-orders-today
                   :earned-money-today    (* finished-orders-today 10000)})))
 

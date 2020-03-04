@@ -51,7 +51,7 @@
             [:= :products.id :order_products.product_id]]})
 
 
-(defn- order-total-sum-query
+(defn order-total-sum-query
   [order-id]
   {:select [(hs/raw "coalesce(sum(order_products.count * products.price), 0) as total_cost")]
    :from   [:order_products :products]
