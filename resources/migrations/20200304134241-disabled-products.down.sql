@@ -1,0 +1,1 @@
+drop table disabled_products;
