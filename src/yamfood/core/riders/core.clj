@@ -34,8 +34,7 @@
        (hs/format)
        (jdbc/query db/db)
        (first)
-       (:sum)
-       (or 0)))
+       (:sum)))
 
 
 (defn finished-orders-query
@@ -49,15 +48,16 @@
 
 (defn orders-sum!
   [rider-id]
-  (->> {:select [(hs/raw "coalesce(sum(order_products.count * products.price), 0) as total_cost")]
-        :from   [:order_products :products]
-        :where  [:and
-                 [:in :order_products.order_id (finished-orders-query rider-id)]
-                 [:= :products.id :order_products.product_id]]}
-       (hs/format)
-       (jdbc/query db/db)
-       (first)
-       (:total_cost)))
+  (or (->> {:select [(hs/raw "coalesce(sum(order_products.count * products.price), 0) as total_cost")]
+            :from   [:order_products :products]
+            :where  [:and
+                     [:in :order_products.order_id (finished-orders-query rider-id)]
+                     [:= :products.id :order_products.product_id]]}
+           (hs/format)
+           (jdbc/query db/db)
+           (first)
+           (:total_cost))
+      0))
 
 
 (defn calculate-deposit!
