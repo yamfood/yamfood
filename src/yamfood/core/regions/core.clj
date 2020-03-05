@@ -3,6 +3,7 @@
             [clojure.java.jdbc :as jdbc]
             [clojure.data.json :as json]
             [yamfood.core.db.core :as db]
+            [yamfood.core.kitchens.core :as k]
             [yamfood.core.external.geocoding :as geo]))
 
 
@@ -25,7 +26,8 @@
 (defn location-info!
   [lon lat]
   {:region  (region-by-location! lon lat)
-   :address (geo/get-address! lon lat)})
+   :address (geo/get-address! lon lat)
+   :kitchen (k/nearest-kitchen! lon lat)})
 
 
 (defn all-regions-query

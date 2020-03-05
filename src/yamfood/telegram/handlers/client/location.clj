@@ -84,7 +84,8 @@
                               (:payload user)
                               :location {:address   (:address location-info)
                                          :longitude (:longitude location)
-                                         :latitude  (:latitude location)})]}
+                                         :latitude  (:latitude location)
+                                         :kitchen   (:kitchen location-info)})]}
      :send-text {:chat-id chat-id
                  :text    (str "Новый адресс: " (u/text-from-address (:address location-info)))
                  :options {:reply_markup {:remove_keyboard true}}}}))
