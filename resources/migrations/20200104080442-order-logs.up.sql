@@ -5,6 +5,5 @@ create table "order_logs"
   status     varchar(200) not null,
   created_at timestamp    not null default (now() at time zone 'utc'),
 
-  unique (order_id, status),
   primary key (id)
 )
