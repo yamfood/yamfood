@@ -1,11 +1,11 @@
-(ns yamfood.api.admin.handlers.users
+(ns yamfood.api.admin.handlers.clients
   (:require
     [yamfood.utils :as u]
     [compojure.core :as c]
     [clojure.spec.alpha :as s]
     [clojure.data.json :as json]
     [yamfood.api.pagination :as p]
-    [yamfood.core.users.core :as users]))
+    [yamfood.core.clients.core :as clients]))
 
 
 (def labels
@@ -18,51 +18,51 @@
    :basket_id       "ID корзины"})
 
 
-(defn fmt-user-details
-  [user]
+(defn fmt-client-details
+  [client]
   (map
     #(hash-map :label ((first %) labels)
                :value (json/write-str (second %)))
-    (seq user)))
+    (seq client)))
 
 
-(defn user-detail
+(defn client-detail
   [request]
-  (let [user-id (u/str->int (:id (:params request)))]
-    {:body (-> (users/user-with-id! user-id)
-               (fmt-user-details))}))
+  (let [client-id (u/str->int (:id (:params request)))]
+    {:body (-> (clients/client-with-id! client-id)
+               (fmt-client-details))}))
 
 
 (s/def ::is_blocked boolean?)
-(s/def ::user-patch
+(s/def ::client-patch
   (s/keys :opt-un [::is_blocked]))
 
-(defn user-patch
+(defn client-patch
   [request]
-  (let [user-id (u/str->int (:id (:params request)))
+  (let [client-id (u/str->int (:id (:params request)))
         data (:body request)
-        valid? (s/valid? ::user-patch data)]
+        valid? (s/valid? ::client-patch data)]
     (if valid?
       (do
-        (users/update! user-id data)
+        (clients/update! client-id data)
         {:body data})
       {:body "Invalid input"
        :code 400})))
 
 
-(defn users-list
+(defn clients-list
   [request]
   (let [page (p/get-page request)
         per-page (p/get-per-page request)
         phone (u/str->int (get (:params request) "phone" ""))
-        search (when phone [:= :users.phone phone])
-        count (users/users-count! search)
+        search (when phone [:= :clients.phone phone])
+        count (clients/clients-count! search)
         offset (p/calc-offset page per-page)]
     {:body (p/format-result
              count
              per-page
              page
-             (users/users-list!
+             (clients/clients-list!
                offset
                per-page
                search))}))
@@ -70,6 +70,6 @@
 
 (c/defroutes
   routes
-  (c/GET "/" [] users-list)
-  (c/GET "/:id{[0-9]+}/" [] user-detail)
-  (c/PATCH "/:id{[0-9]+}/" [] user-patch))
+  (c/GET "/" [] clients-list)
+  (c/GET "/:id{[0-9]+}/" [] client-detail)
+  (c/PATCH "/:id{[0-9]+}/" [] client-patch))

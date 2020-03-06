@@ -37,7 +37,7 @@
   ([ctx]
    (let [update (:update ctx)
          query (:inline_query update)
-         kitchen-id (get-in ctx [:user :payload :location :kitchen :id])]
+         kitchen-id (get-in ctx [:client :payload :location :kitchen :id])]
      (cond
        (= (:query query) "") {:run {:function   p/all-products!
                                     :args       [kitchen-id]
@@ -47,7 +47,7 @@
                     :next-event :c/inline}})))
   ([ctx products]
    (let [update (:update ctx)
-         address (get-in ctx [:user :payload :location :address])]
+         address (get-in ctx [:client :payload :location :address])]
      {:answer-inline
       {:inline-query-id (:id (:inline_query update))
        :options         {:cache_time 0}

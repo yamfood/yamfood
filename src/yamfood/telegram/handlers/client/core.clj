@@ -1,8 +1,8 @@
 (ns yamfood.telegram.handlers.client.core
   (:require
     [environ.core :refer [env]]
-    [yamfood.core.users.core :as users]
     [yamfood.telegram.dispatcher :as d]
+    [yamfood.core.clients.core :as clients]
     [yamfood.telegram.handlers.utils :as u]))
 
 
@@ -11,7 +11,7 @@
   {:token          (env :bot-token)
    :payments-token (env :payments-token)
    :update         update
-   :user           (users/user-with-tid!
+   :client         (clients/client-with-tid!
                      (u/tid-from-update update))})
 
 
@@ -39,7 +39,7 @@
         callback-query (:callback_query update)
         pre-checkout-query (:pre_checkout_query update)
         ctx (build-ctx! update)
-        blocked? (:is_blocked (:user ctx))]
+        blocked? (:is_blocked (:client ctx))]
     (if (not blocked?)
       (do
         (if message
@@ -52,4 +52,3 @@
           (d/dispatch! ctx [:c/callback])))
       (d/dispatch! ctx [:c/blocked]))))
 
-;(build-ctx! {:update_id 220544587, :message {:message_id 10499, :from {:id 79225668, :is_bot false, :first_name "Рустам", :last_name "Бабаджанов", :username "kensay", :language_code "ru"}, :chat {:id 79225668, :first_name "Рустам", :last_name "Бабаджанов", :username "kensay", :type "private"}, :date 1581846213, :text "/start", :entities [{:offset 0, :length 6, :type "bot_command"}]}})

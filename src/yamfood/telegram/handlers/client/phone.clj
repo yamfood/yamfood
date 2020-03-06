@@ -2,8 +2,8 @@
   (:require
     [clojure.spec.alpha :as s]
     [yamfood.core.specs.core :as cs]
-    [yamfood.core.users.core :as usr]
     [yamfood.telegram.dispatcher :as d]
+    [yamfood.core.clients.core :as clients]
     [yamfood.telegram.handlers.utils :as u]))
 
 
@@ -18,12 +18,12 @@
   (let [update (:update ctx)
         chat-id (u/chat-id update)
         query (:callback_query update)
-        user (:user ctx)]
+        client (:client ctx)]
     (merge
-      {:run       {:function usr/update-payload!
-                   :args     [(:id user)
+      {:run       {:function clients/update-payload!
+                   :args     [(:id client)
                               (assoc
-                                (:payload user)
+                                (:payload client)
                                 :step u/phone-step)]}
        :send-text {:chat-id chat-id
                    :options {:reply_markup request-phone-markup
@@ -54,19 +54,19 @@
 (defn phone-handler
   [ctx]
   (let [update (:update ctx)
-        user (:user ctx)
+        client (:client ctx)
         chat-id (u/chat-id update)
         phone (get-phone update)]
     (if phone
-      {:run       {:function usr/update-payload!
-                   :args     [(:id user)
+      {:run       {:function clients/update-payload!
+                   :args     [(:id client)
                               (merge
                                 (assoc
-                                  (:payload user)
+                                  (:payload client)
                                   :unconfirmed-phone
                                   phone)
                                 (assoc
-                                  (:payload user)
+                                  (:payload client)
                                   :step
                                   u/phone-confirmation-step))]}
        :send-text [{:chat-id chat-id
@@ -87,12 +87,12 @@
   (let [update (:update ctx)
         chat-id (u/chat-id update)
         text (:text (:message update))
-        user (:user ctx)
-        phone (:unconfirmed-phone (:payload user))
+        client (:client ctx)
+        phone (:unconfirmed-phone (:payload client))
         valid? (= text "0000")]
     (if valid?
-      {:run       {:function usr/update-phone!
-                   :args     [(:id user) phone]}
+      {:run       {:function clients/update-phone!
+                   :args     [(:id client) phone]}
        :send-text {:chat-id chat-id
                    :text    "Номер успешно подтвержден!"}
        :dispatch  {:args [:c/menu]}}
@@ -102,7 +102,7 @@
 
 (defn contact-handler
   [ctx]
-  (let [step (:step (:payload (:user ctx)))
+  (let [step (:step (:payload (:client ctx)))
         chat-id (u/chat-id (:update ctx))]
     (if (= step u/phone-step)
       {:dispatch {:args [:c/phone]}}

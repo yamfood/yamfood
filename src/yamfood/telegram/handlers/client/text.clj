@@ -10,12 +10,12 @@
   [ctx]
   (let [update (:update ctx)
         message (:message update)
-        user (:user ctx)
+        client (:client ctx)
         chat-id (:id (:from message))
         text (:text message)]
     (cond
-      (= (:step (:payload user)) u/phone-step) {:dispatch {:args [:c/phone]}}
-      (= (:step (:payload user)) u/phone-confirmation-step) {:dispatch {:args [:c/confirm-phone]}}
+      (= (:step (:payload client)) u/phone-step) {:dispatch {:args [:c/phone]}}
+      (= (:step (:payload client)) u/phone-confirmation-step) {:dispatch {:args [:c/confirm-phone]}}
       (= text update-location-text) {:dispatch {:args [:c/request-location]}}
       :else {:send-text {:chat-id chat-id
                          :text    "Не понял"}})))

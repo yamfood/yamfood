@@ -1,7 +1,7 @@
 (ns yamfood.telegram.handlers.client.reply
   (:require
-    [yamfood.core.users.core :as users]
-    [yamfood.telegram.dispatcher :as d]))
+    [yamfood.telegram.dispatcher :as d]
+    [yamfood.core.clients.core :as clients]))
 
 
 (defn comment-handler
@@ -9,12 +9,12 @@
   (let [update (:update ctx)
         message (:message update)
         text (:text message)
-        user (:user ctx)]
-    {:run      {:function users/update-payload!
-                :args     [(:id user) (assoc
-                                        (:payload user)
-                                        :comment
-                                        text)]}
+        client (:client ctx)]
+    {:run      {:function clients/update-payload!
+                :args     [(:id client) (assoc
+                                          (:payload client)
+                                          :comment
+                                          text)]}
      :dispatch {:args [:c/order-confirmation-state]}}))
 
 

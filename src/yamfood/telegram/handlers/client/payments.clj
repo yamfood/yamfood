@@ -24,7 +24,7 @@
     {:run      [{:function o/pay-order!
                  :args     [order-id]}
                 {:function bsk/clear-basket!
-                 :args     [(:basket_id (:user ctx))]}]
+                 :args     [(:basket_id (:client ctx))]}]
      :dispatch {:args [:c/active-order order-id]}}))
 
 

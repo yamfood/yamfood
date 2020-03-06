@@ -4,7 +4,7 @@
     [honeysql.helpers :as hh]
     [clojure.java.jdbc :as jdbc]
     [yamfood.core.db.core :as db]
-    [yamfood.core.users.core :as users]
+    [yamfood.core.clients.core :as clients]
     [yamfood.telegram.handlers.utils :as u]
     [yamfood.core.kitchens.core :as kitchens]))
 
@@ -88,13 +88,13 @@
   {:select   [:orders.id
               :orders.location
               :orders.created_at
-              :users.name
-              :users.phone
+              :clients.name
+              :clients.phone
               [(order-total-sum-query :orders.id) :total_sum]
               [(order-current-status-query :orders.id) :status]
               :orders.comment]
-   :from     [:orders :users]
-   :where    [:= :orders.user_id :users.id]
+   :from     [:orders :clients]
+   :where    [:= :orders.client_id :clients.id]
    :order-by [:id]})
 
 
@@ -124,9 +124,9 @@
   (assoc order :products (products-by-order-id! (:id order))))
 
 
-(defn orders-by-user-id-query
-  [user-id]
-  (hs/format (hh/merge-where order-detail-query [:= :orders.user_id user-id])))
+(defn orders-by-client-id-query
+  [client-id]
+  (hs/format (hh/merge-where order-detail-query [:= :orders.client_id client-id])))
 
 
 (def active-orders-query
@@ -203,9 +203,9 @@
               order)))))
 
 
-(defn orders-by-user-id!
-  [user-id]
-  (->> (orders-by-user-id-query user-id)
+(defn orders-by-client-id!
+  [client-id]
+  (->> (orders-by-client-id-query client-id)
        (jdbc/query db/db)
        (map fmt-order-location)))
 
@@ -218,9 +218,9 @@
      :status   (:canceled order-statuses)}))
 
 
-(defn user-active-order!
-  [user-id]
-  (-> (orders-by-user-id! user-id)
+(defn client-active-order!
+  [client-id]
+  (-> (orders-by-client-id! client-id)
       (last)
       (#(order-by-id! (:id %)))))
 
@@ -237,9 +237,9 @@
 
 
 (defn insert-order-query
-  [user-id lon lat comment kitchen-id payment]
-  ["insert into orders (user_id, location, comment, kitchen_id, payment) values (?, POINT (?, ?), ?, ?, ?) ;"
-   user-id
+  [client-id lon lat comment kitchen-id payment]
+  ["insert into orders (client_id, location, comment, kitchen_id, payment) values (?, POINT (?, ?), ?, ?, ?) ;"
+   client-id
    lon lat
    comment
    kitchen-id
@@ -247,8 +247,8 @@
 
 
 (defn insert-order!
-  [user-id lon lat comment kitchen-id payment]
-  (let [query (insert-order-query user-id
+  [client-id lon lat comment kitchen-id payment]
+  (let [query (insert-order-query client-id
                                   lon lat
                                   comment
                                   kitchen-id
@@ -264,10 +264,10 @@
 (defn create-order!
   ; TODO: Use transaction!
   [basket-id location comment payment]
-  (let [user (users/user-with-basket-id! basket-id)
+  (let [client (clients/client-with-basket-id! basket-id)
         kitchen (kitchens/nearest-kitchen! (:longitude location)
                                            (:latitude location))
-        order-id (:id (insert-order! (:id user)
+        order-id (:id (insert-order! (:id client)
                                      (:longitude location)
                                      (:latitude location)
                                      comment

@@ -1,7 +1,7 @@
 create table "baskets"
 (
   id      serial,
-  user_id int not null unique references users (id),
+  client_id int not null unique references clients (id),
 
   primary key (id)
 );

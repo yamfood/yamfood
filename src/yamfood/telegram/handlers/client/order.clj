@@ -1,19 +1,19 @@
 (ns yamfood.telegram.handlers.client.order
   (:require
     [yamfood.core.orders.core :as o]
-    [yamfood.core.users.core :as usr]
     [yamfood.core.orders.core :as ord]
     [yamfood.telegram.dispatcher :as d]
     [yamfood.core.baskets.core :as bsk]
     [yamfood.telegram.handlers.utils :as u]
+    [yamfood.core.clients.core :as clients]
     [yamfood.telegram.handlers.client.core :as c]))
 
 
 (defn order-confirmation-state
   [ctx]
-  (let [user (:user ctx)]
+  (let [client (:client ctx)]
     {:run {:function   bsk/order-confirmation-state!
-           :args       [(:basket_id user)]
+           :args       [(:basket_id client)]
            :next-event :c/send-order-detail}}))
 
 
@@ -22,22 +22,22 @@
   (let [update (:update ctx)
         query (:callback_query update)
         chat-id (:id (:from query))
-        user (:user ctx)
+        client (:client ctx)
         message-id (:message_id (:message query))]
     (into
       (cond
-        (:location (:payload user)) {:dispatch {:args [:c/order-confirmation-state]}}
+        (:location (:payload client)) {:dispatch {:args [:c/order-confirmation-state]}}
         :else {:dispatch {:args [:c/request-location]}})
       {:delete-message {:chat-id    chat-id
                         :message-id message-id}
-       :run            {:function usr/update-payload!
-                        :args     [(:id user)
-                                   (assoc (:payload user) :step u/order-confirmation-step)]}})))
+       :run            {:function clients/update-payload!
+                        :args     [(:id client)
+                                   (assoc (:payload client) :step u/order-confirmation-step)]}})))
 
 
 (defn order-confirmation-markup
   [order-state]
-  (let [payment (get-in order-state [:user :payload :payment])]
+  (let [payment (get-in order-state [:client :payload :payment])]
     {:inline_keyboard
      [[{:text u/location-emoji :callback_data "request-location"}
        (cond
@@ -55,10 +55,10 @@
                u/comment-emoji " `%s` \n\n"
                u/location-emoji " %s")
           (u/fmt-values (:total_cost (:basket order-state)))
-          (or (get-in order-state [:user :payload :payment :label]) "Наличными")
-          (or (:comment (:payload (:user order-state))) "Пусто...")
+          (or (get-in order-state [:client :payload :payment :label]) "Наличными")
+          (or (:comment (:payload (:client order-state))) "Пусто...")
           (u/text-from-address
-            (get-in order-state [:user :payload :location :address]))))
+            (get-in order-state [:client :payload :location :address]))))
 
 
 (defn order-detail-handler
@@ -73,9 +73,9 @@
 
 (defn update-order-confirmation-handler
   ([ctx]
-   (let [user (:user ctx)]
+   (let [client (:client ctx)]
      {:run {:function   bsk/order-confirmation-state!
-            :args       [(:basket_id user)]
+            :args       [(:basket_id client)]
             :next-event :c/update-order-confirmation}}))
   ([ctx order-state]
    (let [query (:callback_query (:update ctx))
@@ -91,15 +91,15 @@
 (defn switch-payment-type-handler
   [ctx]
   (let [query (:callback_query (:update ctx))
-        user (:user ctx)
-        payload (:payload user)
+        client (:client ctx)
+        payload (:payload client)
         payment (:payment payload)
         new-payment (cond
                       (or (= payment nil)
                           (= payment u/cash-payment)) u/card-payment
                       (= payment u/card-payment) u/cash-payment)]
-    {:run             {:function usr/update-payload!
-                       :args     [(:id user) (assoc payload :payment new-payment)]}
+    {:run             {:function clients/update-payload!
+                       :args     [(:id client) (assoc payload :payment new-payment)]}
      :dispatch        {:args        [:c/update-order-confirmation]
                        :rebuild-ctx {:function c/build-ctx!
                                      :update   (:update ctx)}}
@@ -113,11 +113,12 @@
         query (:callback_query update)
         chat-id (:id (:from query))
         message-id (:message_id (:message query))
-        basket-id (:basket_id (:user ctx))
-        location (:location (:payload (:user ctx)))
-        payment (or (:payment (:payload (:user ctx)))
+        basket-id (:basket_id (:client ctx))
+        payload (:payload (:client ctx))
+        location (:location payload)
+        payment (or (:payment payload)
                     u/cash-payment)
-        comment (:comment (:payload (:user ctx)))
+        comment (:comment payload)
         card? (= payment u/card-payment)]
     (merge
       {:run            [(merge {:function ord/create-order!

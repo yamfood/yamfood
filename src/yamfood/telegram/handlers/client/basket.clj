@@ -1,7 +1,7 @@
 (ns yamfood.telegram.handlers.client.basket
   (:require
-    [yamfood.core.users.core :as usr]
     [yamfood.telegram.dispatcher :as d]
+    [yamfood.core.clients.core :as clients]
     [yamfood.core.baskets.core :as baskets]
     [yamfood.telegram.handlers.utils :as u]))
 
@@ -11,7 +11,7 @@
   (let [update (:update ctx)
         callback-query (:callback_query update)
         callback-data (:data callback-query)
-        basket-id (:basket_id (:user ctx))
+        basket-id (:basket_id (:client ctx))
         product-id (Integer.
                      (first (u/callback-params callback-data)))]
     {:run             [{:function baskets/increment-product-in-basket!
@@ -28,7 +28,7 @@
   (let [update (:update ctx)
         callback-query (:callback_query update)
         callback-data (:data callback-query)
-        basket-id (:basket_id (:user ctx))
+        basket-id (:basket_id (:client ctx))
         product-id (Integer.
                      (first (u/callback-params callback-data)))]
     {:run             [{:function baskets/decrement-product-in-basket!
@@ -43,7 +43,7 @@
 (defn basket-handler
   [ctx]
   {:run {:function   baskets/basket-state!
-         :args       [(:basket_id (:user ctx))]
+         :args       [(:basket_id (:client ctx))]
          :next-event :c/send-basket}})
 
 
@@ -89,7 +89,7 @@
 (defn send-basket
   [ctx basket-state]
   (let [update (:update ctx)
-        user (:user ctx)
+        client (:client ctx)
         query (:callback_query update)
         chat-id (u/chat-id update)
         message-id (:message_id (:message query))]
@@ -98,9 +98,9 @@
                       :options {:reply_markup (basket-detail-markup basket-state)}}
      :delete-message {:chat-id    chat-id
                       :message-id message-id}
-     :run            {:function usr/update-payload!
-                      :args     [(:id user)
-                                 (assoc (:payload user) :step u/basket-step)]}}))
+     :run            {:function clients/update-payload!
+                      :args     [(:id client)
+                                 (assoc (:payload client) :step u/basket-step)]}}))
 
 
 (defn update-basket-markup

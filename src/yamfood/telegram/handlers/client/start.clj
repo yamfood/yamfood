@@ -1,18 +1,17 @@
 (ns yamfood.telegram.handlers.client.start
   (:require
     [environ.core :refer [env]]
-    [yamfood.core.users.core :as usr]
     [yamfood.core.products.core :as p]
     [yamfood.telegram.dispatcher :as d]
-    [yamfood.core.users.core :as users]
+    [yamfood.core.clients.core :as clients]
     [yamfood.telegram.handlers.utils :as u]
     [yamfood.telegram.handlers.client.core :as c]))
 
 
 (defn start-handler
   [ctx]
-  (if (and (:user ctx)
-           (:phone (:user ctx)))
+  (if (and (:client ctx)
+           (:phone (:client ctx)))
     {:dispatch {:args [:c/menu]}}
     {:dispatch {:args [:c/registration]}}))
 
@@ -54,7 +53,7 @@
           :args       []
           :next-event :c/menu}})
   ([ctx categories]
-   (let [user (:user ctx)
+   (let [client (:client ctx)
          update (:update ctx)
          chat-id (u/chat-id update)
          query (:callback_query update)]
@@ -62,9 +61,9 @@
        {:send-text {:chat-id chat-id
                     :options {:reply_markup (menu-markup categories)}
                     :text    "Готовим и бесплатно доставляем за 30 минут"}
-        :run       {:function usr/update-payload!
-                    :args     [(:id user)
-                               (assoc (:payload user) :step u/menu-step)]}}
+        :run       {:function clients/update-payload!
+                    :args     [(:id client)
+                               (assoc (:payload client) :step u/menu-step)]}}
        (when query
          {:delete-message {:chat-id    chat-id
                            :message-id (:message_id (:message query))}})))))
@@ -76,10 +75,10 @@
         tid (u/chat-id update)
         from (:from (:message update))
         name (str (:first_name from) " " (:last_name from))]
-    (if (:user ctx)
+    (if (:client ctx)
       {:dispatch {:args [:c/request-phone]}}
 
-      {:run      {:function users/create-user!
+      {:run      {:function clients/create-client!
                   :args     [tid name]}
        :dispatch {:args        [:c/request-phone]
                   :rebuild-ctx {:function c/build-ctx!

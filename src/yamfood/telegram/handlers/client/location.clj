@@ -1,7 +1,7 @@
 (ns yamfood.telegram.handlers.client.location
   (:require
-    [yamfood.core.users.core :as usr]
     [yamfood.telegram.dispatcher :as d]
+    [yamfood.core.clients.core :as clients]
     [yamfood.telegram.handlers.utils :as u]
     [yamfood.core.regions.core :as regions]
     [yamfood.telegram.handlers.client.core :as c]))
@@ -54,8 +54,8 @@
                          (:latitude location)]
             :next-event :c/location}}))
   ([ctx location-info]
-   (let [user (:user ctx)
-         step (:step (:payload user))]
+   (let [client (:client ctx)
+         step (:step (:payload client))]
      (if (:region location-info)
        {:dispatch [{:args [:c/update-location location-info]}
                    (cond
@@ -74,14 +74,14 @@
 (defn update-location
   [ctx location-info]
   (let [update (:update ctx)
-        user (:user ctx)
+        client (:client ctx)
         message (:message update)
         chat-id (:id (:from message))
         location (:location message)]
-    {:run       {:function usr/update-payload!
-                 :args     [(:id user)
+    {:run       {:function clients/update-payload!
+                 :args     [(:id client)
                             (assoc
-                              (:payload user)
+                              (:payload client)
                               :location {:address   (:address location-info)
                                          :longitude (:longitude location)
                                          :latitude  (:latitude location)

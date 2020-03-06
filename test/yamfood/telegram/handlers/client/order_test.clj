@@ -378,7 +378,7 @@
 
 
 (def raw-send-invoice-result
-  {:run {:function   ord/user-active-order!,
+  {:run {:function   ord/client-active-order!,
          :args       [10],
          :next-event :c/send-invoice}})
 

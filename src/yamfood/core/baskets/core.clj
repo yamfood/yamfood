@@ -3,7 +3,7 @@
     [honeysql.core :as hs]
     [clojure.java.jdbc :as jdbc]
     [yamfood.core.db.core :as db]
-    [yamfood.core.users.core :as users]
+    [yamfood.core.clients.core :as clients]
     [yamfood.core.products.core :as products]))
 
 
@@ -102,7 +102,7 @@
 (defn order-confirmation-state!
   [basket-id]
   {:basket (basket-state! basket-id)
-   :user   (users/user-with-basket-id! basket-id)})
+   :client (clients/client-with-basket-id! basket-id)})
 
 
 (defn clear-basket!

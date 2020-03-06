@@ -4,20 +4,20 @@
     [yamfood.telegram.dispatcher :as d]
     [yamfood.core.baskets.core :as baskets]
     [yamfood.telegram.handlers.utils :as u]
-    [yamfood.core.products.core :as products]
-    [yamfood.core.users.core :as usr]))
+    [yamfood.core.clients.core :as clients]
+    [yamfood.core.products.core :as products]))
 
 
 (defn want-handler
   [ctx]
   (let [update (:update ctx)
         query (:callback_query update)
-        user (:user ctx)
+        client (:client ctx)
         callback-data (:data query)
         callback-params (u/callback-params callback-data)
         product-id (Integer. (first callback-params))]
     {:run             {:function   baskets/add-product-to-basket!
-                       :args       [(:basket_id user) product-id]
+                       :args       [(:basket_id client) product-id]
                        :next-event :c/update-markup}
      :answer-callback {:callback_query_id (:id query)
                        :text              "Добавлено в корзину"}}))
@@ -28,7 +28,7 @@
   (let [update (:update ctx)
         callback-query (:callback_query update)
         callback-data (:data callback-query)
-        basket-id (:basket_id (:user ctx))
+        basket-id (:basket_id (:client ctx))
         product-id (Integer. (first (u/callback-params callback-data)))]
     {:run             {:function   baskets/increment-product-in-basket!
                        :args       [basket-id product-id]
@@ -42,7 +42,7 @@
   (let [update (:update ctx)
         callback-query (:callback_query update)
         callback-data (:data callback-query)
-        basket-id (:basket_id (:user ctx))
+        basket-id (:basket_id (:client ctx))
         product-id (Integer. (first (u/callback-params callback-data)))]
     {:run             {:function   baskets/decrement-product-in-basket!
                        :args       [basket-id product-id]
@@ -81,11 +81,11 @@
    (let [update (:update ctx)
          message (:message update)]
      {:run {:function   products/product-detail-state-by-name!
-            :args       [(:basket_id (:user ctx)) (:text message)]
+            :args       [(:basket_id (:client ctx)) (:text message)]
             :next-event :c/text}}))
   ([ctx product-detail-state]
    (let [update (:update ctx)
-         user (:user ctx)
+         client (:client ctx)
          message (:message update)
          chat (:chat message)
          chat-id (:id chat)]
@@ -95,18 +95,12 @@
                          :photo   (:photo product-detail-state)}
         :delete-message {:chat-id    chat-id
                          :message-id (:message_id message)}
-        :run            {:function usr/update-payload!
-                         :args     [(:id user)
-                                    (assoc (:payload user) :step u/browse-step)]}}
+        :run            {:function clients/update-payload!
+                         :args     [(:id client)
+                                    (assoc (:payload client) :step u/browse-step)]}}
 
        {:dispatch {:args [:c/no-product-text]}}))))
 
-
-;
-;(product-detail-handler
-;  {:update {:update_id 220544865, :message {:message_id 10858, :from {:id 79225668, :is_bot false, :first_name "Рустам", :last_name "Бабаджанов", :username "kensay", :language_code "ru"}, :chat {:id 79225668, :first_name "Рустам", :last_name "Бабаджанов", :username "kensay", :type "private"}, :date 1583066172, :text "Луковый суп с чесночными гренками и сыром"}}}
-;  (products/product-detail-state-by-name! 6 "Луковый суп с чесночными гренками и сыром"))
-;
 
 (d/register-event-handler!
   :c/text

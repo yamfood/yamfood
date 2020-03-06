@@ -1,10 +1,10 @@
 create table "orders"
 (
-  id       serial,
-  location Point not null,
-  comment  varchar(300),
+    id        serial,
+    location  Point not null,
+    comment   varchar(300),
 
-  user_id  int references users (id),
+    client_id int references clients (id),
 
-  primary key (id)
+    primary key (id)
 )
