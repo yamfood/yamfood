@@ -115,7 +115,8 @@
         message-id (:message_id (:message query))
         basket-id (:basket_id (:user ctx))
         location (:location (:payload (:user ctx)))
-        payment (:payment (:payload (:user ctx)))
+        payment (or (:payment (:payload (:user ctx)))
+                    u/cash-payment)
         comment (:comment (:payload (:user ctx)))
         card? (= payment u/card-payment)]
     (merge
