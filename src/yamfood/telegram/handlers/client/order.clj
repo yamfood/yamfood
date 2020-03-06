@@ -119,16 +119,16 @@
         comment (:comment (:payload (:user ctx)))
         card? (= payment u/card-payment)]
     (merge
-      {:run            (merge {:function ord/create-order!
-                               :args     [basket-id location comment (:value payment)]}
-                              (if card?
-                                {:next-event :c/send-invoice}
-                                {:next-event :c/active-order}))
+      {:run            [(merge {:function ord/create-order!
+                                :args     [basket-id location comment (:value payment)]}
+                               (if card?
+                                 {:next-event :c/send-invoice}
+                                 {:next-event :c/active-order}))
+                        (when (not card?)
+                          {:function bsk/clear-basket!
+                           :args     [basket-id]})]
        :delete-message {:chat-id    chat-id
-                        :message-id message-id}}
-      (when (not card?)
-        {:run {:function bsk/clear-basket!
-               :args     [basket-id]}}))))
+                        :message-id message-id}})))
 
 
 (def write-comment-text "Напишите свой комментарий к заказу")
