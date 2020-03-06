@@ -158,11 +158,6 @@
     ["riders.id = ?" id]))
 
 
-
-(update! 2 {:notes "test"})
-
-
-
 (defn limited-rider-query
   [offset limit]
   (merge rider-list-query {:offset offset :limit limit}))
