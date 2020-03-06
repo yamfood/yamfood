@@ -3,9 +3,9 @@
     [yamfood.utils :as u]
     [compojure.core :as c]
     [clojure.spec.alpha :as s]
+    [clojure.data.json :as json]
     [yamfood.api.pagination :as p]
-    [yamfood.core.users.core :as users]
-    [clojure.data.json :as json]))
+    [yamfood.core.users.core :as users]))
 
 
 (def labels

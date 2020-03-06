@@ -30,11 +30,12 @@
 
 (defn deposits-sum!
   [rider-id]
-  (->> (deposits-sum-query rider-id)
-       (hs/format)
-       (jdbc/query db/db)
-       (first)
-       (:sum)))
+  (or (->> (deposits-sum-query rider-id)
+           (hs/format)
+           (jdbc/query db/db)
+           (first)
+           (:sum))
+      0))
 
 
 (defn finished-orders-query
