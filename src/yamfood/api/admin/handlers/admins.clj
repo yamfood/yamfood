@@ -32,10 +32,18 @@
           :opt-un [::payload]))
 
 
+(defn validate-create-admin!
+  [body]
+  (let [valid? (s/valid? ::admin-create body)]
+    (if valid?
+      (nil? (a/admin-by-login! (:login body)))
+      false)))
+
+
 (defn create-admin
   [request]
   (let [body (:body request)
-        valid? (s/valid? ::admin-create body)]
+        valid? (validate-create-admin! body)]
     (if valid?
       {:body (a/create-admin! body)}
       {:body   {:error "Incorrect input"}
@@ -46,11 +54,19 @@
   (s/keys :opt-un [::login ::password ::payload]))
 
 
+(defn validate-patch-admin!
+  [body]
+  (let [valid? (s/valid? ::admin-patch body)]
+    (if valid?
+      (nil? (a/admin-by-login! (:login body)))
+      false)))
+
+
 (defn patch-admin
   [request]
   (let [admin-id (u/str->int (:id (:params request)))
         body (:body request)
-        valid? (s/valid? ::admin-patch body)]
+        valid? (validate-patch-admin! body)]
     (if valid?
       (do
         (a/update-admin! admin-id body)
@@ -59,10 +75,21 @@
        :status 400})))
 
 
+(defn delete-admin
+  [request]
+  (let [admin-id (u/str->int (:id (:params request)))
+        result (a/delete-admin! admin-id)]
+    (if result
+      {:body {:result "ok"}}
+      {:body   {:error "Not deleted"}
+       :status 400})))
+
+
 (c/defroutes
   routes
   (c/GET "/" [] admins-list)
   (c/POST "/" [] create-admin)
   (c/PATCH "/:id{[0-9]+}/" [] patch-admin)
+  (c/DELETE "/:id{[0-9]+}/" [] delete-admin)
   (c/GET "/permissions/" [] permissions-list))
 

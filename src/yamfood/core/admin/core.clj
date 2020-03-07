@@ -14,7 +14,8 @@
             :admins.password
             :admins.token
             :admins.payload]
-   :from   [:admins]})
+   :from   [:admins]
+   :where  [:= :admins.is_active true]})
 
 
 (defn admin-by-credentials-query
@@ -28,7 +29,17 @@
 
 (defn admin-by-credentials!
   [login password]
-  (->> (hs/format (admin-by-credentials-query login password))
+  (->> (admin-by-credentials-query login password)
+       (hs/format)
+       (jdbc/query db/db)
+       (first)))
+
+
+(defn admin-by-login!
+  [login]
+  (->> (-> admin-query
+           (hh/merge-where [:= :admins.login login]))
+       (hs/format)
        (jdbc/query db/db)
        (first)))
 
@@ -73,3 +84,11 @@
   [admin]
   (-> (jdbc/insert! db/db "admins" admin)
       (first)))
+
+
+(defn delete-admin!
+  [admin-id]
+  (jdbc/update!
+    db/db "admins"
+    {:is_active false}
+    ["admins.id = ?" admin-id]))

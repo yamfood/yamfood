@@ -12,8 +12,7 @@
         callback-query (:callback_query update)
         callback-data (:data callback-query)
         basket-id (:basket_id (:client ctx))
-        product-id (Integer.
-                     (first (u/callback-params callback-data)))]
+        product-id (u/parse-int (first (u/callback-params callback-data)))]
     {:run             [{:function baskets/increment-product-in-basket!
                         :args     [basket-id product-id]}
                        {:function   baskets/basket-state!
@@ -29,8 +28,7 @@
         callback-query (:callback_query update)
         callback-data (:data callback-query)
         basket-id (:basket_id (:client ctx))
-        product-id (Integer.
-                     (first (u/callback-params callback-data)))]
+        product-id (u/parse-int (first (u/callback-params callback-data)))]
     {:run             [{:function baskets/decrement-product-in-basket!
                         :args     [basket-id product-id]}
                        {:function   baskets/basket-state!
