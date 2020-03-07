@@ -34,13 +34,30 @@
   (let [order-id (u/str->int (:id (:params request)))]
     {:body (o/order-by-id! order-id)}))
 
+
+(defn accept-order
+  [request]
+  (let [admin-id (:id (:admin request))
+        order-id (u/str->int (:id (:params request)))
+        order (o/order-by-id! order-id)
+        acceptable? (= (:new o/order-statuses) (:status order))]
+    (if acceptable?
+      (do
+        (if (o/accept-order! (:id order) admin-id)
+          {:body (get-active-orders!)}
+          {:body   {:error "Unexpected error"}
+           :status 500}))
+      {:body   {:error "Can't accept order in this status"}
+       :status 400})))
+
+
 (defn cancel-order
   [request]
   (let [order-id (u/str->int (:id (:params request)))
         order (o/order-by-id! order-id)
-        cancelable (u/in? o/cancelable-order-statuses
-                          (:status order))]
-    (if cancelable
+        cancelable? (u/in? o/cancelable-order-statuses
+                           (:status order))]
+    (if cancelable?
       (do
         (if (o/cancel-order! (:id order))
           {:body (get-active-orders!)}
@@ -58,6 +75,7 @@
 (c/defroutes
   routes
   (c/GET "/:id{[0-9]+}/" [] order-details)
+  (c/POST "/:id{[0-9]+}/accept/" [] accept-order)
   (c/POST "/:id{[0-9]+}/cancel/" [] cancel-order)
 
   (c/GET "/active/" [] active-orders-list)

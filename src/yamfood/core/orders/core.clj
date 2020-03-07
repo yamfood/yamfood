@@ -210,6 +210,15 @@
        (map fmt-order-location)))
 
 
+(defn accept-order!
+  [order-id admin-id]
+  (jdbc/insert!
+    db/db "order_logs"
+    {:order_id order-id
+     :status   (:on-kitchen order-statuses)
+     :payload  {:admin_id admin-id}}))
+
+
 (defn cancel-order!
   [order-id]
   (jdbc/insert!
