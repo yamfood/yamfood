@@ -55,10 +55,11 @@
 
 
 (defn validate-patch-admin!
-  [body]
+  [body admin-id]
   (let [valid? (s/valid? ::admin-patch body)]
     (if valid?
-      (nil? (a/admin-by-login! (:login body)))
+      (let [admin (a/admin-by-login! (:login body))]
+        (or (nil? admin) (= (:id admin) admin-id)))
       false)))
 
 
@@ -66,7 +67,7 @@
   [request]
   (let [admin-id (u/str->int (:id (:params request)))
         body (:body request)
-        valid? (validate-patch-admin! body)]
+        valid? (validate-patch-admin! body admin-id)]
     (if valid?
       (do
         (a/update-admin! admin-id body)
