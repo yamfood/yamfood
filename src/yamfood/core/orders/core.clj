@@ -99,7 +99,8 @@
 
 
 (def order-products-query
-  {:select [:products.name
+  {:select [:products.id
+            :products.name
             :products.price
             :order_products.count]
    :from   [:order_products :products]
