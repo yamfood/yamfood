@@ -11,12 +11,16 @@
 (s/def ::energy int?)
 (s/def ::price int?)
 (s/def ::category_id int?)
-(s/def ::is_active boolean?)
 
 
 (defn products-list
   [_]
   {:body (p/all-products!)})
+
+
+(defn categories-list
+  [_]
+  {:body (p/all-categories!)})
 
 
 (s/def ::create-product
@@ -47,4 +51,6 @@
 (c/defroutes
   routes
   (c/GET "/" [] products-list)
-  (c/POST "/" [] create-product))
+  (c/POST "/" [] create-product)
+
+  (c/GET "/categories/" [] categories-list))
