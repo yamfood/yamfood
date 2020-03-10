@@ -108,6 +108,15 @@
    :order-by [:categories.position]})
 
 
+(defn product-by-name!
+  [name]
+  (->> (-> all-products-query
+           (hh/merge-where [:= :products.name name]))
+       (hs/format)
+       (jdbc/query db/db)
+       (first)))
+
+
 (defn all-categories!
   []
   (->> categories-list-query
@@ -121,3 +130,12 @@
            (hh/merge-where [:= :categories.emoji emoji]))
        (hs/format)
        (jdbc/query db/db)))
+
+
+(defn create-product!
+  [product]
+  (first
+    (jdbc/insert!
+      db/db
+      "products"
+      product)))
