@@ -71,11 +71,12 @@
 
 
 (defn validate-patch-product!
-  [body]
+  [body product-id]
   (let [valid? (s/valid? ::patch-product body)
         name (:name body)]
     (if valid?
-      (nil? (p/product-by-name! name))
+      (let [product (p/product-by-name! name)]
+        (or (nil? product) (= (:id product) product-id)))
       false)))
 
 
@@ -84,7 +85,7 @@
   (let [product-id (u/str->int (:id (:params request)))
         product (p/product-by-id! product-id)
         body (:body request)
-        valid? (validate-patch-product! body)]
+        valid? (validate-patch-product! body product-id)]
     (if product
       (if valid?
         (do
