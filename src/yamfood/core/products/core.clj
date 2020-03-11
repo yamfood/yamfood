@@ -117,6 +117,15 @@
        (first)))
 
 
+(defn product-by-id!
+  [id]
+  (->> (-> all-products-query
+           (hh/merge-where [:= :products.id id]))
+       (hs/format)
+       (jdbc/query db/db)
+       (first)))
+
+
 (defn all-categories!
   []
   (->> categories-list-query
@@ -139,3 +148,12 @@
       db/db
       "products"
       product)))
+
+
+(defn update!
+  [product-id row]
+  (jdbc/update!
+    db/db
+    "products"
+    row
+    ["products.id = ?" product-id]))

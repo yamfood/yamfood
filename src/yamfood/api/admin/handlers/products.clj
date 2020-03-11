@@ -2,7 +2,8 @@
   (:require
     [compojure.core :as c]
     [clojure.spec.alpha :as s]
-    [yamfood.core.products.core :as p]))
+    [yamfood.core.products.core :as p]
+    [yamfood.utils :as u]))
 
 
 (s/def ::photo string?)
@@ -48,9 +49,58 @@
        :status 400})))
 
 
+(defn product-detail
+  [request]
+  (let [product-id (u/str->int (:id (:params request)))
+        product (p/product-by-id! product-id)]
+    (if product
+      {:body product}
+      {:body   {:error "Product not found"}
+       :status 404})))
+
+
+(s/def ::patch-product
+  (s/keys
+    :opt-un
+    [::photo
+     ::thumbnail
+     ::name
+     ::price
+     ::energy
+     ::category_id]))
+
+
+(defn validate-patch-product!
+  [body]
+  (let [valid? (s/valid? ::patch-product body)
+        name (:name body)]
+    (if valid?
+      (nil? (p/product-by-name! name))
+      false)))
+
+
+(defn patch-product
+  [request]
+  (let [product-id (u/str->int (:id (:params request)))
+        product (p/product-by-id! product-id)
+        body (:body request)
+        valid? (validate-patch-product! body)]
+    (if product
+      (if valid?
+        (do
+          (p/update! product-id body)
+          {:body (p/product-by-id! product-id)})
+        {:body   {:error "Invalid input or duplicate name"}
+         :status 400})
+      {:body   {:error "Product not found"}
+       :status 404})))
+
+
 (c/defroutes
   routes
   (c/GET "/" [] products-list)
   (c/POST "/" [] create-product)
+  (c/GET "/:id{[0-9]+}/" [] product-detail)
+  (c/PATCH "/:id{[0-9]+}/" [] patch-product)
 
   (c/GET "/categories/" [] categories-list))
