@@ -1,9 +1,9 @@
 (ns yamfood.api.admin.handlers.products
   (:require
+    [yamfood.utils :as u]
     [compojure.core :as c]
     [clojure.spec.alpha :as s]
-    [yamfood.core.products.core :as p]
-    [yamfood.utils :as u]))
+    [yamfood.core.products.core :as p]))
 
 
 (s/def ::photo string?)
@@ -96,11 +96,24 @@
        :status 404})))
 
 
+(defn delete-product
+  [request]
+  (let [product-id (u/str->int (:id (:params request)))
+        product (p/product-by-id! product-id)]
+    (if product
+      (do
+        (p/delete! product-id)
+        {:status 204})
+      {:body   {:error "Not found"}
+       :status 404})))
+
+
 (c/defroutes
   routes
   (c/GET "/" [] products-list)
   (c/POST "/" [] create-product)
   (c/GET "/:id{[0-9]+}/" [] product-detail)
   (c/PATCH "/:id{[0-9]+}/" [] patch-product)
+  (c/DELETE "/:id{[0-9]+}/" [] delete-product)
 
   (c/GET "/categories/" [] categories-list))

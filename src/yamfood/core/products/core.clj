@@ -157,3 +157,12 @@
     "products"
     row
     ["products.id = ?" product-id]))
+
+
+(defn delete!
+  [product-id]
+  (jdbc/update!
+    db/db
+    "products"
+    {:is_active false}
+    ["products.id = ?" product-id]))
