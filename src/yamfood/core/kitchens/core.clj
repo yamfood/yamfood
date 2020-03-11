@@ -2,7 +2,8 @@
   (:require
     [honeysql.core :as hs]
     [clojure.java.jdbc :as jdbc]
-    [yamfood.core.db.core :as db]))
+    [yamfood.core.db.core :as db]
+    [honeysql.helpers :as hh]))
 
 
 (def kitchen-query
@@ -26,6 +27,16 @@
        (hs/format)
        (jdbc/query db/db)
        (map fmt-location)))
+
+
+(defn kitchen-by-id!
+  [kitchen-id]
+  (->> (-> kitchen-query
+           (hh/merge-where [:= :kitchens.id kitchen-id])
+           (hs/format))
+       (jdbc/query db/db)
+       (map fmt-location)
+       (first)))
 
 
 (def kitchens-distance-function-query
