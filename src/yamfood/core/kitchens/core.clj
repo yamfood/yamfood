@@ -3,7 +3,8 @@
     [honeysql.core :as hs]
     [clojure.java.jdbc :as jdbc]
     [yamfood.core.db.core :as db]
-    [honeysql.helpers :as hh]))
+    [honeysql.helpers :as hh]
+    [clj-postgresql.core :as pg]))
 
 
 (def kitchen-query
@@ -61,3 +62,13 @@
        (jdbc/query db/db)
        (first)
        (fmt-location)))
+
+
+(defn create!
+  [name lon lat]
+  (->> (jdbc/insert!
+         db/db
+         "kitchens"
+         {:name name :location (pg/point lon lat)})
+       (map fmt-location)
+       (first)))
