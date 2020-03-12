@@ -13,6 +13,7 @@
                :products.photo
                :products.thumbnail
                :products.energy
+               :products.category_id
                :categories.emoji
                [:categories.name :category]]
    :from      [:products]
