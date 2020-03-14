@@ -11,7 +11,7 @@
 (s/def ::name string?)
 (s/def ::energy int?)
 (s/def ::price int?)
-(s/def ::category_id int?)
+(s/def ::category_id (s/nilable int?))
 
 
 (defn products-list
