@@ -16,6 +16,14 @@
    :order-by [:kitchens.id]})
 
 
+(def open-kitchens-where
+  [:case
+   [:> :kitchens.start_at :kitchens.end_at]
+   [(hs/raw "now()::time + interval '5 hours' not between kitchens.end_at and kitchens.start_at")]
+   [:< :kitchens.start_at :kitchens.end_at]
+   [(hs/raw "now()::time + interval '5 hours' between kitchens.start_at and kitchens.end_at")]])
+
+
 (defn fmt-location
   [kitchen]
   (let [pg-location (:location kitchen)]
@@ -46,13 +54,14 @@
 
 (defn nearest-kitchen-query
   [lon lat]
-  (assoc
-    kitchen-query
-    :order-by
-    [(hs/raw
-       (format
-         kitchens-distance-function-query
-         lon lat))]))
+  (-> (assoc
+        kitchen-query
+        :order-by
+        [(hs/raw
+           (format
+             kitchens-distance-function-query
+             lon lat))])
+      (hh/merge-where open-kitchens-where)))
 
 
 (defn nearest-kitchen!
