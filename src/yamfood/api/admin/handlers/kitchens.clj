@@ -6,11 +6,24 @@
     [yamfood.core.kitchens.core :as k]))
 
 
+(defn time?
+  [str]
+  (and
+    (string? str)
+    (not
+      (nil?
+        (re-matches
+          #"^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$"
+          str)))))
+
+
 (s/def ::name string?)
 (s/def ::longitude float?)
 (s/def ::latitude float?)
 (s/def ::location
   (s/keys :req-un [::longitude ::latitude]))
+(s/def ::start_at time?)
+(s/def ::end_at time?)
 
 
 (defn kitchens-list
@@ -27,11 +40,10 @@
       {:body   {:error "Not found"}
        :status 404})))
 
-(s/valid? ::location {:longitude 1
-                      :latitude  1})
 
 (s/def ::create-kitchen
-  (s/keys :req-un [::name ::location]))
+  (s/keys :req-un [::name ::location]
+          :opt-un [::start_at ::end_at]))
 
 
 (defn create-kitchen
