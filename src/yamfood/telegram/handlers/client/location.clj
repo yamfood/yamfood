@@ -31,6 +31,8 @@
   {:inline_keyboard
    [[{:text "Карта обслуживания"
       :url  u/map-url}]
+    [{:text          (str u/back-emoji " Меню")
+      :callback_data "menu"}]
     [{:text          (str u/basket-emoji " Корзина")
       :callback_data "basket"}]]})
 
