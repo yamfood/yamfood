@@ -38,8 +38,8 @@
 (defn invalid-location-handler
   [ctx]
   (let [chat-id (u/chat-id (:update ctx))]
-    {:send-text [{:chat-id
-                  :text "Принято"
+    {:send-text [{:chat-id chat-id
+                  :text    "Принято"
                   :options {:reply_markup {:remove_keyboard true}}}
                  {:chat-id chat-id
                   :text    "К сожалению, мы не обслуживаем данный регион"
