@@ -1,6 +1,7 @@
 (ns yamfood.telegram.handlers.client.core
   (:require
     [environ.core :refer [env]]
+    [yamfood.core.params.core :as p]
     [yamfood.telegram.dispatcher :as d]
     [yamfood.core.clients.core :as clients]
     [yamfood.telegram.handlers.utils :as u]))
@@ -11,6 +12,7 @@
   {:token          (env :bot-token)
    :payments-token (env :payments-token)
    :update         update
+   :params         (p/params!)
    :client         (clients/client-with-tid!
                      (u/tid-from-update update))})
 
