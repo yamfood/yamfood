@@ -52,12 +52,20 @@
   (str/replace (format "%,d" amount) "," " "))
 
 
+(defn more-button
+  [state]
+  (let [category (:category state)]
+    (if category
+      [{:text (str (:emoji state) " " category) :switch_inline_query_current_chat (:emoji state)}]
+      [{:text "\uD83C\uDF7D Еще?" :switch_inline_query_current_chat ""}])))
+
+
 (defn product-not-in-basket-markup
   [state]
   (let [basket-cost (:basket_cost state)]
     {:inline_keyboard
      [[{:text "Хочу" :callback_data (str "want/" (:id state))}]
-      [{:text (str (:emoji state) " " (:category state)) :switch_inline_query_current_chat (:emoji state)}]
+      (more-button state)
       [{:text (format (str basket-emoji " Корзина (%s сум)") (fmt-values basket-cost)) :callback_data "basket"}]
       [{:text (str back-emoji " Назад") :callback_data "menu"}]]}))
 
@@ -74,7 +82,7 @@
   (let [basket-cost (:basket_cost state)]
     {:inline_keyboard
      [(basket-product-controls "detail" (:id state) (:count_in_basket state))
-      [{:text (str (:emoji state) " " (:category state)) :switch_inline_query_current_chat (:emoji state)}]
+      (more-button state)
       [{:text (format (str basket-emoji " Корзина (%s сум)") (fmt-values basket-cost)) :callback_data "basket"}]
       [{:text (str back-emoji " Назад") :callback_data "menu"}]]}))
 

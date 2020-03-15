@@ -1,8 +1,7 @@
 {
   "name": "YamFood Template",
   "description": "Food delivery service",
-  "repository": "https://github.com/kensay98/yamfood",
-  "logo": "https://node-js-sample.herokuapp.com/node.png",
+  "repository": "https://github.com/yamfood/yamfood",
   "keywords": [],
   "addons": [
     "heroku-postgresql:hobby-dev"

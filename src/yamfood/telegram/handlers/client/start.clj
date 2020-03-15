@@ -38,7 +38,7 @@
   (let []
     {:inline_keyboard
      (conj (apply conj []
-                  [{:text                             "Что поесть?"
+                  [{:text                             "\uD83C\uDF7D Что поесть?"
                     :switch_inline_query_current_chat ""}]
                   (categories-in-markup categories))
            [{:text (str u/location-emoji " Зона покрытия")

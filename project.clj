@@ -21,7 +21,6 @@
                  [honeysql "0.9.6"]]
   :plugins [[lein-cloverage "1.0.10"]]
   :uberjar-name "yamfood.jar"
-  :java-agents [[com.newrelic.agent.java/newrelic-agent “2.19.0”]]
   :profiles
   {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]
                         [ring/ring-mock "0.3.2"]]}})
