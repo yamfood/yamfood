@@ -69,8 +69,8 @@
   (->> (nearest-kitchen-query lon lat)
        (hs/format)
        (jdbc/query db/db)
-       (first)
-       (fmt-location)))
+       (map fmt-location)
+       (first)))
 
 
 (defn create!

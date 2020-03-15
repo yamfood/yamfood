@@ -37,8 +37,7 @@
 
 (defn invalid-location-handler
   [ctx]
-  (let [message (:message (:update ctx))
-        chat-id (:from (:id message))]
+  (let [chat-id (u/chat-id (:update ctx))]
     {:send-text {:chat-id chat-id
                  :text    "К сожалению, мы не обслуживаем данный регион"
                  :options {:reply_markup invalid-location-markup}}}))
