@@ -53,11 +53,11 @@
         phone (get-phone update)]
     (if phone
       {:run       [{:function clients/update-payload!
-                    :args     [(:id client
-                                 (assoc
-                                   (:payload client)
-                                   :step
-                                   u/phone-confirmation-step))]}
+                    :args     [(:id client)
+                               (assoc
+                                 (:payload client)
+                                 :step
+                                 u/phone-confirmation-step)]}
                    {:function clients/update-phone!
                     :args     [(:id client) phone]}]
        :send-text {:chat-id chat-id
