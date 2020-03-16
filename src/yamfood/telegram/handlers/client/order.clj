@@ -25,14 +25,16 @@
         client (:client ctx)
         message-id (:message_id (:message query))]
     (into
-      (cond
-        (:location (:payload client)) {:dispatch {:args [:c/order-confirmation-state]}}
-        :else {:dispatch {:args [:c/request-location]}})
       {:delete-message {:chat-id    chat-id
                         :message-id message-id}
        :run            {:function clients/update-payload!
                         :args     [(:id client)
-                                   (assoc (:payload client) :step u/order-confirmation-step)]}})))
+                                   (assoc (:payload client) :step u/order-confirmation-step)]}}
+      (cond
+        (:location (:payload client)) {:dispatch {:args [:c/order-confirmation-state]}}
+        :else {:dispatch {:args        [:c/request-location]
+                          :rebuild-ctx {:function c/build-ctx!
+                                        :update   (:update ctx)}}}))))
 
 
 (defn order-confirmation-markup
