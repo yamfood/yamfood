@@ -53,7 +53,9 @@
        :options         {:cache_time 0}
        :results         (into
                           [(current-location-inline-result
-                             (u/text-from-address address))]
+                             (if address
+                               (u/text-from-address address)
+                               "Адрес не определен..."))]
                           (map query-result-from-product products))}})))
 
 
