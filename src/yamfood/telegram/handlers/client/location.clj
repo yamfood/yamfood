@@ -20,8 +20,11 @@
         chat-id (u/chat-id update)
         message-id (:message_id (:message query))]
     (merge {:send-text {:chat-id chat-id
-                        :text    "Куда доставить?"
-                        :options {:reply_markup markup-for-request-location}}}
+                        :text    (str "*куда доставить?*\n\n"
+                                      "нажмите отправить локацию или отправьте локцию вручную\n\n"
+                                      "_не забудьте включить локацию на своем телефоне..._")
+                        :options {:parse_mode   "markdown"
+                                  :reply_markup markup-for-request-location}}}
            (when query
              {:delete-message {:chat-id    chat-id
                                :message-id message-id}}))))
