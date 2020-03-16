@@ -61,7 +61,8 @@
                    {:function clients/update-phone!
                     :args     [(:id client) phone]}]
        :send-text {:chat-id chat-id
-                   :text    "Номер успешно подтвержден!"}}
+                   :text    "Номер успешно подтвержден!"}
+       :dispatch  {:args [:c/menu]}}
       {:send-text {:chat-id chat-id
                    :text    "Неверный номер телефона, попробуйте еще раз..."}})))
 
@@ -89,8 +90,3 @@
 (d/register-event-handler!
   :c/phone
   phone-handler)
-
-
-(d/register-event-handler!
-  :c/confirm-phone
-  confirm-phone-handler)

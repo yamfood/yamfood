@@ -40,9 +40,6 @@
   (let [payment (get-in order-state [:client :payload :payment])]
     {:inline_keyboard
      [[{:text u/location-emoji :callback_data "request-location"}
-       (cond
-         (= payment u/card-payment) {:text u/card-emoji :callback_data "switch-payment-type"}
-         :else {:text u/cash-emoji :callback_data "switch-payment-type"})
        {:text u/comment-emoji :callback_data "change-comment"}]
       [{:text (str u/basket-emoji " Корзина") :callback_data "basket"}]
       [{:text "✅ Подтвердить" :callback_data "create-order"}]]}))
