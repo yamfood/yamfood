@@ -3,7 +3,8 @@
     [yamfood.utils :as u]
     [compojure.core :as c]
     [yamfood.core.orders.core :as o]
-    [yamfood.core.orders.core :as ord]))
+    [yamfood.core.orders.core :as ord]
+    [yamfood.api.pagination :as p]))
 
 
 (defn reduce-active-orders
@@ -67,9 +68,19 @@
        :status 400})))
 
 
-(defn finished-orders                                       ; TODO: Use pagination!!!
-  [_]
-  {:body (o/finished-orders!)})
+(defn finished-orders
+  [request]
+  (let [page (p/get-page request)
+        per-page (p/get-per-page request)
+        count (o/ended-orders-count!)
+        offset (p/calc-offset page per-page)]
+    {:body (p/format-result
+             count
+             per-page
+             page
+             (o/ended-orders!
+               offset
+               per-page))}))
 
 
 (c/defroutes

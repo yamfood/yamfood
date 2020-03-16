@@ -25,7 +25,7 @@
    (:on-way order-statuses)])
 
 
-(def finished-order-statuses
+(def ended-order-statuses
   [(:canceled order-statuses)
    (:finished order-statuses)])
 
@@ -145,19 +145,36 @@
        (map fmt-order-location)))
 
 
-(def finished-orders-query
+(defn ended-orders-query
+  [offset limit]
   {:with   [[:cte_orders order-detail-query]]
    :select [:*]
    :from   [:cte_orders]
-   :where  [:= :cte_orders.status (:finished order-statuses)]})
+   :where  [:in :cte_orders.status ended-order-statuses]
+   :offset offset
+   :limit  limit})
 
 
-(defn finished-orders!
+(defn ended-orders!
+  ([]
+   (ended-orders! 0 100))
+  ([offset limit]
+   (->> (ended-orders-query offset limit)
+        (hs/format)
+        (jdbc/query db/db)
+        (map fmt-order-location))))
+
+
+(defn ended-orders-count!
   []
-  (->> finished-orders-query
+  (->> (-> (ended-orders-query 0 100)
+           (dissoc :limit)
+           (dissoc :offset)
+           (assoc :select [:%count.cte_orders.id]))
        (hs/format)
        (jdbc/query db/db)
-       (map fmt-order-location)))
+       (first)
+       (:count)))
 
 
 (defn active-order-by-rider-id-query
