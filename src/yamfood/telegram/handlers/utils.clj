@@ -66,8 +66,7 @@
     {:inline_keyboard
      [[{:text "Хочу" :callback_data (str "want/" (:id state))}]
       (more-button state)
-      [{:text (format (str basket-emoji " Корзина (%s сум)") (fmt-values basket-cost)) :callback_data "basket"}]
-      [{:text (str back-emoji " Назад") :callback_data "menu"}]]}))
+      [{:text (format (str basket-emoji " Корзина (%s сум)") (fmt-values basket-cost)) :callback_data "basket"}]]}))
 
 
 (defn basket-product-controls
@@ -83,8 +82,7 @@
     {:inline_keyboard
      [(basket-product-controls "detail" (:id state) (:count_in_basket state))
       (more-button state)
-      [{:text (format (str basket-emoji " Корзина (%s сум)") (fmt-values basket-cost)) :callback_data "basket"}]
-      [{:text (str back-emoji " Назад") :callback_data "menu"}]]}))
+      [{:text (format (str basket-emoji " Корзина (%s сум)") (fmt-values basket-cost)) :callback_data "basket"}]]}))
 
 
 (defn product-detail-markup

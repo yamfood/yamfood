@@ -18,7 +18,7 @@
       (= (:step (:payload client)) u/phone-confirmation-step) {:dispatch {:args [:c/confirm-phone]}}
       (= text update-location-text) {:dispatch {:args [:c/request-location]}}
       :else {:send-text {:chat-id chat-id
-                         :text    "Не понял"}})))
+                         :text    "есть вопросы? пишите @helpkitchen"}})))
 
 
 (d/register-event-handler!
