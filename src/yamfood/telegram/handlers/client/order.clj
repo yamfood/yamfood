@@ -171,15 +171,11 @@
 
 (defn active-order
   [ctx order]
-  (if (int? order)
-    {:run {:function   o/order-by-id!
-           :args       [order]
-           :next-event :c/active-order}}
-    (let [update (:update ctx)
-          chat-id (u/chat-id update)]
-      {:send-text {:chat-id chat-id
-                   :text    (active-order-text order)
-                   :options {:parse_mode "markdown"}}})))
+  (let [update (:update ctx)
+        chat-id (u/chat-id update)]
+    {:send-text {:chat-id chat-id
+                 :text    "благодарим за уделенное время — вы помогли нам лучше узнать о ваших предпочтениях перед запуском проекта\n\nмы не сможем привезти текущий заказ, но обещаем сделать это после запуска и выслать вам промокод на первый заказ \n\nвопросы и пожелания @helpkitchen"
+                 :options {:parse_mode "markdown"}}}))
 
 
 (defn invoice-description

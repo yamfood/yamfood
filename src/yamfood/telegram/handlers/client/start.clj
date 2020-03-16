@@ -42,9 +42,7 @@
                     :switch_inline_query_current_chat ""}]
                   (categories-in-markup categories))
            [{:text (str u/location-emoji " Зона покрытия")
-             :url  u/map-url}]
-           [{:text          (str u/settings-emoji " Настройки")
-             :callback_data "settings"}])}))
+             :url  u/map-url}])}))
 
 
 (defn menu-handler
