@@ -61,7 +61,8 @@
                    {:function clients/update-phone!
                     :args     [(:id client) phone]}]
        :send-text {:chat-id chat-id
-                   :text    "Номер успешно подтвержден!"}
+                   :text    "Номер успешно сохранен!"
+                   :options {:reply_markup {:remove_keyboard true}}}
        :dispatch  {:args [:c/menu]}}
       {:send-text {:chat-id chat-id
                    :text    "Неверный номер телефона, попробуйте еще раз..."}})))
