@@ -127,8 +127,8 @@
 
 
 (defn insert-client!
-  [tid name]
-  (first (jdbc/insert! db/db "clients" {:tid tid :name name})))
+  [tid name payload]
+  (first (jdbc/insert! db/db "clients" {:tid tid :name name :payload payload})))
 
 
 (defn init-basket!
@@ -137,9 +137,11 @@
 
 
 (defn create-client!
-  [tid name]
-  (let [client (insert-client! tid name)]
-    (init-basket! (:id client))))
+  ([tid name]
+   (create-client! tid name {}))
+  ([tid name payload]
+   (let [client (insert-client! tid name payload)]
+     (init-basket! (:id client)))))
 
 
 (defn update-location-query
