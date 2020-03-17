@@ -62,6 +62,9 @@
             :next-event :c/location}}))
   ([ctx location-info]
    (let [client (:client ctx)
+         update (:update ctx)
+         message (:message update)
+         location (:location message)
          step (:step (:payload client))]
      (if (:region location-info)
        {:dispatch [{:args [:c/update-location location-info]}
@@ -75,7 +78,14 @@
                      :else {:args        [:c/menu]
                             :rebuild-ctx {:function c/build-ctx!
                                           :update   (:update ctx)}})]}
-       {:dispatch {:args [:c/invalid-location]}}))))
+       {:run      {:function clients/update-payload!
+                   :args     [(:id client)
+                              (assoc
+                                (:payload client)
+                                :invalid-location {:address   (:address location-info)
+                                                   :longitude (:longitude location)
+                                                   :latitude  (:latitude location)})]}
+        :dispatch {:args [:c/invalid-location]}}))))
 
 
 (defn update-location

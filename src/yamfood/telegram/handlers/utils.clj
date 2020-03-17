@@ -149,3 +149,10 @@
         road (:road address)
         house (:house_number address)]
     (str road ", " house)))
+
+
+(defn utm
+  [update]
+  (let [message (:message update)
+        text (:text message)]
+    (second (str/split text #" "))))

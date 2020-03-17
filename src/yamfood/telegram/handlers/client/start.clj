@@ -72,12 +72,13 @@
   (let [update (:update ctx)
         tid (u/chat-id update)
         from (:from (:message update))
-        name (str (:first_name from) " " (:last_name from))]
+        name (str (:first_name from) " " (:last_name from))
+        utm (u/utm update)]
     (if (:client ctx)
       {:dispatch {:args [:c/request-phone]}}
 
       {:run      {:function clients/create-client!
-                  :args     [tid name]}
+                    :args     [tid name (if utm {:utm utm} {})]}
        :dispatch {:args        [:c/request-phone]
                   :rebuild-ctx {:function c/build-ctx!
                                 :update   (:update ctx)}}})))

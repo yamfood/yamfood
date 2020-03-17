@@ -26,11 +26,11 @@
         reply-to (:reply_to_message message)
         successful_payment (:successful_payment message)]
     (cond
-      (= text "/start") (d/dispatch! ctx [:c/start])
       location (d/dispatch! ctx [:c/location])
       successful_payment (d/dispatch! ctx [:c/successful-payment])
       contact (d/dispatch! ctx [:c/contact])
       reply-to (d/dispatch! ctx [:c/reply])
+      (and text (re-matches #"^/start(.*)" text)) (d/dispatch! ctx [:c/start])
       text (d/dispatch! ctx [:c/text]))))
 
 
