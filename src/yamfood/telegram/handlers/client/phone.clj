@@ -52,18 +52,20 @@
         chat-id (u/chat-id update)
         phone (get-phone update)]
     (if phone
-      {:run       [{:function clients/update-payload!
-                    :args     [(:id client)
-                               (assoc
-                                 (:payload client)
-                                 :step
-                                 u/phone-confirmation-step)]}
-                   {:function clients/update-phone!
-                    :args     [(:id client) phone]}]
-       :send-text {:chat-id chat-id
-                   :text    "Номер успешно сохранен!"
-                   :options {:reply_markup {:remove_keyboard true}}}
-       :dispatch  {:args [:c/menu]}}
+      {:run            [{:function clients/update-payload!
+                         :args     [(:id client)
+                                    (assoc
+                                      (:payload client)
+                                      :step
+                                      u/phone-confirmation-step)]}
+                        {:function clients/update-phone!
+                         :args     [(:id client) phone]}]
+       :send-text      {:chat-id chat-id
+                        :text    "Номер успешно сохранен!"
+                        :options {:reply_markup {:remove_keyboard true}}}
+       :send-animation {:chat-id   chat-id
+                        :animation "https://ucarecdn.com/aa2e3023-b426-4118-8b9b-3a61115b175c/telegramclouddocument25440493077376534159.mp4"}
+       :dispatch       {:args [:c/menu]}}
       {:send-text {:chat-id chat-id
                    :text    "Неверный номер телефона, попробуйте еще раз..."}})))
 
