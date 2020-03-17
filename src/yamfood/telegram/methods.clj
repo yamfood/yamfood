@@ -33,6 +33,19 @@
      (-> resp :body))))
 
 
+(defn send-animation
+  "Sends animation to the chat
+  (https://core.telegram.org/bots/api#sendanimation)"
+  ([token chat-id animation] (send-animation token chat-id animation {}))
+  ([token chat-id animation options]
+   (let [url (str base-url token "/sendAnimation")
+         query (into {:chat_id chat-id :animation animation} options)
+         resp (http/post url {:content-type :json
+                              :as           :json
+                              :form-params  query})]
+     (-> resp :body))))
+
+
 (defn send-invoice
   "Sends invoice to the chat
   (https://core.telegram.org/bots/api#editmessagereplymarkup)"
