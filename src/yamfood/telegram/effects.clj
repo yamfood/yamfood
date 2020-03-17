@@ -83,6 +83,16 @@
 
 
 (d/register-effect-handler!
+  :send-animation
+  (fn [ctx effect]
+    (-t/send-animation
+      (:token ctx)
+      (:chat-id effect)
+      (:animation effect)
+      (:options effect))))
+
+
+(d/register-effect-handler!
   :delete-message
   (fn [ctx effect]
     (t/delete-text
