@@ -68,19 +68,39 @@
        :status 400})))
 
 
+(defn finished-orders-where
+  [order-id client-phone rider-phone]
+  (if (every? nil? [order-id client-phone rider-phone])
+    nil
+    (remove
+      nil?
+      [:and
+       (when order-id [:= :cte_orders.id order-id])
+       (when client-phone [:= :cte_orders.phone client-phone])
+       (when rider-phone [:= :cte_orders.rider_phone rider-phone])])))
+
+
 (defn finished-orders
   [request]
   (let [page (p/get-page request)
         per-page (p/get-per-page request)
-        count (o/ended-orders-count!)
-        offset (p/calc-offset page per-page)]
+        offset (p/calc-offset page per-page)
+        params (:params request)
+        order-id (u/str->int (get params "order_id"))
+        client-phone (u/str->int (get params "client_phone"))
+        rider-phone (u/str->int (get params "rider_phone"))
+        where (finished-orders-where order-id
+                                     client-phone
+                                     rider-phone)
+        count (o/ended-orders-count! where)]
     {:body (p/format-result
              count
              per-page
              page
              (o/ended-orders!
                offset
-               per-page))}))
+               per-page
+               where))}))
 
 
 (c/defroutes

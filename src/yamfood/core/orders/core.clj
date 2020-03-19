@@ -163,22 +163,28 @@
   ([]
    (ended-orders! 0 100))
   ([offset limit]
-   (->> (ended-orders-query offset limit)
+   (ended-orders! offset limit nil))
+  ([offset limit where]
+   (->> (-> (ended-orders-query offset limit)
+            (hh/merge-where where))
         (hs/format)
         (jdbc/query db/db)
         (map fmt-order-location))))
 
 
 (defn ended-orders-count!
-  []
-  (->> (-> (ended-orders-query 0 100)
-           (dissoc :limit)
-           (dissoc :offset)
-           (assoc :select [:%count.cte_orders.id]))
-       (hs/format)
-       (jdbc/query db/db)
-       (first)
-       (:count)))
+  ([]
+   (ended-orders-count! nil))
+  ([where]
+   (->> (-> (ended-orders-query 0 100)
+            (dissoc :limit)
+            (dissoc :offset)
+            (assoc :select [:%count.cte_orders.id])
+            (hh/merge-where where))
+        (hs/format)
+        (jdbc/query db/db)
+        (first)
+        (:count))))
 
 
 (defn active-order-by-rider-id-query
