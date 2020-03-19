@@ -12,7 +12,6 @@
 (def order-statuses
   {:new        "new"
    :on-kitchen "onKitchen"
-   :ready      "ready"
    :on-way     "onWay"
    :finished   "finished"
    :canceled   "canceled"})
