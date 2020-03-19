@@ -20,7 +20,6 @@
 (def active-order-statuses
   [(:new order-statuses)
    (:on-kitchen order-statuses)
-   (:ready order-statuses)
    (:on-way order-statuses)])
 
 
