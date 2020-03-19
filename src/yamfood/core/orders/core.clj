@@ -85,17 +85,23 @@
 
 
 (def order-detail-query
-  {:select   [:orders.id
-              :orders.location
-              :orders.created_at
-              :clients.name
-              :clients.phone
-              [(order-total-sum-query :orders.id) :total_sum]
-              [(order-current-status-query :orders.id) :status]
-              :orders.comment]
-   :from     [:orders :clients]
-   :where    [:= :orders.client_id :clients.id]
-   :order-by [:id]})
+  {:select    [:orders.id
+               :orders.location
+               [:kitchens.name :kitchen]
+               [(hs/raw "orders.created_at + interval '5 hours'")
+                :created_at]
+               :clients.name
+               :clients.phone
+               [:riders.name :rider_name]
+               [:riders.phone :rider_phone]
+               [(order-total-sum-query :orders.id) :total_sum]
+               [(order-current-status-query :orders.id) :status]
+               :orders.comment]
+   :from      [:orders]
+   :left-join [:riders [:= :orders.rider_id :riders.id]
+               :clients [:= :orders.client_id :clients.id]
+               :kitchens [:= :orders.kitchen_id :kitchens.id]]
+   :order-by  [:id]})
 
 
 (def order-products-query
