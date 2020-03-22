@@ -274,19 +274,21 @@
 
 
 (defn insert-order-query
-  [client-id lon lat comment kitchen-id payment]
-  ["insert into orders (client_id, location, comment, kitchen_id, payment) values (?, POINT (?, ?), ?, ?, ?) ;"
+  [client-id lon lat address comment kitchen-id payment]
+  ["insert into orders (client_id, location, address, comment, kitchen_id, payment) values (?, POINT (?, ?), ?, ?, ?, ?) ;"
    client-id
    lon lat
+   address
    comment
    kitchen-id
    payment])
 
 
 (defn insert-order!
-  [client-id lon lat comment kitchen-id payment]
+  [client-id lon lat address comment kitchen-id payment]
   (let [query (insert-order-query client-id
                                   lon lat
+                                  address
                                   comment
                                   kitchen-id
                                   payment)]
@@ -300,13 +302,14 @@
 
 (defn create-order!
   ; TODO: Use transaction!
-  [basket-id location comment payment]
+  [basket-id location address comment payment]
   (let [client (clients/client-with-basket-id! basket-id)
         kitchen (kitchens/nearest-kitchen! (:longitude location)
                                            (:latitude location))
         order-id (:id (insert-order! (:id client)
                                      (:longitude location)
                                      (:latitude location)
+                                     address
                                      comment
                                      (:id kitchen)
                                      payment))]

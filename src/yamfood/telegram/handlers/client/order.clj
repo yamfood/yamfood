@@ -121,10 +121,13 @@
         payment (or (:payment payload)
                     u/cash-payment)
         comment (:comment payload)
+        address (:address location)
         card? (= payment u/card-payment)]
     (merge
       {:run            [(merge {:function ord/create-order!
-                                :args     [basket-id location comment (:value payment)]}
+                                :args     [basket-id location
+                                           (u/text-from-address address)
+                                           comment (:value payment)]}
                                (if card?
                                  {:next-event :c/send-invoice}
                                  {:next-event :c/active-order}))
