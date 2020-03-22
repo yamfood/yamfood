@@ -12,7 +12,6 @@
 (def order-statuses
   {:new        "new"
    :on-kitchen "onKitchen"
-   :ready      "ready"
    :on-way     "onWay"
    :finished   "finished"
    :canceled   "canceled"})
@@ -21,7 +20,6 @@
 (def active-order-statuses
   [(:new order-statuses)
    (:on-kitchen order-statuses)
-   (:ready order-statuses)
    (:on-way order-statuses)])
 
 
@@ -85,17 +83,23 @@
 
 
 (def order-detail-query
-  {:select   [:orders.id
-              :orders.location
-              :orders.created_at
-              :clients.name
-              :clients.phone
-              [(order-total-sum-query :orders.id) :total_sum]
-              [(order-current-status-query :orders.id) :status]
-              :orders.comment]
-   :from     [:orders :clients]
-   :where    [:= :orders.client_id :clients.id]
-   :order-by [:id]})
+  {:select    [:orders.id
+               :orders.location
+               [:kitchens.name :kitchen]
+               [(hs/raw "orders.created_at + interval '5 hours'")
+                :created_at]
+               :clients.name
+               :clients.phone
+               [:riders.name :rider_name]
+               [:riders.phone :rider_phone]
+               [(order-total-sum-query :orders.id) :total_sum]
+               [(order-current-status-query :orders.id) :status]
+               :orders.comment]
+   :from      [:orders]
+   :left-join [:riders [:= :orders.rider_id :riders.id]
+               :clients [:= :orders.client_id :clients.id]
+               :kitchens [:= :orders.kitchen_id :kitchens.id]]
+   :order-by  [:id]})
 
 
 (def order-products-query
@@ -159,22 +163,28 @@
   ([]
    (ended-orders! 0 100))
   ([offset limit]
-   (->> (ended-orders-query offset limit)
+   (ended-orders! offset limit nil))
+  ([offset limit where]
+   (->> (-> (ended-orders-query offset limit)
+            (hh/merge-where where))
         (hs/format)
         (jdbc/query db/db)
         (map fmt-order-location))))
 
 
 (defn ended-orders-count!
-  []
-  (->> (-> (ended-orders-query 0 100)
-           (dissoc :limit)
-           (dissoc :offset)
-           (assoc :select [:%count.cte_orders.id]))
-       (hs/format)
-       (jdbc/query db/db)
-       (first)
-       (:count)))
+  ([]
+   (ended-orders-count! nil))
+  ([where]
+   (->> (-> (ended-orders-query 0 100)
+            (dissoc :limit)
+            (dissoc :offset)
+            (assoc :select [:%count.cte_orders.id])
+            (hh/merge-where where))
+        (hs/format)
+        (jdbc/query db/db)
+        (first)
+        (:count))))
 
 
 (defn active-order-by-rider-id-query
@@ -264,19 +274,21 @@
 
 
 (defn insert-order-query
-  [client-id lon lat comment kitchen-id payment]
-  ["insert into orders (client_id, location, comment, kitchen_id, payment) values (?, POINT (?, ?), ?, ?, ?) ;"
+  [client-id lon lat address comment kitchen-id payment]
+  ["insert into orders (client_id, location, address, comment, kitchen_id, payment) values (?, POINT (?, ?), ?, ?, ?, ?) ;"
    client-id
    lon lat
+   address
    comment
    kitchen-id
    payment])
 
 
 (defn insert-order!
-  [client-id lon lat comment kitchen-id payment]
+  [client-id lon lat address comment kitchen-id payment]
   (let [query (insert-order-query client-id
                                   lon lat
+                                  address
                                   comment
                                   kitchen-id
                                   payment)]
@@ -290,13 +302,14 @@
 
 (defn create-order!
   ; TODO: Use transaction!
-  [basket-id location comment payment]
+  [basket-id location address comment payment]
   (let [client (clients/client-with-basket-id! basket-id)
         kitchen (kitchens/nearest-kitchen! (:longitude location)
                                            (:latitude location))
         order-id (:id (insert-order! (:id client)
                                      (:longitude location)
                                      (:latitude location)
+                                     address
                                      comment
                                      (:id kitchen)
                                      payment))]
