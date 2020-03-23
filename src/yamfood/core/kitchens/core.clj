@@ -13,7 +13,8 @@
               :kitchens.location
               :kitchens.start_at
               :kitchens.end_at
-              :kitchens.payload]
+              :kitchens.payload
+              :kitchens.is_disabled]
    :from     [:kitchens]
    :order-by [:kitchens.id]})
 
