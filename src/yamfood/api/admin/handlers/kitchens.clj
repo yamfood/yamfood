@@ -24,6 +24,7 @@
   (s/keys :req-un [::longitude ::latitude]))
 (s/def ::start_at time?)
 (s/def ::end_at time?)
+(s/def ::payload map?)
 
 
 (defn kitchens-list
@@ -43,7 +44,7 @@
 
 (s/def ::create-kitchen
   (s/keys :req-un [::name ::location]
-          :opt-un [::start_at ::end_at]))
+          :opt-un [::start_at ::end_at ::payload]))
 
 
 (defn create-kitchen

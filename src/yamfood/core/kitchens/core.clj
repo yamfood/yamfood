@@ -11,6 +11,8 @@
   {:select   [:kitchens.id
               :kitchens.name
               :kitchens.location
+              :kitchens.start_at
+              :kitchens.end_at
               :kitchens.payload]
    :from     [:kitchens]
    :order-by [:kitchens.id]})
