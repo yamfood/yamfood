@@ -1,9 +1,10 @@
 (ns yamfood.core.kitchens.core
   (:require
+    [yamfood.utils :as u]
     [honeysql.core :as hs]
+    [honeysql.helpers :as hh]
     [clojure.java.jdbc :as jdbc]
     [yamfood.core.db.core :as db]
-    [honeysql.helpers :as hh]
     [clj-postgresql.core :as pg]))
 
 
@@ -27,10 +28,12 @@
    [(hs/raw "now()::time + interval '5 hours' between kitchens.start_at and kitchens.end_at")]])
 
 
-(defn fmt-location
+(defn fmt-kitchen
   [kitchen]
-  (let [pg-location (:location kitchen)]
-    (assoc kitchen :location (db/point->clj pg-location))))
+  (-> kitchen
+      (update :start_at u/->time)
+      (update :end_at u/->time)
+      (update :location db/point->clj)))
 
 
 (defn all-kitchens!
@@ -38,7 +41,7 @@
   (->> kitchen-query
        (hs/format)
        (jdbc/query db/db)
-       (map fmt-location)))
+       (map fmt-kitchen)))
 
 
 (defn kitchen-by-id!
@@ -47,7 +50,7 @@
            (hh/merge-where [:= :kitchens.id kitchen-id])
            (hs/format))
        (jdbc/query db/db)
-       (map fmt-location)
+       (map fmt-kitchen)
        (first)))
 
 
@@ -72,7 +75,7 @@
   (->> (nearest-kitchen-query lon lat)
        (hs/format)
        (jdbc/query db/db)
-       (map fmt-location)
+       (map fmt-kitchen)
        (first)))
 
 
@@ -82,5 +85,23 @@
          db/db
          "kitchens"
          {:name name :location (pg/point lon lat)})
-       (map fmt-location)
+       (map fmt-kitchen)
        (first)))
+
+
+(defn prepare-for-update
+  [kitchen]
+  (let [location (:location kitchen)
+        lon (:longitude location)
+        lat (:latitude location)]
+    (assoc kitchen :location (pg/point lon lat))))
+
+
+(defn update!
+  [kitchen-id kitchen]
+  (let [kitchen (prepare-for-update kitchen)]
+    (jdbc/update!
+      db/db
+      "kitchens"
+      kitchen
+      ["kitchen.id = ?" kitchen-id])))

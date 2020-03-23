@@ -61,9 +61,30 @@
        :status 400})))
 
 
+(s/def ::patch-kitchen
+  (s/keys :opt-un [::name ::location
+                   ::start_at ::end_at
+                   ::payload]))
+
+
+(defn patch-kitchen
+  [request]
+  (let [kitchen-id (u/str->int (:id (:params request)))
+        kitchen (k/kitchen-by-id! kitchen-id)
+        body (:body request)
+        valid? (s/valid? ::patch-kitchen body)]
+    (if (and kitchen valid?)
+      (do
+        (k/update! kitchen-id body)
+        {:body (k/kitchen-by-id! kitchen-id)})
+      {:body   {:error "Invalid input or kitchen_id"}
+       :status 400})))
+
+
 (c/defroutes
   routes
   (c/GET "/" [] kitchens-list)
   (c/POST "/" [] create-kitchen)
-  (c/GET "/:id{[0-9]+}/" [] kitchen-detail))
+  (c/GET "/:id{[0-9]+}/" [] kitchen-detail)
+  (c/PATCH "/:id{[0-9]+}/" [] patch-kitchen))
 

@@ -1,6 +1,7 @@
 (ns yamfood.utils
   (:require [clojure.edn :as edn])
-  (:import (java.util UUID)))
+  (:import (java.util UUID)
+           (java.text SimpleDateFormat)))
 
 
 (defn uuid [] (str (UUID/randomUUID)))
@@ -16,3 +17,8 @@
   (some #(= elm %) coll))
 
 
+(defn ->time
+  [inst]
+  (.format
+    (SimpleDateFormat. "hh:mm")
+    inst))
