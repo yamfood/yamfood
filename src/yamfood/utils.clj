@@ -1,5 +1,7 @@
 (ns yamfood.utils
-  (:require [clojure.edn :as edn])
+  (:require [clojure.edn :as edn]
+            [clj-time.format :as timef]
+            [clj-time.coerce :as timec])
   (:import (java.util UUID)
            (java.text SimpleDateFormat)))
 
@@ -22,3 +24,10 @@
   (.format
     (SimpleDateFormat. "hh:mm")
     inst))
+
+
+(defn time->sql
+  [time]
+  (->> time
+       (timef/parse)
+       (timec/to-sql-time)))

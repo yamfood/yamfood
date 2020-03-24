@@ -5,6 +5,8 @@
     [honeysql.helpers :as hh]
     [clojure.java.jdbc :as jdbc]
     [yamfood.core.db.core :as db]
+    [clj-time.format :as timef]
+    [clj-time.coerce :as timec]
     [clj-postgresql.core :as pg]))
 
 
@@ -94,7 +96,10 @@
   (let [location (:location kitchen)
         lon (:longitude location)
         lat (:latitude location)]
-    (assoc kitchen :location (pg/point lon lat))))
+    (-> kitchen
+        (assoc :location (pg/point lon lat))
+        (update :start_at u/time->sql)
+        (update :end_at u/time->sql))))
 
 
 (defn update!
@@ -104,4 +109,4 @@
       db/db
       "kitchens"
       kitchen
-      ["kitchen.id = ?" kitchen-id])))
+      ["kitchens.id = ?" kitchen-id])))

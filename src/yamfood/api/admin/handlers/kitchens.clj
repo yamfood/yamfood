@@ -75,8 +75,12 @@
         valid? (s/valid? ::patch-kitchen body)]
     (if (and kitchen valid?)
       (do
-        (k/update! kitchen-id body)
-        {:body (k/kitchen-by-id! kitchen-id)})
+        (try
+          (k/update! kitchen-id body)
+          {:body (k/kitchen-by-id! kitchen-id)}
+          (catch Exception e
+            {:body   {:error "Unexpected error"}
+             :status 500})))
       {:body   {:error "Invalid input or kitchen_id"}
        :status 400})))
 
