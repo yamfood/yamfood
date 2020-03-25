@@ -37,7 +37,10 @@
   (let [kitchen-id (u/str->int (:id (:params request)))
         kitchen (k/kitchen-by-id! kitchen-id)]
     (if kitchen
-      {:body kitchen}
+      {:body (assoc
+               kitchen
+               :disabled_products
+               (k/kitchen-disabled-products! kitchen-id))}
       {:body   {:error "Not found"}
        :status 404})))
 
@@ -89,6 +92,6 @@
   routes
   (c/GET "/" [] kitchens-list)
   (c/POST "/" [] create-kitchen)
+
   (c/GET "/:id{[0-9]+}/" [] kitchen-detail)
   (c/PATCH "/:id{[0-9]+}/" [] patch-kitchen))
-

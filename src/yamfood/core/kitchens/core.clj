@@ -4,10 +4,8 @@
     [honeysql.core :as hs]
     [honeysql.helpers :as hh]
     [clojure.java.jdbc :as jdbc]
-    [yamfood.core.db.core :as db]
-    [clj-time.format :as timef]
-    [clj-time.coerce :as timec]
-    [clj-postgresql.core :as pg]))
+    [clj-postgresql.core :as pg]
+    [yamfood.core.db.core :as db]))
 
 
 (def kitchen-query
@@ -79,6 +77,21 @@
        (jdbc/query db/db)
        (map fmt-kitchen)
        (first)))
+
+
+(def disabled-products-query
+  {:select [:products.id
+            :products.name]
+   :from   [:disabled_products :products]
+   :where  [:= :disabled_products.product_id :products.id]})
+
+
+(defn kitchen-disabled-products!
+  [kitchen-id]
+  (->> (-> disabled-products-query
+           (hh/merge-where [:= :disabled_products.kitchen_id kitchen-id])
+           (hs/format))
+       (jdbc/query db/db)))
 
 
 (defn create!
