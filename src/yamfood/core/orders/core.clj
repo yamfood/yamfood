@@ -94,7 +94,8 @@
                [:riders.phone :rider_phone]
                [(order-total-sum-query :orders.id) :total_sum]
                [(order-current-status-query :orders.id) :status]
-               :orders.comment]
+               :orders.comment
+               :orders.address]
    :from      [:orders]
    :left-join [:riders [:= :orders.rider_id :riders.id]
                :clients [:= :orders.client_id :clients.id]
