@@ -24,6 +24,7 @@
   (s/keys :req-un [::longitude ::latitude]))
 (s/def ::start_at time?)
 (s/def ::end_at time?)
+(s/def ::payload map?)
 
 
 (defn kitchens-list
@@ -36,14 +37,17 @@
   (let [kitchen-id (u/str->int (:id (:params request)))
         kitchen (k/kitchen-by-id! kitchen-id)]
     (if kitchen
-      {:body kitchen}
+      {:body (assoc
+               kitchen
+               :disabled_products
+               (k/kitchen-disabled-products! kitchen-id))}
       {:body   {:error "Not found"}
        :status 404})))
 
 
 (s/def ::create-kitchen
   (s/keys :req-un [::name ::location]
-          :opt-un [::start_at ::end_at]))
+          :opt-un [::start_at ::end_at ::payload]))
 
 
 (defn create-kitchen
@@ -60,9 +64,34 @@
        :status 400})))
 
 
+(s/def ::patch-kitchen
+  (s/keys :opt-un [::name ::location
+                   ::start_at ::end_at
+                   ::payload]))
+
+
+(defn patch-kitchen
+  [request]
+  (let [kitchen-id (u/str->int (:id (:params request)))
+        kitchen (k/kitchen-by-id! kitchen-id)
+        body (:body request)
+        valid? (s/valid? ::patch-kitchen body)]
+    (if (and kitchen valid?)
+      (do
+        (try
+          (k/update! kitchen-id body)
+          {:body (k/kitchen-by-id! kitchen-id)}
+          (catch Exception e
+            {:body   {:error "Unexpected error"}
+             :status 500})))
+      {:body   {:error "Invalid input or kitchen_id"}
+       :status 400})))
+
+
 (c/defroutes
   routes
   (c/GET "/" [] kitchens-list)
   (c/POST "/" [] create-kitchen)
-  (c/GET "/:id{[0-9]+}/" [] kitchen-detail))
 
+  (c/GET "/:id{[0-9]+}/" [] kitchen-detail)
+  (c/PATCH "/:id{[0-9]+}/" [] patch-kitchen))

@@ -1,17 +1,21 @@
 (ns yamfood.core.kitchens.core
   (:require
+    [yamfood.utils :as u]
     [honeysql.core :as hs]
-    [clojure.java.jdbc :as jdbc]
-    [yamfood.core.db.core :as db]
     [honeysql.helpers :as hh]
-    [clj-postgresql.core :as pg]))
+    [clojure.java.jdbc :as jdbc]
+    [clj-postgresql.core :as pg]
+    [yamfood.core.db.core :as db]))
 
 
 (def kitchen-query
   {:select   [:kitchens.id
               :kitchens.name
               :kitchens.location
-              :kitchens.payload]
+              :kitchens.start_at
+              :kitchens.end_at
+              :kitchens.payload
+              :kitchens.is_disabled]
    :from     [:kitchens]
    :order-by [:kitchens.id]})
 
@@ -24,10 +28,12 @@
    [(hs/raw "now()::time + interval '5 hours' between kitchens.start_at and kitchens.end_at")]])
 
 
-(defn fmt-location
+(defn fmt-kitchen
   [kitchen]
-  (let [pg-location (:location kitchen)]
-    (assoc kitchen :location (db/point->clj pg-location))))
+  (-> kitchen
+      (update :start_at u/->time)
+      (update :end_at u/->time)
+      (update :location db/point->clj)))
 
 
 (defn all-kitchens!
@@ -35,7 +41,7 @@
   (->> kitchen-query
        (hs/format)
        (jdbc/query db/db)
-       (map fmt-location)))
+       (map fmt-kitchen)))
 
 
 (defn kitchen-by-id!
@@ -44,7 +50,7 @@
            (hh/merge-where [:= :kitchens.id kitchen-id])
            (hs/format))
        (jdbc/query db/db)
-       (map fmt-location)
+       (map fmt-kitchen)
        (first)))
 
 
@@ -69,8 +75,23 @@
   (->> (nearest-kitchen-query lon lat)
        (hs/format)
        (jdbc/query db/db)
-       (map fmt-location)
+       (map fmt-kitchen)
        (first)))
+
+
+(def disabled-products-query
+  {:select [:products.id
+            :products.name]
+   :from   [:disabled_products :products]
+   :where  [:= :disabled_products.product_id :products.id]})
+
+
+(defn kitchen-disabled-products!
+  [kitchen-id]
+  (->> (-> disabled-products-query
+           (hh/merge-where [:= :disabled_products.kitchen_id kitchen-id])
+           (hs/format))
+       (jdbc/query db/db)))
 
 
 (defn create!
@@ -79,5 +100,26 @@
          db/db
          "kitchens"
          {:name name :location (pg/point lon lat)})
-       (map fmt-location)
+       (map fmt-kitchen)
        (first)))
+
+
+(defn prepare-for-update
+  [kitchen]
+  (let [location (:location kitchen)
+        lon (:longitude location)
+        lat (:latitude location)]
+    (-> kitchen
+        (assoc :location (pg/point lon lat))
+        (update :start_at u/time->sql)
+        (update :end_at u/time->sql))))
+
+
+(defn update!
+  [kitchen-id kitchen]
+  (let [kitchen (prepare-for-update kitchen)]
+    (jdbc/update!
+      db/db
+      "kitchens"
+      kitchen
+      ["kitchens.id = ?" kitchen-id])))
