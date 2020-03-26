@@ -20,7 +20,7 @@
    :where     [:= :is_active true]
    :left-join [:categories
                [:= :categories.id :products.category_id]]
-   :order-by  [:id]})
+   :order-by  [:products.category_id :products.id]})
 
 
 (defn disabled-products-query
