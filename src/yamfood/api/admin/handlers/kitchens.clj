@@ -59,7 +59,11 @@
     (if valid?
       {:body (k/create! name
                         (:longitude location)
-                        (:latitude location))}
+                        (:latitude location)
+                        (:payload body)
+                        (:start_at body)
+                        (:end_at body))}
+
       {:body   {:error "Incorrect input"}
        :status 400})))
 

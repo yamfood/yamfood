@@ -95,11 +95,12 @@
 
 
 (defn create!
-  [name lon lat]
+  [name lon lat payload start_at end_at]
   (->> (jdbc/insert!
          db/db
          "kitchens"
-         {:name name :location (pg/point lon lat)})
+         {:name     name :location (pg/point lon lat) :payload payload
+          :start_at (u/time->sql start_at) :end_at (u/time->sql end_at)})
        (map fmt-kitchen)
        (first)))
 
