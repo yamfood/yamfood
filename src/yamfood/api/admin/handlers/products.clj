@@ -11,6 +11,7 @@
 (s/def ::name string?)
 (s/def ::energy int?)
 (s/def ::price int?)
+(s/def ::position int?)
 (s/def ::category_id (s/nilable int?))
 
 
@@ -26,7 +27,7 @@
 
 (s/def ::create-product
   (s/keys :req-un [::photo ::thumbnail ::name ::price]
-          :opt-un [::energy ::category_id]))
+          :opt-un [::energy ::category_id ::position]))
 
 
 (defn validate-create-product!
@@ -67,7 +68,8 @@
      ::name
      ::price
      ::energy
-     ::category_id]))
+     ::category_id
+     ::position]))
 
 
 (defn validate-patch-product!
