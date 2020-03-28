@@ -13,13 +13,16 @@
     (str "*---------- Заказ №%s ----------*\n\n"
          u/client-emoji " %s\n"
          u/phone-emoji " +%s\n"
-         u/money-emoji " %s сум\n\n"
+         u/money-emoji " %s\n\n"
          u/comment-emoji " %s\n")
     (:id order)
     (:name order)
     (:phone order)
-    (u/fmt-values (:total_cost order))
-    (:comment order)))
+    (if (= (:payment order)
+           (:value u/cash-payment))
+      (str (u/fmt-values (:total_cost order)) " сум")
+      "Оплачено картой")
+    (or (:comment order) "Пусто...")))
 
 
 (defn- order-detail-markup
@@ -116,16 +119,13 @@
          chat-id (u/chat-id update)
          message-id (:message_id (:message query))
          rider (:rider ctx)]
-     {:run             {:function r/finish-order!
-                        :args     [(:id order) (:id rider)]}
-      :answer-callback {:callback_query_id (:id query)
-                        :text              "Заказ успешно завершен!"
-                        :show_alert        true}
-      :dispatch        {:args        [:r/menu]
-                        :rebuild-ctx {:function c/build-ctx!
-                                      :update   update}}
-      :delete-message  {:chat-id    chat-id
-                        :message-id message-id}})))
+     {:run            {:function r/finish-order!
+                       :args     [(:id order) (:id rider)]}
+      :dispatch       {:args        [:r/menu]
+                       :rebuild-ctx {:function c/build-ctx!
+                                     :update   update}}
+      :delete-message {:chat-id    chat-id
+                       :message-id message-id}})))
 
 
 (defn cancel-order!
@@ -143,16 +143,13 @@
          chat-id (u/chat-id update)
          message-id (:message_id (:message query))
          rider (:rider ctx)]
-     {:run             {:function r/cancel-order!
-                        :args     [(:id order) (:id rider)]}
-      :answer-callback {:callback_query_id (:id query)
-                        :text              "Заказ отменен!"
-                        :show_alert        true}
-      :dispatch        {:args        [:r/menu]
-                        :rebuild-ctx {:function c/build-ctx!
-                                      :update   update}}
-      :delete-message  {:chat-id    chat-id
-                        :message-id message-id}})))
+     {:run            {:function r/cancel-order!
+                       :args     [(:id order) (:id rider)]}
+      :dispatch       {:args        [:r/menu]
+                       :rebuild-ctx {:function c/build-ctx!
+                                     :update   update}}
+      :delete-message {:chat-id    chat-id
+                       :message-id message-id}})))
 
 
 (d/register-event-handler!
