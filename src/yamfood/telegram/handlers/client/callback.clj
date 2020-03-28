@@ -24,6 +24,7 @@
       "change-comment" {:dispatch {:args [:c/change-comment]}}
       "create-order" {:dispatch {:args [:c/create-order]}}
       "cancel-invoice" {:dispatch {:args [:c/cancel-invoice]}}
+      "feedback" {:dispatch {:args [:c/feedback]}}
       {:answer-callback {:callback_query_id (:id query)
                          :text              " "}})))
 

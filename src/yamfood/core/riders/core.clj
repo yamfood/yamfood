@@ -4,7 +4,8 @@
     [honeysql.helpers :as hh]
     [clojure.java.jdbc :as jdbc]
     [yamfood.core.db.core :as db]
-    [yamfood.core.orders.core :as o])
+    [yamfood.core.orders.core :as o]
+    [yamfood.telegram.helpers.feedback :as feedback])
   (:import
     (java.time LocalDateTime)))
 
@@ -217,7 +218,8 @@
     (jdbc/insert! t-con "order_logs"
                   {:order_id order-id
                    :status   (:finished o/order-statuses)
-                   :payload  (db/map->jsonb {:rider_id rider-id})})))
+                   :payload  (db/map->jsonb {:rider_id rider-id})}))
+  (feedback/send-feedback-request! order-id))
 
 
 (defn cancel-order!

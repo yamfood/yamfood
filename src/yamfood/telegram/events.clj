@@ -11,6 +11,7 @@
     [yamfood.telegram.handlers.client.blocked]
     [yamfood.telegram.handlers.client.callback]
     [yamfood.telegram.handlers.client.location]
+    [yamfood.telegram.handlers.client.feedback]
     [yamfood.telegram.handlers.client.payments]
 
     [yamfood.telegram.handlers.rider.menu]

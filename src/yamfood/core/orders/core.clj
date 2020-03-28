@@ -88,6 +88,7 @@
                [:kitchens.name :kitchen]
                [(hs/raw "orders.created_at + interval '5 hours'")
                 :created_at]
+               :clients.tid
                :clients.name
                :clients.phone
                [:riders.name :rider_name]
