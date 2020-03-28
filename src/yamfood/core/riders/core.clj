@@ -5,6 +5,7 @@
     [clojure.java.jdbc :as jdbc]
     [yamfood.core.db.core :as db]
     [yamfood.core.orders.core :as o]
+    [yamfood.telegram.handlers.utils :as u]
     [yamfood.telegram.helpers.feedback :as feedback])
   (:import
     (java.time LocalDateTime)))
@@ -42,8 +43,9 @@
 (defn finished-orders-query
   [rider-id]
   {:select [:order_logs.order_id]
-   :from   [:order_logs]
+   :from   [:order_logs :orders]
    :where  [:and
+            [:= :order_logs.order_id :orders.id]
             [:= :order_logs.status (:finished o/order-statuses)]
             [:= (hs/raw "(order_logs.payload->>'rider_id')::numeric") rider-id]]})
 
@@ -53,7 +55,8 @@
   (or (->> {:select [(hs/raw "coalesce(sum(order_products.count * products.price), 0) as total_cost")]
             :from   [:order_products :products]
             :where  [:and
-                     [:in :order_products.order_id (finished-orders-query rider-id)]
+                     [:in :order_products.order_id (-> (finished-orders-query rider-id)
+                                                       (hh/merge-where [:= :orders.payment (:value u/cash-payment)]))]
                      [:= :products.id :order_products.product_id]]}
            (hs/format)
            (jdbc/query db/db)
