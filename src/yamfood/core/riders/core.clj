@@ -6,6 +6,7 @@
     [yamfood.core.db.core :as db]
     [yamfood.core.orders.core :as o]
     [yamfood.telegram.handlers.utils :as u]
+    [yamfood.telegram.helpers.status :as status]
     [yamfood.telegram.helpers.feedback :as feedback])
   (:import
     (java.time LocalDateTime)))
@@ -211,7 +212,8 @@
                   {:order_id order-id
                    :status   (:on-way o/order-statuses)
                    :payload  (db/map->jsonb {:rider_id rider-id})})
-    (jdbc/update! t-con "orders" {:rider_id rider-id} ["id = ?" order-id])))
+    (jdbc/update! t-con "orders" {:rider_id rider-id} ["id = ?" order-id])
+    (status/notify-order-on-way! order-id)))
 
 
 (defn finish-order!

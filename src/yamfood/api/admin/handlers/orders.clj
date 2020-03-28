@@ -4,7 +4,8 @@
     [compojure.core :as c]
     [yamfood.core.orders.core :as o]
     [yamfood.core.orders.core :as ord]
-    [yamfood.api.pagination :as p]))
+    [yamfood.api.pagination :as p]
+    [yamfood.telegram.helpers.status :as status]))
 
 
 (defn reduce-active-orders
@@ -44,7 +45,8 @@
         acceptable? (= (:new o/order-statuses) (:status order))]
     (if acceptable?
       (do
-        (if (o/accept-order! (:id order) admin-id)
+        (if (do (o/accept-order! (:id order) admin-id)
+                (status/notify-order-accepted! (:id order)))
           {:body (get-active-orders!)}
           {:body   {:error "Unexpected error"}
            :status 500}))
@@ -60,7 +62,8 @@
                            (:status order))]
     (if cancelable?
       (do
-        (if (o/cancel-order! (:id order))
+        (if (do (o/cancel-order! (:id order))
+                (status/notify-order-canceled! (:id order)))
           {:body (get-active-orders!)}
           {:body   {:error "Unexpected error"}
            :status 500}))
