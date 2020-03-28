@@ -20,8 +20,7 @@
           (u/fmt-values (:deposit state))))
 
 
-(defn rider-menu-markup
-  [rider]
+(def rider-menu-markup
   {:inline_keyboard
    [[{:text (str u/refresh-emoji " Обновить") :callback_data "refresh-menu"}]]})
 
@@ -36,13 +35,12 @@
        {:dispatch {:args [:r/registration]}})))
   ([ctx menu-state]
    (let [update (:update ctx)
-         rider (:rider ctx)
          chat-id (u/chat-id update)
          utype (u/update-type update)]
      (merge
        {:send-text {:chat-id chat-id
                     :text    (rider-menu-text menu-state)
-                    :options {:reply_markup (rider-menu-markup rider)
+                    :options {:reply_markup rider-menu-markup
                               :parse_mode   "markdown"}}}
        (if (= utype :callback_query)
          {:delete-message
@@ -50,6 +48,22 @@
            :message-id (:message_id (:message (:callback_query update)))}}
          {})))))
 
+
+(defn refresh-menu-handler
+  ([ctx]
+   {:run {:function   r/menu-state!
+          :args       [(:id (:rider ctx))]
+          :next-event :r/refresh-menu}})
+  ([ctx state]
+   (let [update (:update ctx)
+         chat-id (u/chat-id update)
+         query (:callback_query update)
+         message-id (:message_id (:message query))]
+     {:edit-message {:chat-id    chat-id
+                     :message-id message-id
+                     :text       (rider-menu-text state)
+                     :options    {:parse_mode   "markdown"
+                                  :reply_markup rider-menu-markup}}})))
 
 
 (def registration-markup
@@ -87,6 +101,11 @@
 (d/register-event-handler!
   :r/menu
   rider-menu-handler)
+
+
+(d/register-event-handler!
+  :r/refresh-menu
+  refresh-menu-handler)
 
 
 (d/register-event-handler!
