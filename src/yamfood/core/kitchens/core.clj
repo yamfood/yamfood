@@ -94,6 +94,14 @@
        (jdbc/query db/db)))
 
 
+(defn add-disabled-product!
+  [kitchen-id product-id]
+  (jdbc/insert!
+    db/db
+    "disabled_products"
+    {:kitchen_id kitchen-id :product_id product-id}))
+
+
 (defn create!
   [name lon lat payload start_at end_at]
   (->> (jdbc/insert!
