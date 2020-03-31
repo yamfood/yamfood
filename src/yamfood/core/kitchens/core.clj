@@ -102,6 +102,14 @@
     {:kitchen_id kitchen-id :product_id product-id}))
 
 
+(defn delete-disabled-product!
+  [kitchen-id product-id]
+  (jdbc/delete!
+    db/db
+    "disabled_products"
+    ["kitchen_id = ? and product_id = ?" kitchen-id product-id]))
+
+
 (defn create!
   [name lon lat payload start_at end_at]
   (->> (jdbc/insert!

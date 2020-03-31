@@ -113,6 +113,20 @@
        :status 400})))
 
 
+(defn delete-disabled-product
+  [request]
+  (let [kitchen-id (u/str->int (:id (:params request)))
+        product-id (u/str->int (:product-id (:params request)))
+        kitchen (k/kitchen-by-id! kitchen-id)
+        product (p/product-by-id! product-id)]
+    (if (and kitchen product)
+      (do
+        (k/delete-disabled-product! kitchen-id product-id)
+        {:body (kitchen-details! kitchen-id)})
+      {:body   {:error "Kitchen or Product does not exist"}
+       :status 400})))
+
+
 (c/defroutes
   routes
   (c/GET "/" [] kitchens-list)
@@ -122,4 +136,4 @@
   (c/PATCH "/:id{[0-9]+}/" [] patch-kitchen)
 
   (c/POST "/:id{[0-9]+}/disabled/:product-id{[0-9]+}/" [] add-disabled-product)
-  (c/DELETE "/:id{[0-9]+}/disabled/:product-id{[0-9]+}/" [] kitchen-detail))
+  (c/DELETE "/:id{[0-9]+}/disabled/:product-id{[0-9]+}/" [] delete-disabled-product))
