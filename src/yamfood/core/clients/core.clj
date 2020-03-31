@@ -90,6 +90,7 @@
               :clients.tid
               :clients.name
               :clients.phone
+              :clients.payload
               :clients.is_blocked]
    :from     [:clients]
    :order-by [:clients.id]
@@ -123,7 +124,8 @@
    (->> (-> (clients-list-query offset limit)
             (hh/merge-where where))
         (hs/format)
-        (jdbc/query db/db))))
+        (jdbc/query db/db)
+        (map fmt-payload))))
 
 
 (defn insert-client!
@@ -154,6 +156,11 @@
 (defn update!
   [client-id row]
   (jdbc/update! db/db "clients" row ["id = ?" client-id]))
+
+
+(defn update-by-tid!
+  [tid row]
+  (jdbc/update! db/db "clients" row ["tid = ?" tid]))
 
 
 (defn update-location!
