@@ -127,6 +127,11 @@
        :status 400})))
 
 
+(defn kitchen-products
+  [_]
+  {:body (p/all-products!)})
+
+
 (c/defroutes
   routes
   (c/GET "/" [] kitchens-list)
@@ -134,6 +139,8 @@
 
   (c/GET "/:id{[0-9]+}/" [] kitchen-detail)
   (c/PATCH "/:id{[0-9]+}/" [] patch-kitchen)
+
+  (c/GET "/:id{[0-9]+}/products/" [] kitchen-products)
 
   (c/POST "/:id{[0-9]+}/disabled/:product-id{[0-9]+}/" [] add-disabled-product)
   (c/DELETE "/:id{[0-9]+}/disabled/:product-id{[0-9]+}/" [] delete-disabled-product))
