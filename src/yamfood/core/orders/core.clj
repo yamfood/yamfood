@@ -2,6 +2,7 @@
   (:require
     [honeysql.core :as hs]
     [honeysql.helpers :as hh]
+    [yamfood.core.utils :as cu]
     [clojure.java.jdbc :as jdbc]
     [yamfood.core.db.core :as db]
     [yamfood.core.clients.core :as clients]
@@ -85,7 +86,9 @@
 (def order-detail-query
   {:select    [:orders.id
                :orders.location
+               :orders.payment
                [:kitchens.name :kitchen]
+               [:kitchens.payload :kitchen_payload]
                [(hs/raw "orders.created_at + interval '5 hours'")
                 :created_at]
                :clients.tid
@@ -108,6 +111,7 @@
   {:select [:products.id
             :products.name
             :products.price
+            :products.payload
             :order_products.count]
    :from   [:order_products :products]
    :where  [:= :order_products.product_id :products.id]})
@@ -123,7 +127,8 @@
 (defn products-by-order-id!
   [order-id]
   (->> (products-by-order-id-query order-id)
-       (jdbc/query db/db)))
+       (jdbc/query db/db)
+       (map cu/keywordize-field)))
 
 
 (defn add-products!
@@ -224,6 +229,7 @@
          order (->> (order-by-id-query order-id)
                     (jdbc/query db/db)
                     (map fmt-order-location)
+                    (map #(cu/keywordize-field % :kitchen_payload))
                     (first))
          products? (:products? options)
          totals? (:totals? options)]
