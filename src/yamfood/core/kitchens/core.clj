@@ -81,6 +81,7 @@
 
 (def disabled-products-query
   {:select [:products.id
+            :products.thumbnail
             :products.name]
    :from   [:disabled_products :products]
    :where  [:= :disabled_products.product_id :products.id]})
