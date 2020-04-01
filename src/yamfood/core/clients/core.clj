@@ -2,6 +2,7 @@
   (:require
     [honeysql.core :as hs]
     [honeysql.helpers :as hh]
+    [yamfood.core.utils :as cu]
     [clojure.java.jdbc :as jdbc]
     [yamfood.core.db.core :as db]))
 
@@ -30,20 +31,6 @@
    :where  [:= :baskets.client_id :clients.id]})
 
 
-(defn keywordize
-  [data]
-  (into
-    {}
-    (for [[k v] data]
-      [(keyword k) (if (map? v) (keywordize v) v)])))
-
-
-(defn fmt-payload
-  [client]
-  (let [payload (:payload client)]
-    (assoc client :payload (keywordize payload))))
-
-
 (defn client-with-tid-query
   [tid]
   (hs/format (hh/merge-where client-query [:= :clients.tid tid])))
@@ -64,7 +51,7 @@
   [basket-id]
   (->> (client-with-basket-id-query basket-id)
        (jdbc/query db/db)
-       (map fmt-payload)
+       (map cu/keywordize-field)
        (first)))
 
 
@@ -72,7 +59,7 @@
   [tid]                                                     ; TODO: CACHE!
   (->> (client-with-tid-query tid)
        (jdbc/query db/db)
-       (map fmt-payload)
+       (map cu/keywordize-field)
        (first)))
 
 
@@ -80,7 +67,7 @@
   [id]
   (->> (client-with-id-query id)
        (jdbc/query db/db)
-       (map fmt-payload)
+       (map cu/keywordize-field)
        (first)))
 
 
@@ -125,7 +112,7 @@
             (hh/merge-where where))
         (hs/format)
         (jdbc/query db/db)
-        (map fmt-payload))))
+        (map cu/keywordize-field))))
 
 
 (defn insert-client!
