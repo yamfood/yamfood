@@ -6,6 +6,7 @@
     [environ.core :refer [env]]
     [compojure.route :as route]
     [yamfood.core.db.init :as db]
+    [yamfood.tasks.core :as tasks]
     [yamfood.telegram.core :as telegram]
     [ring.adapter.jetty :refer [run-jetty]]
     [ring.middleware.json :refer [wrap-json-body]]))
@@ -29,6 +30,7 @@
 
 (defn -main []
   (db/init)
+  (tasks/run-tasks!)
   (let [port (Integer. (or (env :port) 666))]
     (run-jetty #'app {:port port :join? false})))
 
