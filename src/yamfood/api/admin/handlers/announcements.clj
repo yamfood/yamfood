@@ -87,7 +87,15 @@
 
 
 (defn delete-announcement
-  [request])
+  [request]
+  (let [announcement-id (u/str->int (:id (:params request)))
+        announcement (a/announcement-by-id! announcement-id)]
+    (if announcement
+      (do
+        (a/delete! announcement)
+        {:status 204})
+      {:body   {:error "Announcement not found"}
+       :status 404})))
 
 
 (c/defroutes

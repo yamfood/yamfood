@@ -95,3 +95,12 @@
       db/db
       "announcements"
       announcement)))
+
+
+(defn delete!
+  [announcement-id]
+  (jdbc/update!
+    db/db
+    "announcements"
+    {:is_active false}
+    ["id = ?" announcement-id]))
