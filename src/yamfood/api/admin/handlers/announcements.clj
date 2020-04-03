@@ -22,7 +22,13 @@
 
 
 (defn announcement-details
-  [request])
+  [request]
+  (let [announcement-id (u/str->int (:id (:params request)))
+        announcement (a/announcement-by-id! announcement-id)]
+    (if announcement
+      {:body announcement}
+      {:body   {:error "Announcement not found"}
+       :status 404})))
 
 
 (defn create-announcement

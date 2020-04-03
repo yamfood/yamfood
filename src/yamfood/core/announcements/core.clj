@@ -54,6 +54,15 @@
        (jdbc/query db/db)))
 
 
+(defn announcement-by-id!
+  [id]
+  (->> (-> announcement-query
+           (hh/merge-where [:= :announcements.id id])
+           (hs/format))
+       (jdbc/query db/db)
+       (first)))
+
+
 (defn update!
   [announcement-id row]
   (jdbc/update!
