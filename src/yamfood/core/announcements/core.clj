@@ -33,6 +33,17 @@
         (jdbc/query db/db))))
 
 
+(defn all-announcements-count!
+  []
+  (->> (-> announcement-query
+           (assoc :select [:%count.announcements.id])
+           (dissoc :order-by)
+           (hs/format))
+       (jdbc/query db/db)
+       (first)
+       (:count)))
+
+
 (defn announcements-to-send!
   []
   (->> (-> announcement-query
@@ -50,3 +61,15 @@
     "announcements"
     row
     ["id = ?" announcement-id]))
+
+
+(defn create!
+  [announcement]
+  (let [announcement
+        (if (contains? announcement :status)
+          announcement
+          (assoc announcement :status (:scheduled announcement-statuses)))]
+    (jdbc/insert!
+      db/db
+      "announcements"
+      announcement)))
