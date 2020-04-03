@@ -16,7 +16,8 @@
 (defn in?
   "true if coll contains elm"
   [coll elm]
-  (some #(= elm %) coll))
+  (or (some #(= elm %) coll)
+      false))
 
 
 (defn ->time
@@ -31,3 +32,10 @@
   (->> time
        (timef/parse)
        (timec/to-sql-time)))
+
+
+(defn timestamp->sql
+  [timestamp]
+  (->> timestamp
+       (timef/parse (timef/formatter "yyyy-MM-dd HH:mm"))
+       (timec/to-sql-date)))

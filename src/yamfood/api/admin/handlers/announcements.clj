@@ -2,8 +2,22 @@
   (:require
     [yamfood.utils :as u]
     [compojure.core :as c]
+    [clojure.spec.alpha :as s]
     [yamfood.api.pagination :as p]
     [yamfood.core.announcements.core :as a]))
+
+
+(defn timestamp?
+  [str]
+  (and (string? str)
+       (not (nil? (re-matches
+                    #"^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[01][0-9]):[0-5][0-9]$"
+                    str)))))
+
+
+(s/def ::text string?)
+(s/def ::image_url string?)
+(s/def ::send_at timestamp?)
 
 
 (defn announcements-list
@@ -31,8 +45,23 @@
        :status 404})))
 
 
+(s/def ::create-announcement
+  (s/keys :req-un [::text ::image_url]
+          :opt-un [::send_at]))
+
+
 (defn create-announcement
-  [request])
+  [request]
+  (let [body (:body request)
+        valid? (s/valid? ::create-announcement body)]
+    (if valid?
+      (try
+        {:body (a/create! body)}
+        (catch Exception e
+          {:body   {:error "Unexpected error"}
+           :status 500}))
+      {:body   {:error "Invalid input"}
+       :status 400})))
 
 
 (defn patch-announcement

@@ -3,7 +3,8 @@
     [honeysql.core :as hs]
     [honeysql.helpers :as hh]
     [clojure.java.jdbc :as jdbc]
-    [yamfood.core.db.core :as db]))
+    [yamfood.core.db.core :as db]
+    [yamfood.utils :as u]))
 
 
 (def announcement-statuses
@@ -72,12 +73,17 @@
     ["id = ?" announcement-id]))
 
 
+(defn prepare-announcement
+  [announcement]
+  (-> (if (contains? announcement :status)
+        announcement
+        (assoc announcement :status (:scheduled announcement-statuses)))
+      (update :send_at u/timestamp->sql)))
+
+
 (defn create!
   [announcement]
-  (let [announcement
-        (if (contains? announcement :status)
-          announcement
-          (assoc announcement :status (:scheduled announcement-statuses)))]
+  (let [announcement (prepare-announcement announcement)]
     (jdbc/insert!
       db/db
       "announcements"
