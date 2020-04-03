@@ -64,8 +64,26 @@
        :status 400})))
 
 
+(s/def ::patch-announcement
+  (s/keys :opt-un [::text ::image_url ::send_at]))
+
+
 (defn patch-announcement
-  [request])
+  [request]
+  (let [body (:body request)
+        announcement-id (u/str->int (:id (:params request)))
+        announcement (a/announcement-by-id! announcement-id)
+        valid? (s/valid? ::create-announcement body)]
+    (if (and valid? announcement)
+      (try
+        (do
+          (a/update! announcement-id body)
+          {:body (a/announcement-by-id! announcement-id)})
+        (catch Exception e
+          {:body   {:error "Unexpected error"}
+           :status 500}))
+      {:body   {:error "Invalid input"}
+       :status 400})))
 
 
 (defn delete-announcement

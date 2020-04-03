@@ -1,10 +1,10 @@
 (ns yamfood.core.announcements.core
   (:require
+    [yamfood.utils :as u]
     [honeysql.core :as hs]
     [honeysql.helpers :as hh]
     [clojure.java.jdbc :as jdbc]
-    [yamfood.core.db.core :as db]
-    [yamfood.utils :as u]))
+    [yamfood.core.db.core :as db]))
 
 
 (def announcement-statuses
@@ -64,16 +64,23 @@
        (first)))
 
 
+(defn prepare-announcement-for-update
+  [announcement]
+  (-> announcement
+      (update :send_at u/timestamp->sql)))
+
+
 (defn update!
   [announcement-id row]
-  (jdbc/update!
-    db/db
-    "announcements"
-    row
-    ["id = ?" announcement-id]))
+  (let [row (prepare-announcement-for-update row)]
+    (jdbc/update!
+      db/db
+      "announcements"
+      row
+      ["id = ?" announcement-id])))
 
 
-(defn prepare-announcement
+(defn prepare-announcement-for-create
   [announcement]
   (-> (if (contains? announcement :status)
         announcement
@@ -83,7 +90,7 @@
 
 (defn create!
   [announcement]
-  (let [announcement (prepare-announcement announcement)]
+  (let [announcement (prepare-announcement-for-create announcement)]
     (jdbc/insert!
       db/db
       "announcements"
