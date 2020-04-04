@@ -9,13 +9,9 @@
 
 (defn time?
   [str]
-  (and
-    (string? str)
-    (not
-      (nil?
-        (re-matches
-          #"^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$"
-          str)))))
+  (and (string? str)
+       (not (nil? (re-matches #"^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$"
+                              str)))))
 
 
 (s/def ::name string?)
