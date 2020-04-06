@@ -37,5 +37,7 @@
 (defn timestamp->sql
   [timestamp]
   (->> timestamp
-       (timef/parse (timef/formatter "yyyy-MM-dd HH:mm"))
+       (#(if (string? %)
+           (timef/parse (timef/formatter "yyyy-MM-dd HH:mm") %)
+           %))
        (timec/to-sql-date)))

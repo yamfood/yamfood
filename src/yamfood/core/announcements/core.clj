@@ -66,8 +66,10 @@
 
 (defn prepare-announcement-for-update
   [announcement]
-  (-> announcement
-      (update :send_at u/timestamp->sql)))
+  (if (contains? announcement :send_at)
+    (-> announcement
+        (update :send_at u/timestamp->sql))
+    announcement))
 
 
 (defn update!
