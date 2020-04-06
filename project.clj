@@ -9,10 +9,10 @@
                  [ring/ring-json "0.5.0"]
                  [ring-cors "0.1.13"]
                  [compojure "1.6.1"]
+
                  [overtone/at-at "1.2.0"]
-
+                 [amazonica "0.3.152"]
                  [environ "1.1.0"]
-
                  [clj-http "3.10.0"]
                  [morse "0.4.3"]
 
