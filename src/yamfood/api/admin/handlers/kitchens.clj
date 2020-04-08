@@ -3,15 +3,9 @@
     [yamfood.utils :as u]
     [compojure.core :as c]
     [clojure.spec.alpha :as s]
+    [yamfood.core.specs.core :as cs]
     [yamfood.core.kitchens.core :as k]
     [yamfood.core.products.core :as p]))
-
-
-(defn time?
-  [str]
-  (and (string? str)
-       (not (nil? (re-matches #"^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$"
-                              str)))))
 
 
 (s/def ::name string?)
@@ -19,8 +13,8 @@
 (s/def ::latitude float?)
 (s/def ::location
   (s/keys :req-un [::longitude ::latitude]))
-(s/def ::start_at time?)
-(s/def ::end_at time?)
+(s/def ::start_at cs/timestamp?)
+(s/def ::end_at cs/timestamp?)
 (s/def ::payload map?)
 
 
@@ -60,13 +54,16 @@
         name (:name body)
         location (:location body)]
     (if valid?
-      {:body (k/create! name
-                        (:longitude location)
-                        (:latitude location)
-                        (:payload body)
-                        (:start_at body)
-                        (:end_at body))}
-
+      (try
+        {:body (k/create! name
+                          (:longitude location)
+                          (:latitude location)
+                          (:payload body)
+                          (:start_at body)
+                          (:end_at body))}
+        (catch Exception e
+          {:body   {:error "Unexpected error"}
+           :status 400}))
       {:body   {:error "Incorrect input"}
        :status 400})))
 

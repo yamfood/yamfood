@@ -9,4 +9,4 @@
 
 
 ;(init)
-;(migratus/create m/config "user_phone_nullable")
+(migratus/create m/config "rider_deposits_timestamps")

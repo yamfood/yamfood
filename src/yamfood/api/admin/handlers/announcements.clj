@@ -4,20 +4,13 @@
     [compojure.core :as c]
     [clojure.spec.alpha :as s]
     [yamfood.api.pagination :as p]
+    [yamfood.core.specs.core :as cs]
     [yamfood.core.announcements.core :as a]))
-
-
-(defn timestamp?
-  [str]
-  (and (string? str)
-       (not (nil? (re-matches
-                    #"^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[01][0-9]):[0-5][0-9]$"
-                    str)))))
 
 
 (s/def ::text string?)
 (s/def ::image_url string?)
-(s/def ::send_at timestamp?)
+(s/def ::send_at cs/timestamp?)
 
 
 (defn announcements-list
