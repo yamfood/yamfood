@@ -16,6 +16,12 @@
      :latitude  (.y point)}))
 
 
+(defn clj->point
+  [location]
+  (pg/point (:longitude location)
+            (:latitude location)))
+
+
 (defn map->jsonb
   [map]
   (pgt/map->parameter map :jsonb))

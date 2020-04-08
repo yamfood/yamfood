@@ -89,8 +89,7 @@
                :orders.payment
                [:kitchens.name :kitchen]
                [:kitchens.payload :kitchen_payload]
-               [(hs/raw "orders.created_at + interval '5 hours'")
-                :created_at]
+               :orders.created_at
                :clients.tid
                :clients.name
                :clients.phone

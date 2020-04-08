@@ -27,17 +27,8 @@
     inst))
 
 
-(defn time->sql
-  [time]
-  (->> time
-       (timef/parse)
-       (timec/to-sql-time)))
-
-
-(defn timestamp->sql
-  [timestamp]
-  (->> timestamp
-       (#(if (string? %)
-           (timef/parse (timef/formatter "yyyy-MM-dd HH:mm") %)
-           %))
-       (timec/to-sql-date)))
+(defn update-if-exists
+  [m k f]
+  (if (contains? m k)
+    (assoc m k (f (get m k)))
+    m))
