@@ -139,7 +139,7 @@
   [rider-id]
   (let [today (.toLocalDate (LocalDateTime/now))]
     (->> (-> (finished-orders-count-query rider-id)
-             (hh/merge-where [:> :created_at today]))
+             (hh/merge-where [:> :order_logs.created_at today]))
          (hs/format)
          (jdbc/query db/db)
          (first)
