@@ -5,7 +5,9 @@
     [yamfood.api.pagination :as p]
     [yamfood.core.orders.core :as o]
     [yamfood.core.orders.core :as ord]
-    [yamfood.telegram.helpers.status :as status]))
+    [yamfood.integrations.iiko.core :as iiko]
+    [yamfood.telegram.helpers.status :as status]
+    [clojure.data.json :as json]))
 
 
 (defn reduce-active-orders
@@ -114,3 +116,12 @@
 
   (c/GET "/active/" [] active-orders-list)
   (c/GET "/finished/" [] finished-orders))
+
+
+;(def order (o/order-by-id! 6))
+;(iiko/check-order! (iiko/access-token!)
+;                   (iiko/order->iiko order))
+;(iiko/create-order! order)
+;(json/write-str (iiko/order->iiko order))
+;(iiko/order-info! (iiko/access-token!)
+;                  "ec70bdd7-d33c-4cf1-b865-cb77659d37ca")
