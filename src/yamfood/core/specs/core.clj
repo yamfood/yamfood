@@ -13,4 +13,11 @@
     (= c (count (digits num)))))
 
 
+(defn timestamp?
+  [str]
+  ; TODO: Implement regexp
+  (and (string? str)
+       true))
+
+
 (s/def ::phone (s/and number? (digits-count? 12)))

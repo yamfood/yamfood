@@ -3,6 +3,7 @@
     [yamfood.utils :as u]
     [honeysql.core :as hs]
     [honeysql.helpers :as hh]
+    [clj-time.coerce :as timec]
     [clojure.java.jdbc :as jdbc]
     [yamfood.core.db.core :as db]))
 
@@ -49,7 +50,7 @@
   []
   (->> (-> announcement-query
            (hh/merge-where [:and
-                            [:< :announcements.send_at :%now]
+                            [:< :announcements.send_at :current_timestamp]
                             [:= :announcements.status (:scheduled announcement-statuses)]])
            (hs/format))
        (jdbc/query db/db)))
@@ -66,10 +67,8 @@
 
 (defn prepare-announcement-for-update
   [announcement]
-  (if (contains? announcement :send_at)
-    (-> announcement
-        (update :send_at u/timestamp->sql))
-    announcement))
+  (-> announcement
+      (u/update-if-exists :send_at timec/to-sql-time)))
 
 
 (defn update!
@@ -87,7 +86,7 @@
   (-> (if (contains? announcement :status)
         announcement
         (assoc announcement :status (:scheduled announcement-statuses)))
-      (update :send_at u/timestamp->sql)))
+      (u/update-if-exists :send_at timec/to-sql-time)))
 
 
 (defn create!

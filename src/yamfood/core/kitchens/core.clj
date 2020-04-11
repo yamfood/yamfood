@@ -3,6 +3,7 @@
     [yamfood.utils :as u]
     [honeysql.core :as hs]
     [honeysql.helpers :as hh]
+    [clj-time.coerce :as timec]
     [clojure.java.jdbc :as jdbc]
     [clj-postgresql.core :as pg]
     [yamfood.core.db.core :as db]))
@@ -23,16 +24,14 @@
 (def open-kitchens-where
   [:case
    [:> :kitchens.start_at :kitchens.end_at]
-   [(hs/raw "now()::time + interval '5 hours' not between kitchens.end_at and kitchens.start_at")]
+   [(hs/raw "now()::time not between kitchens.end_at and kitchens.start_at")]
    [:< :kitchens.start_at :kitchens.end_at]
-   [(hs/raw "now()::time + interval '5 hours' between kitchens.start_at and kitchens.end_at")]])
+   [(hs/raw "now()::time between kitchens.start_at and kitchens.end_at")]])
 
 
 (defn fmt-kitchen
   [kitchen]
   (-> kitchen
-      (update :start_at u/->time)
-      (update :end_at u/->time)
       (update :location db/point->clj)))
 
 
@@ -116,21 +115,21 @@
   (->> (jdbc/insert!
          db/db
          "kitchens"
-         {:name     name :location (pg/point lon lat) :payload payload
-          :start_at (u/time->sql start_at) :end_at (u/time->sql end_at)})
+         {:name     name
+          :location (pg/point lon lat)
+          :payload  payload
+          :start_at (timec/to-sql-time start_at)
+          :end_at   (timec/to-sql-time end_at)})
        (map fmt-kitchen)
        (first)))
 
 
 (defn prepare-for-update
   [kitchen]
-  (let [location (:location kitchen)
-        lon (:longitude location)
-        lat (:latitude location)]
-    (-> kitchen
-        (assoc :location (pg/point lon lat))
-        (update :start_at u/time->sql)
-        (update :end_at u/time->sql))))
+  (-> kitchen
+      (u/update-if-exists :location db/clj->point)
+      (u/update-if-exists :start_at timec/to-sql-time)
+      (u/update-if-exists :end_at timec/to-sql-time)))
 
 
 (defn update!
