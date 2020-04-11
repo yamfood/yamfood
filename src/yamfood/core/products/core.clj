@@ -11,6 +11,7 @@
                :products.name
                :products.price
                :products.photo
+               :products.position
                :products.thumbnail
                :products.energy
                :products.category_id
