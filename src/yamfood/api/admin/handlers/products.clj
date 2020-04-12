@@ -44,8 +44,12 @@
   (let [body (:body request)
         valid? (validate-create-product! body)]
     (if valid?
-      (let [product (p/create-product! body)]
-        {:body product})
+      (try
+        {:body (p/create-product! body)}
+        (catch Exception e
+          (println e)
+          {:body   {:error "Unexpected error"}
+           :status 500}))
       {:body   {:error "Invalid input or duplicate name"}
        :status 400})))
 
