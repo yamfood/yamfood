@@ -1,5 +1,6 @@
 (ns yamfood.core
   (:require
+    [aleph.http :as http]
     [compojure.core :as c]
     [yamfood.api.core :as api]
     [yamfood.web.core :as web]
@@ -32,7 +33,7 @@
   (db/init)
   (tasks/run-tasks!)
   (let [port (Integer. (or (env :port) 666))]
-    (run-jetty #'app {:port port :join? false})))
+    (http/start-server #'app {:port port :join? false})))
 
 
 ;(def server (-main))

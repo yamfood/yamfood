@@ -4,6 +4,7 @@
     [compojure.core :as c]
     [clojure.string :as str]
     [yamfood.integrations.s3.core :as s3]
+    [yamfood.api.admin.handlers.ws :as ws]
     [yamfood.api.admin.handlers.auth :as auth]
     [yamfood.api.admin.handlers.data :as data]
     [yamfood.api.admin.handlers.riders :as riders]
@@ -34,6 +35,7 @@
 (c/defroutes
   routes
   (c/context "/auth" [] auth/routes)
+  (c/context "/ws" [] ws/routes)
   (wrap-auth
     (c/routes
       (c/GET "/sign-s3" [] sign-s3)
