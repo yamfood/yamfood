@@ -1,11 +1,18 @@
 (ns yamfood.api.admin.handlers.orders
   (:require
+    [aleph.http :as http]
     [yamfood.utils :as u]
     [compojure.core :as c]
+    [manifold.stream :as s]
+    [clojure.data.json :as json]
     [yamfood.api.pagination :as p]
+    [yamfood.core.admin.core :as a]
     [yamfood.core.orders.core :as o]
     [yamfood.core.orders.core :as ord]
     [yamfood.telegram.helpers.status :as status]))
+
+
+(defonce open-orders (atom {}))
 
 
 (defn reduce-active-orders
@@ -13,6 +20,13 @@
   (let [status (keyword (:status order))
         prev (status result)]
     (assoc result status (into prev [order]))))
+
+
+(defn add-viewer!
+  [order]
+  (let [order-id (:id order)
+        viewer ((keyword (str order-id)) @open-orders)]
+    (assoc order :viewer viewer)))
 
 
 (defn get-active-orders!
@@ -23,7 +37,7 @@
       merge
       (map #(hash-map (keyword %) [])
            ord/active-order-statuses))
-    (ord/active-orders!)))
+    (map add-viewer! (ord/active-orders!))))
 
 
 (defn active-orders-list
@@ -104,6 +118,50 @@
                offset
                per-page
                where))}))
+
+
+(def non-websocket-request
+  {:status  400
+   :headers {"content-type" "application/text"}
+   :body    "Expected a websocket request."})
+
+
+(defn message->clj
+  [message]
+  (json/read-str message :key-fn keyword))
+
+
+(defn consumer!
+  [message]
+  (let [data (message->clj message)
+        order-id (:order data)
+        token (:token data)
+        admin (a/admin-by-token! token)]
+    (swap! open-orders assoc (keyword (str order-id)) (:login admin))))
+
+
+(defn close-fn!
+  [message]
+  (fn []
+    (let [data (message->clj message)
+          order-id (:order data)]
+      (swap! open-orders dissoc (keyword (str order-id))))))
+
+
+(defn ws-handler
+  [req]
+  (if-let [socket (try
+                    @(http/websocket-connection req)
+                    (catch Exception e
+                      nil))]
+    (do
+      (let [message @(s/take! socket)]
+        (consumer! message)
+        (s/on-closed
+          socket
+          (close-fn! message)))
+      nil)
+    non-websocket-request))
 
 
 (c/defroutes
