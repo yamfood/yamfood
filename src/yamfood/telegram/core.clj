@@ -47,6 +47,8 @@
   (c/POST "/rider" [] rider-handler!))
 
 
-(def webhook-url "https://bee9f35d.ngrok.io")
-;(morse.api/set-webhook (env :bot-token) (str webhook-url "/updates/client"))
-;(morse.api/set-webhook (env :rider-bot-token) (str webhook-url "/updates/rider"))
+(comment
+  (let [webhook-url "https://b3184c60.ngrok.io"]
+    (morse.api/set-webhook (env :bot-token) (str webhook-url "/updates/client"))
+    (morse.api/set-webhook (env :rider-bot-token) (str webhook-url "/updates/rider"))))
+

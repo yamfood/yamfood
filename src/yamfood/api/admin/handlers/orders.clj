@@ -9,7 +9,8 @@
     [yamfood.core.admin.core :as a]
     [yamfood.core.orders.core :as o]
     [yamfood.core.orders.core :as ord]
-    [yamfood.telegram.helpers.status :as status]))
+    [yamfood.telegram.helpers.status :as status]
+    [yamfood.core.products.core :as products]))
 
 
 (defonce open-orders (atom {}))
@@ -164,11 +165,27 @@
     non-websocket-request))
 
 
+(defn order-available-products
+  [request]
+  (let [order-id (u/str->int (:id (:params request)))
+        order (o/order-by-id! order-id)]
+    (println order-id)
+    (if order
+      (try
+        {:body (products/all-products! (:kitchen_id order))}
+        (catch Exception e
+          {:body   {:error "Unexpected error"}
+           :status 500}))
+      {:body   {:error "Order not found"}
+       :status 404})))
+
+
 (c/defroutes
   routes
   (c/GET "/:id{[0-9]+}/" [] order-details)
   (c/POST "/:id{[0-9]+}/accept/" [] accept-order)
   (c/POST "/:id{[0-9]+}/cancel/" [] cancel-order)
+  (c/GET "/:id{[0-9]+}/products/" [] order-available-products)
 
   (c/GET "/active/" [] active-orders-list)
   (c/GET "/finished/" [] finished-orders))

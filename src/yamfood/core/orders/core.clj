@@ -87,6 +87,7 @@
   {:select    [:orders.id
                :orders.location
                :orders.payment
+               [:kitchens.id :kitchen_id]
                [:kitchens.name :kitchen]
                [:kitchens.payload :kitchen_payload]
                :orders.created_at
