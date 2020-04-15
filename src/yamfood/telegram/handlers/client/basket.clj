@@ -73,7 +73,7 @@
         total_energy (:total_energy basket-state)]
     {:inline_keyboard
      (conj (basket-detail-products-markup basket-state)
-           [{:text "Еще!" :switch_inline_query_current_chat ""}]
+           [{:text (str u/back-emoji " В меню") :callback_data "menu"}]
            [{:text          (format (str u/money-emoji " %s сум "
                                          u/energy-emoji " %s кКал")
                                     (u/fmt-values total_cost)
