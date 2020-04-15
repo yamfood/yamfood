@@ -38,9 +38,10 @@
   (let []
     {:inline_keyboard
      (conj (apply conj []
-                  [{:text                             "\uD83C\uDF7D Что поесть?"
-                    :switch_inline_query_current_chat ""}]
-                  (categories-in-markup categories))
+                  (if (empty? categories)
+                    [[{:text                             "\uD83C\uDF7D Что поесть?"
+                       :switch_inline_query_current_chat ""}]]
+                    (categories-in-markup categories)))
            [{:text (str u/location-emoji " Зона покрытия")
              :url  u/map-url}]
            [{:text          (str u/settings-emoji " Настройки")
@@ -80,7 +81,7 @@
       {:dispatch {:args [:c/request-phone]}}
 
       {:run      {:function clients/create-client!
-                    :args     [tid name (if utm {:utm utm} {})]}
+                  :args     [tid name (if utm {:utm utm} {})]}
        :dispatch {:args        [:c/request-phone]
                   :rebuild-ctx {:function c/build-ctx!
                                 :update   (:update ctx)}}})))
