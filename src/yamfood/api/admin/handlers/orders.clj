@@ -3,14 +3,16 @@
     [aleph.http :as http]
     [yamfood.utils :as u]
     [compojure.core :as c]
-    [manifold.stream :as s]
+    [clojure.spec.alpha :as s]
+    [manifold.stream :as stream]
     [clojure.data.json :as json]
     [yamfood.api.pagination :as p]
     [yamfood.core.admin.core :as a]
+    [yamfood.core.specs.core :as cs]
     [yamfood.core.orders.core :as o]
     [yamfood.core.orders.core :as ord]
-    [yamfood.telegram.helpers.status :as status]
-    [yamfood.core.products.core :as products]))
+    [yamfood.core.products.core :as products]
+    [yamfood.telegram.helpers.status :as status]))
 
 
 (defonce open-orders (atom {}))
@@ -156,9 +158,9 @@
                     (catch Exception e
                       nil))]
     (do
-      (let [message @(s/take! socket)]
+      (let [message @(stream/take! socket)]
         (consumer! message)
-        (s/on-closed
+        (stream/on-closed
           socket
           (close-fn! message)))
       nil)
@@ -169,7 +171,6 @@
   [request]
   (let [order-id (u/str->int (:id (:params request)))
         order (o/order-by-id! order-id)]
-    (println order-id)
     (if order
       (try
         {:body (products/all-products! (:kitchen_id order))}
@@ -180,12 +181,40 @@
        :status 404})))
 
 
+(s/def ::product_id int?)
+(s/def ::count int?)
+(s/def ::order-products
+  (s/keys :req-un [::product_id ::count]))
+(s/def ::patch-order-products (s/coll-of ::order-products))
+
+
+(defn patch-order-products
+  [request]
+  (let [order-id (u/str->int (:id (:params request)))
+        order (o/order-by-id! order-id)
+        valid? (and
+                 order
+                 (= (:status order) "new")
+                 (s/valid? ::patch-order-products (:body request)))]
+    (if valid?
+      (try
+        (o/update-order-products! order-id (:body request))
+        {:body (o/order-by-id! order-id)}
+        (catch Exception e
+          (println e)
+          {:body   {:error "Unexpected error"}
+           :status 500}))
+      {:body   {:error "Invalid input or order"}
+       :status 400})))
+
+
 (c/defroutes
   routes
   (c/GET "/:id{[0-9]+}/" [] order-details)
   (c/POST "/:id{[0-9]+}/accept/" [] accept-order)
   (c/POST "/:id{[0-9]+}/cancel/" [] cancel-order)
   (c/GET "/:id{[0-9]+}/products/" [] order-available-products)
+  (c/PATCH "/:id{[0-9]+}/products/" [] patch-order-products)
 
   (c/GET "/active/" [] active-orders-list)
   (c/GET "/finished/" [] finished-orders))

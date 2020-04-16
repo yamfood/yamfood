@@ -343,3 +343,20 @@
     (jdbc/insert! t-con "order_logs"
                   {:order_id order-id
                    :status   (:new order-statuses)})))
+
+
+(defn update-order-products!
+  [order-id products]
+  (let [products (map
+                   #(assoc % :order_id order-id)
+                   products)]
+    (jdbc/with-db-transaction
+      [t-con db/db]
+      (jdbc/delete!
+        t-con
+        "order_products"
+        ["order_products.order_id = ?" order-id])
+      (jdbc/insert-multi!
+        t-con
+        "order_products"
+        products))))
