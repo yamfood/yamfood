@@ -3,7 +3,8 @@
     [environ.core :refer [env]]
     [yamfood.core.products.core :as p]
     [yamfood.telegram.dispatcher :as d]
-    [yamfood.telegram.handlers.utils :as u]))
+    [yamfood.telegram.handlers.utils :as u]
+    [yamfood.core.kitchens.core :as k]))
 
 
 (defn product-description
@@ -37,7 +38,9 @@
   ([ctx]
    (let [update (:update ctx)
          query (:inline_query update)
-         kitchen-id (get-in ctx [:client :payload :location :kitchen :id])]
+         location (get-in ctx [:client :payload :location])
+         kitchen-id (:id (k/nearest-kitchen! (:longitude location)
+                                             (:latitude location)))]
      (cond
        (= (:query query) "") {:run {:function   p/all-products!
                                     :args       [kitchen-id]
