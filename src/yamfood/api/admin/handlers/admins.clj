@@ -6,6 +6,7 @@
     [yamfood.core.admin.core :as a]))
 
 
+(s/def ::name string?)
 (s/def ::login string?)
 (s/def ::password string?)
 (s/def ::payload map?)
@@ -28,7 +29,7 @@
 
 
 (s/def ::admin-create
-  (s/keys :req-un [::login ::password]
+  (s/keys :req-un [::name ::login ::password]
           :opt-un [::payload]))
 
 
@@ -51,7 +52,7 @@
 
 
 (s/def ::admin-patch
-  (s/keys :opt-un [::login ::password ::payload]))
+  (s/keys :opt-un [::name ::login ::password ::payload]))
 
 
 (defn validate-patch-admin!

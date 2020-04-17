@@ -10,6 +10,7 @@
 
 (def admin-query
   {:select [:admins.id
+            :admins.name
             :admins.login
             :admins.password
             :admins.token

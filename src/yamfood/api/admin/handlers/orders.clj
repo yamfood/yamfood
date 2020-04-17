@@ -140,7 +140,7 @@
         order-id (:order data)
         token (:token data)
         admin (a/admin-by-token! token)]
-    (swap! open-orders assoc (keyword (str order-id)) (:login admin))))
+    (swap! open-orders assoc (keyword (str order-id)) (:name admin))))
 
 
 (defn close-fn!
