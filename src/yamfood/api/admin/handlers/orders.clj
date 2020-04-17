@@ -71,16 +71,25 @@
        :status 400})))
 
 
+(s/def ::reason string?)
+(s/def ::cancel-order-body
+  (s/keys :opt-un [::reason]))
+
+
 (defn cancel-order
   [request]
   (let [order-id (u/str->int (:id (:params request)))
         order (o/order-by-id! order-id)
         cancelable? (u/in? o/cancelable-order-statuses
-                           (:status order))]
-    (if cancelable?
+                           (:status order))
+        valid? (and
+                 cancelable?
+                 (s/valid? ::cancel-order-body (:body request)))]
+    (if valid?
       (do
         (if (do (o/cancel-order! (:id order))
-                (status/notify-order-canceled! (:id order)))
+                (status/notify-order-canceled! (:id order)
+                                               (:reason (:body request))))
           {:body (get-active-orders!)}
           {:body   {:error "Unexpected error"}
            :status 500}))

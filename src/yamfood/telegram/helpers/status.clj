@@ -19,13 +19,15 @@
 
 
 (defn notify-order-canceled!
-  [order-id]
-  (let [order (o/order-by-id! order-id)]
-    (t/send-text
-      token
-      (:tid order)
-      {:parse_mode "markdown"}
-      "Заказ отменен (")))
+  ([order-id]
+   (notify-order-canceled! order-id "Заказ отменен ("))
+  ([order-id reason]
+   (let [order (o/order-by-id! order-id)]
+     (t/send-text
+       token
+       (:tid order)
+       {:parse_mode "markdown"}
+       reason))))
 
 
 (defn notify-order-on-way!
