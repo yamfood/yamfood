@@ -85,7 +85,7 @@
         announcement (a/announcement-by-id! announcement-id)]
     (if announcement
       (do
-        (a/delete! announcement)
+        (a/delete! announcement-id)
         {:status 204})
       {:body   {:error "Announcement not found"}
        :status 404})))
