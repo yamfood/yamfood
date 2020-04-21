@@ -21,6 +21,7 @@
               :announcements.status
               :announcements.send_at]
    :from     [:announcements]
+   :where    [:= :announcements.is_active true]
    :order-by [[:announcements.send_at :desc]]})
 
 
