@@ -2,13 +2,14 @@
   (:require
     [aleph.http :as http]
     [yamfood.utils :as u]
+    [clj-time.core :as t]
     [compojure.core :as c]
+    [clj-time.coerce :as tc]
     [clojure.spec.alpha :as s]
     [manifold.stream :as stream]
     [clojure.data.json :as json]
     [yamfood.api.pagination :as p]
     [yamfood.core.admin.core :as a]
-    [yamfood.core.specs.core :as cs]
     [yamfood.core.orders.core :as o]
     [yamfood.core.orders.core :as ord]
     [yamfood.core.products.core :as products]
@@ -21,8 +22,18 @@
 (defn reduce-active-orders
   [result order]
   (let [status (keyword (:status order))
-        prev (status result)]
-    (assoc result status (into prev [order]))))
+        prev (get-in result [status :list])]
+    (assoc-in result [status :list] (into prev [order]))))
+
+
+(defn add-latency
+  [order]
+  (let [created-at (tc/from-sql-date (:created_at order))
+        late-at (t/plus created-at (t/minutes 30))
+        latency (if (t/after? (t/now) late-at)
+                  (t/in-minutes (t/interval late-at (t/now)))
+                  nil)]
+    (assoc order :latency latency)))
 
 
 (defn add-viewer!
@@ -32,15 +43,23 @@
     (assoc order :viewer viewer)))
 
 
+(defn empty-structure
+  []
+  (apply
+    merge
+    (map #(hash-map (keyword %) {:late 0
+                                 :list []})
+         ord/active-order-statuses)))
+
+
 (defn get-active-orders!
   []
   (reduce
     reduce-active-orders
-    (apply
-      merge
-      (map #(hash-map (keyword %) [])
-           ord/active-order-statuses))
-    (map add-viewer! (ord/active-orders!))))
+    (empty-structure)
+    (->> (ord/active-orders!)
+         (map add-viewer!)
+         (map add-latency))))
 
 
 (defn active-orders-list
