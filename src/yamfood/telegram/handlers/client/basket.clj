@@ -107,10 +107,11 @@
 (defn update-basket-markup
   [ctx basket-state]
   (let [update (:update ctx)
+        lang (:lang ctx)
         query (:callback_query update)]
     {:edit-reply-markup {:chat_id      (:id (:from query))
                          :message_id   (:message_id (:message query))
-                         :reply_markup (basket-detail-markup basket-state)}}))
+                         :reply_markup (basket-detail-markup lang basket-state)}}))
 
 
 (d/register-event-handler!
