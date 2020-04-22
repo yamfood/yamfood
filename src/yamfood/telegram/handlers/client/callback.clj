@@ -11,6 +11,8 @@
         action (u/callback-action (:data query))]
     (case action
       "menu" {:dispatch {:args [:c/menu]}}
+      "settings" {:dispatch {:args [:c/settings]}}
+      "language" {:dispatch {:args [:c/change-language]}}
       "want" {:dispatch {:args [:c/detail-want]}}
       "detail+" {:dispatch {:args [:c/detail-inc]}}
       "detail-" {:dispatch {:args [:c/detail-dec]}}

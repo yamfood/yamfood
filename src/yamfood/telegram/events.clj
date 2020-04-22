@@ -13,6 +13,7 @@
     [yamfood.telegram.handlers.client.location]
     [yamfood.telegram.handlers.client.feedback]
     [yamfood.telegram.handlers.client.payments]
+    [yamfood.telegram.handlers.client.settings]
 
     [yamfood.telegram.handlers.rider.menu]
     [yamfood.telegram.handlers.rider.order]

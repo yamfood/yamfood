@@ -19,7 +19,15 @@
         :hello-message                   "Готовим и бесплатно доставляем за 30 минут"
         :menu-button                     "\uD83C\uDF7D Что поесть?"
         :regions-button                  (str e/location-emoji " Зона покрытия")
-        :settings-button                 (str e/settings-emoji " Настройки!!!")
+        :settings-button                 (str e/settings-emoji " Настройки")
+
+        ; Settings
+        :settings-change-phone-button    "Изменить номер телефона"
+        :settings-menu-button            (str e/back-emoji " Назад")
+        :settings-message                (str e/settings-emoji " *Настройки* \n\n"
+                                              "*Язык*: Русский\n"
+                                              "*Номер телефона*: +{1}\n\n"
+                                              "_Для смены языка нажмите на соответствующую кнопку_")
 
         ; Update location
         :update-location-inline-button   "Коснитесь чтобы обновить\n"

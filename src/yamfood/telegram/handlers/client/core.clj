@@ -16,7 +16,9 @@
      :update         update
      :params         (p/params!)
      :client         client
-     :lang           :ru}))
+     :lang           (keyword (get-in client
+                                      [:payload :lang]
+                                      :ru))}))
 
 
 (defn process-message
