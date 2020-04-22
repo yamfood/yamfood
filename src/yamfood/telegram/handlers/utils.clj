@@ -20,7 +20,6 @@
                    :label "Картой"})
 
 
-; TODO: Make it work with all updates!
 (defn tid-from-update
   [update]
   (let [message (:message update)

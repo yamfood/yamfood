@@ -56,7 +56,7 @@
 
 
 (defn client-with-tid!
-  [tid]                                                     ; TODO: CACHE!
+  [tid]
   (->> (client-with-tid-query tid)
        (jdbc/query db/db)
        (map cu/keywordize-field)

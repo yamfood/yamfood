@@ -67,6 +67,13 @@
                                               e/comment-emoji " `{3}` \n\n"
                                               e/location-emoji " {4}")
 
+        ; Active Order
+        :active-order-message            (str "*Заказ №{1}:*\n\n"
+                                              "{2}"
+                                              "\n"
+                                              e/money-emoji " {3} сум ({4})\n\n"
+                                              "Ваш заказ готовится, курьер приедет через 30 минут")
+
         ; Payments
         :pay-button                      "Оплатить"
         :invoice-title                   "Оплатить заказ №{1}"

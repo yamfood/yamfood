@@ -155,15 +155,14 @@
                       :message-id message-id}}))
 
 
+; TODO: Use actual payment type
 (defn active-order-text
-  [order]
-  (format (str "*Заказ №%s:*\n\n"
-               (apply str (u/order-products-text (:products order)))
-               "\n"
-               e/money-emoji " %s сум (Наличными)\n\n"
-               "Ваш заказ готовится, курьер приедет через 30 минут")
-          (:id order)
-          (u/fmt-values (:total_cost order))))
+  [lang order]
+  (translate lang :active-order-message
+             (:id order)
+             (apply str (u/order-products-text (:products order)))
+             (u/fmt-values (:total_cost order))
+             "Наличными"))
 
 
 (defn product-price
@@ -184,9 +183,10 @@
            :args       [order]
            :next-event :c/active-order}}
     (let [update (:update ctx)
+          lang (:lang ctx)
           chat-id (u/chat-id update)]
       {:send-text {:chat-id chat-id
-                   :text    (active-order-text order)
+                   :text    (active-order-text lang order)
                    :options {:parse_mode "markdown"}}})))
 
 
