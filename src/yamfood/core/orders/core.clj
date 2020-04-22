@@ -325,7 +325,7 @@
     (-> (products-from-basket! basket-id)
         (prepare-basket-products-to-order order-id)
         (insert-products!))
-    (when (= payment (:value u/cash-payment))
+    (when (= payment u/cash-payment)
       (jdbc/insert!
         db/db "order_logs"
         {:order_id order-id

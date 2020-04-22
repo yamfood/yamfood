@@ -56,8 +56,8 @@
   [lang order-state]
   (translate lang :oc-message
              (u/fmt-values (:total_cost (:basket order-state)))
-             (or (get-in order-state [:client :payload :payment :label])
-                 "Наличными")
+             (translate lang (keyword (or (get-in order-state [:client :payload :payment])
+                                          "cash")))
              (or (:comment (:payload (:client order-state)))
                  (translate lang :oc-empty-comment-text))
              (u/text-from-address
@@ -130,7 +130,7 @@
       {:run            [(merge {:function ord/create-order!
                                 :args     [basket-id location
                                            (u/text-from-address address)
-                                           comment (:value payment)]}
+                                           comment payment]}
                                (if card?
                                  {:next-event :c/send-invoice}
                                  {:next-event :c/active-order}))
@@ -155,14 +155,13 @@
                       :message-id message-id}}))
 
 
-; TODO: Use actual payment type
 (defn active-order-text
   [lang order]
   (translate lang :active-order-message
              (:id order)
              (apply str (u/order-products-text (:products order)))
              (u/fmt-values (:total_cost order))
-             "Наличными"))
+             (translate lang (keyword (:payment order)))))
 
 
 (defn product-price

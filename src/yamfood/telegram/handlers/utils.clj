@@ -14,10 +14,8 @@
 (def basket-step "basket")
 (def order-confirmation-step "order-confirmation")
 
-(def cash-payment {:value "cash"
-                   :label "Наличными"})
-(def card-payment {:value "card"
-                   :label "Картой"})
+(def cash-payment "cash")
+(def card-payment "card")
 
 
 (defn tid-from-update

@@ -57,7 +57,7 @@
             :from   [:order_products :products]
             :where  [:and
                      [:in :order_products.order_id (-> (finished-orders-query rider-id)
-                                                       (hh/merge-where [:= :orders.payment (:value u/cash-payment)]))]
+                                                       (hh/merge-where [:= :orders.payment u/cash-payment]))]
                      [:= :products.id :order_products.product_id]]}
            (hs/format)
            (jdbc/query db/db)

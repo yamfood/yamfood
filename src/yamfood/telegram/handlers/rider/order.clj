@@ -20,7 +20,7 @@
     (:name order)
     (:phone order)
     (if (= (:payment order)
-           (:value u/cash-payment))
+           u/cash-payment)
       (str (u/fmt-values (:total_cost order)) " сум")
       "Оплачено картой")
     (or (:comment order) "Пусто...")))
