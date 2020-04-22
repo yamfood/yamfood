@@ -9,7 +9,7 @@
   [ctx]
   (let [chat-id (u/chat-id (:update ctx))]
     {:send-text {:chat-id chat-id
-                 :text    (translate :ru :blocked-message)}}))
+                 :text    (translate (:lang ctx) :blocked-message)}}))
 
 
 (d/register-event-handler!

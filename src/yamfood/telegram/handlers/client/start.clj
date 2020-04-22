@@ -35,17 +35,17 @@
 
 
 (defn menu-markup
-  [categories]
+  [lang categories]
   (let []
     {:inline_keyboard
      (conj (apply conj []
                   (if (empty? categories)
-                    [[{:text                             (translate :ru :menu-button)
+                    [[{:text                             (translate lang :menu-button)
                        :switch_inline_query_current_chat ""}]]
                     (categories-in-markup categories)))
-           [{:text (translate :ru :regions-button)
+           [{:text (translate lang :regions-button)
              :url  u/map-url}]
-           [{:text          (translate :ru :settings-button)
+           [{:text          (translate lang :settings-button)
              :callback_data "settings"}])}))
 
 
@@ -56,13 +56,14 @@
           :next-event :c/menu}})
   ([ctx categories]
    (let [client (:client ctx)
+         lang (:lang ctx)
          update (:update ctx)
          chat-id (u/chat-id update)
          query (:callback_query update)]
      (merge
        {:send-text {:chat-id chat-id
-                    :options {:reply_markup (menu-markup categories)}
-                    :text    (translate :ru :hello-message)}
+                    :options {:reply_markup (menu-markup lang categories)}
+                    :text    (translate lang :hello-message)}
         :run       {:function clients/update-payload!
                     :args     [(:id client)
                                (assoc (:payload client) :step u/menu-step)]}}

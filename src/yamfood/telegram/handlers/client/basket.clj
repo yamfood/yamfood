@@ -62,40 +62,41 @@
 
 
 (defn basket-detail-products-markup
-  [basket-state]
+  [lang basket-state]
   (cond
-    (empty? (:products basket-state)) [[{:text          (translate :ru :empty-basket-text)
+    (empty? (:products basket-state)) [[{:text          (translate lang :empty-basket-text)
                                          :callback_data "nothing"}]]
     :else (reduce basket-product-markup [] (:products basket-state))))
 
 
 (defn basket-detail-markup
-  [basket-state]
+  [lang basket-state]
   (let [total_cost (:total_cost basket-state)
         total_energy (:total_energy basket-state)]
     {:inline_keyboard
-     (conj (basket-detail-products-markup basket-state)
-           [{:text (translate :ru :basket-menu-button) :callback_data "menu"}]
+     (conj (basket-detail-products-markup lang basket-state)
+           [{:text (translate lang :basket-menu-button) :callback_data "menu"}]
            [{:text          (format (str e/money-emoji " %s сум "
                                          e/energy-emoji " %s кКал")
                                     (u/fmt-values total_cost)
                                     (u/fmt-values total_energy))
              :callback_data "nothing"}]
            (if (not (empty? (:products basket-state)))
-             [{:text (translate :ru :to-order-button) :callback_data "to-order"}]
+             [{:text (translate lang :to-order-button) :callback_data "to-order"}]
              []))}))
 
 
 (defn send-basket
   [ctx basket-state]
   (let [update (:update ctx)
+        lang (:lang ctx)
         client (:client ctx)
         query (:callback_query update)
         chat-id (u/chat-id update)
         message-id (:message_id (:message query))]
     {:send-text      {:chat-id chat-id
-                      :text    (translate :ru :basket-message)
-                      :options {:reply_markup (basket-detail-markup basket-state)}}
+                      :text    (translate lang :basket-message)
+                      :options {:reply_markup (basket-detail-markup lang basket-state)}}
      :delete-message {:chat-id    chat-id
                       :message-id message-id}
      :run            {:function clients/update-payload!

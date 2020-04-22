@@ -26,12 +26,12 @@
 
 
 (defn current-location-inline-result
-  [address]
+  [lang address]
   {:type                  "article"
    :id                    99999
    :input_message_content {:message_text "Обновить локацию"}
    :title                 address
-   :description           (translate :ru :update-location-inline-button)
+   :description           (translate lang :update-location-inline-button)
    :thumb_url             "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/320/apple/114/round-pushpin_1f4cd.png"})
 
 
@@ -57,6 +57,7 @@
        :options         {:cache_time 0}
        :results         (into
                           [(current-location-inline-result
+                             (:lang ctx)
                              (u/text-from-address address))]
                           (map query-result-from-product products))}})))
 

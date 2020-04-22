@@ -8,9 +8,10 @@
     [yamfood.telegram.translation.core :refer [translate]]))
 
 
-(def request-phone-markup
+(defn request-phone-markup
+  [lang]
   {:resize_keyboard true
-   :keyboard        [[{:text            (translate :ru :send-contact-button)
+   :keyboard        [[{:text            (translate lang :send-contact-button)
                        :request_contact true}]]})
 
 
@@ -27,17 +28,18 @@
                                 (:payload client)
                                 :step u/phone-step)]}
        :send-text {:chat-id chat-id
-                   :options {:reply_markup request-phone-markup
+                   :options {:reply_markup (request-phone-markup (:lang ctx))
                              :parse_mode   "markdown"}
-                   :text    (translate :ru :request-contact-message)}}
+                   :text    (translate (:lang ctx) :request-contact-message)}}
       (when query
         {:delete-message {:chat-id    chat-id
                           :message-id (:message_id (:message query))}}))))
 
 
-(def phone-confirmation-markup
+(defn phone-confirmation-markup
+  [lang]
   {:inline_keyboard
-   [[{:text (translate :ru :change-phone-button) :callback_data "request-phone"}]]})
+   [[{:text (translate lang :change-phone-button) :callback_data "request-phone"}]]})
 
 
 (defn get-phone
@@ -54,6 +56,7 @@
 (defn phone-handler
   [ctx]
   (let [update (:update ctx)
+        lang (:lang ctx)
         client (:client ctx)
         chat-id (u/chat-id update)
         phone (get-phone update)]
@@ -72,18 +75,19 @@
        :send-text [{:chat-id chat-id
                     :options {:parse_mode   "markdown"
                               :reply_markup {:remove_keyboard true}}
-                    :text    (translate :ru :accepted)}
+                    :text    (translate lang :accepted)}
                    {:chat-id chat-id
                     :options {:parse_mode   "markdown"
-                              :reply_markup phone-confirmation-markup}
-                    :text    (translate :ru :request-code-message phone)}]}
+                              :reply_markup (phone-confirmation-markup (:lang ctx))}
+                    :text    (translate lang :request-code-message phone)}]}
       {:send-text {:chat-id chat-id
-                   :text    (translate :ru :invalid-phone-message)}})))
+                   :text    (translate lang :invalid-phone-message)}})))
 
 
 (defn confirm-phone-handler
   [ctx]
   (let [update (:update ctx)
+        lang (:lang ctx)
         chat-id (u/chat-id update)
         text (:text (:message update))
         client (:client ctx)
@@ -93,10 +97,10 @@
       {:run       {:function clients/update-phone!
                    :args     [(:id client) phone]}
        :send-text {:chat-id chat-id
-                   :text    (translate :ru :phone-confirmed-message)}
+                   :text    (translate lang :phone-confirmed-message)}
        :dispatch  {:args [:c/menu]}}
       {:send-text {:chat-id chat-id
-                   :text    (translate :ru :incorrect-code-message)}})))
+                   :text    (translate lang :incorrect-code-message)}})))
 
 
 (defn contact-handler

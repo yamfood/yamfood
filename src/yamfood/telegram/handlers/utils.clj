@@ -38,21 +38,21 @@
 
 
 (defn more-button
-  [state]
+  [lang state]
   (let [category (:category state)]
     (if category
       [{:text (str (:emoji state) " " category) :switch_inline_query_current_chat (:emoji state)}]
-      [{:text (translate :ru :more-button) :switch_inline_query_current_chat ""}])))
+      [{:text (translate lang :more-button) :switch_inline_query_current_chat ""}])))
 
 
 (defn product-not-in-basket-markup
-  [state]
+  [lang state]
   (let [basket-cost (:basket_cost state)]
     {:inline_keyboard
-     [[{:text (translate :ru :add-product-button) :callback_data (str "want/" (:id state))}]
-      (more-button state)
-      [{:text (translate :ru :product-basket-button (fmt-values basket-cost)) :callback_data "basket"}]
-      [{:text (translate :ru :product-menu-button) :callback_data "menu"}]]}))
+     [[{:text (translate lang :add-product-button) :callback_data (str "want/" (:id state))}]
+      (more-button lang state)
+      [{:text (translate lang :product-basket-button (fmt-values basket-cost)) :callback_data "basket"}]
+      [{:text (translate lang :product-menu-button) :callback_data "menu"}]]}))
 
 
 (defn basket-product-controls
@@ -63,21 +63,21 @@
 
 
 (defn product-in-basket-markup
-  [state]
+  [lang state]
   (let [basket-cost (:basket_cost state)]
     {:inline_keyboard
      [(basket-product-controls "detail" (:id state) (:count_in_basket state))
-      (more-button state)
-      [{:text (translate :ru :product-basket-button (fmt-values basket-cost)) :callback_data "basket"}]
-      [{:text (translate :ru :product-menu-button) :callback_data "menu"}]]}))
+      (more-button lang state)
+      [{:text (translate lang :product-basket-button (fmt-values basket-cost)) :callback_data "basket"}]
+      [{:text (translate lang :product-menu-button) :callback_data "menu"}]]}))
 
 
 (defn product-detail-markup
-  [state-for-detail]
+  [lang state-for-detail]
   (let [count-in-basket (:count_in_basket state-for-detail)]
     (if (= count-in-basket 0)
-      (product-not-in-basket-markup state-for-detail)
-      (product-in-basket-markup state-for-detail))))
+      (product-not-in-basket-markup lang state-for-detail)
+      (product-in-basket-markup lang state-for-detail))))
 
 
 (defn callback-action

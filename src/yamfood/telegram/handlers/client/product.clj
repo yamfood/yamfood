@@ -12,6 +12,7 @@
 (defn want-handler
   [ctx]
   (let [update (:update ctx)
+        lang (:lang ctx)
         query (:callback_query update)
         client (:client ctx)
         callback-data (:data query)
@@ -21,7 +22,7 @@
                        :args       [(:basket_id client) product-id]
                        :next-event :c/update-markup}
      :answer-callback {:callback_query_id (:id query)
-                       :text              (translate :ru :added-to-basket-message)}}))
+                       :text              (translate lang :added-to-basket-message)}}))
 
 
 (defn detail-inc-handler
@@ -58,21 +59,23 @@
         query (:callback_query update)]
     {:edit-reply-markup {:chat_id      (:id (:from query))
                          :message_id   (:message_id (:message query))
-                         :reply_markup (u/product-detail-markup product-state)}}))
+                         :reply_markup (u/product-detail-markup
+                                         (:lang ctx)
+                                         product-state)}}))
 
 
 (defn product-caption
-  [product]
-  (translate :ru :product-caption {:name   (:name product)
-                                   :price  (u/fmt-values (:price product))
-                                   :energy (u/fmt-values (:energy product))}))
+  [lang product]
+  (translate lang :product-caption {:name   (:name product)
+                                    :price  (u/fmt-values (:price product))
+                                    :energy (u/fmt-values (:energy product))}))
 
 
 (defn product-detail-options
-  [product]
-  {:caption      (product-caption product)
+  [lang product]
+  {:caption      (product-caption lang product)
    :parse_mode   "markdown"
-   :reply_markup (json/write-str (u/product-detail-markup product))})
+   :reply_markup (json/write-str (u/product-detail-markup lang product))})
 
 
 (defn product-detail-handler
@@ -84,13 +87,14 @@
             :next-event :c/text}}))
   ([ctx product-detail-state]
    (let [update (:update ctx)
+         lang (:lang ctx)
          client (:client ctx)
          message (:message update)
          chat (:chat message)
          chat-id (:id chat)]
      (if product-detail-state
        {:send-photo     {:chat-id chat-id
-                         :options (product-detail-options product-detail-state)
+                         :options (product-detail-options lang product-detail-state)
                          :photo   (:photo product-detail-state)}
         :delete-message {:chat-id    chat-id
                          :message-id (:message_id message)}

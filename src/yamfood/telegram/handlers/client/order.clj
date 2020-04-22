@@ -40,7 +40,7 @@
 
 
 (defn order-confirmation-markup
-  [order-state]
+  [lang order-state]
   (let [payment (get-in order-state [:client :payload :payment])]
     {:inline_keyboard
      [[{:text e/location-emoji :callback_data "request-location"}
@@ -48,18 +48,18 @@
          (= payment u/card-payment) {:text e/card-emoji :callback_data "switch-payment-type"}
          :else {:text e/cash-emoji :callback_data "switch-payment-type"})
        {:text e/comment-emoji :callback_data "change-comment"}]
-      [{:text (translate :ru :oc-basket-button) :callback_data "basket"}]
-      [{:text (translate :ru :oc-create-order-button) :callback_data "create-order"}]]}))
+      [{:text (translate lang :oc-basket-button) :callback_data "basket"}]
+      [{:text (translate lang :oc-create-order-button) :callback_data "create-order"}]]}))
 
 
 (defn pre-order-text
-  [order-state]
-  (translate :ru :oc-message
+  [lang order-state]
+  (translate lang :oc-message
              (u/fmt-values (:total_cost (:basket order-state)))
              (or (get-in order-state [:client :payload :payment :label])
                  "Наличными")
              (or (:comment (:payload (:client order-state)))
-                 (translate :ru :oc-empty-comment-text))
+                 (translate lang :oc-empty-comment-text))
              (u/text-from-address
                (get-in order-state [:client :payload :location :address]))))
 
@@ -67,10 +67,11 @@
 (defn order-detail-handler
   [ctx order-state]
   (let [update (:update ctx)
+        lang (:lang ctx)
         chat-id (u/chat-id update)]
     {:send-text {:chat-id chat-id
-                 :text    (pre-order-text order-state)
-                 :options {:reply_markup (order-confirmation-markup order-state)
+                 :text    (pre-order-text lang order-state)
+                 :options {:reply_markup (order-confirmation-markup lang order-state)
                            :parse_mode   "markdown"}}}))
 
 
@@ -82,12 +83,13 @@
             :next-event :c/update-order-confirmation}}))
   ([ctx order-state]
    (let [query (:callback_query (:update ctx))
+         lang (:lang ctx)
          chat-id (:id (:from query))
          message-id (:message_id (:message query))]
      {:edit-message {:chat-id    chat-id
                      :message-id message-id
-                     :text       (pre-order-text order-state)
-                     :options    {:reply_markup (order-confirmation-markup order-state)
+                     :text       (pre-order-text lang order-state)
+                     :options    {:reply_markup (order-confirmation-markup lang order-state)
                                   :parse_mode   "markdown"}}})))
 
 
@@ -193,8 +195,9 @@
   (format (str (apply str (u/order-products-text (:products order))))))
 
 
-(def invoice-reply-markup
-  {:inline_keyboard [[{:text (translate :ru :pay-button) :pay true}]]})
+(defn invoice-reply-markup
+  [lang]
+  {:inline_keyboard [[{:text (translate lang :pay-button) :pay true}]]})
 
 
 (defn send-invoice
@@ -204,15 +207,16 @@
            :args       [order]
            :next-event :c/send-invoice}}
     (let [update (:update ctx)
+          lang (:lang ctx)
           chat-id (u/chat-id update)
           message-id (:message_id (:message (:callback_query update)))]
       {:send-invoice   {:chat-id     chat-id
-                        :title       (translate :ru :invoice-title (:id order))
+                        :title       (translate lang :invoice-title (:id order))
                         :description (invoice-description order)
                         :payload     {:order_id (:id order)}
                         :currency    "UZS"
                         :prices      (order-prices order)
-                        :options     {:reply_markup invoice-reply-markup}}
+                        :options     {:reply_markup (invoice-reply-markup lang)}}
        :delete-message {:chat-id    chat-id
                         :message-id message-id}})))
 

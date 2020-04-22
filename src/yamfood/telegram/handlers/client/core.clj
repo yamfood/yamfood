@@ -9,12 +9,14 @@
 
 (defn build-ctx!
   [update]
-  {:token          (env :bot-token)
-   :payments-token (env :payments-token)
-   :update         update
-   :params         (p/params!)
-   :client         (clients/client-with-tid!
-                     (u/tid-from-update update))})
+  (let [client (clients/client-with-tid!
+                 (u/tid-from-update update))]
+    {:token          (env :bot-token)
+     :payments-token (env :payments-token)
+     :update         update
+     :params         (p/params!)
+     :client         client
+     :lang           :ru}))
 
 
 (defn process-message

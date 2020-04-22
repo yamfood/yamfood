@@ -8,46 +8,50 @@
     [yamfood.telegram.translation.core :refer [translate]]))
 
 
-(def markup-for-request-location
+(defn markup-for-request-location
+  [lang]
   {:resize_keyboard true
-   :keyboard        [[{:text             (translate :ru :send-current-location-button)
+   :keyboard        [[{:text             (translate lang :send-current-location-button)
                        :request_location true}]]})
 
 
 (defn request-location-handler
   [ctx]
   (let [update (:update ctx)
+        lang (:lang ctx)
         query (:callback_query update)
         chat-id (u/chat-id update)
         message-id (:message_id (:message query))]
     (merge {:send-text {:chat-id chat-id
-                        :text    (translate :ru :request-location-message)
+                        :text    (translate lang :request-location-message)
                         :options {:parse_mode   "markdown"
-                                  :reply_markup markup-for-request-location}}}
+                                  :reply_markup (markup-for-request-location lang)}}}
            (when query
              {:delete-message {:chat-id    chat-id
                                :message-id message-id}}))))
 
 
-(def invalid-location-markup
+(defn invalid-location-markup
+  [lang]
   {:inline_keyboard
-   [[{:text (translate :ru :invalid-location-regions-button)
+   [[{:text (translate lang :invalid-location-regions-button)
       :url  u/map-url}]
-    [{:text          (translate :ru :invalid-location-menu-button)
+    [{:text          (translate lang :invalid-location-menu-button)
       :callback_data "menu"}]
-    [{:text          (translate :ru :invalid-location-basket-button)
+    [{:text          (translate lang :invalid-location-basket-button)
       :callback_data "basket"}]]})
 
 
 (defn invalid-location-handler
   [ctx]
-  (let [chat-id (u/chat-id (:update ctx))]
+  (let [chat-id (u/chat-id (:update ctx))
+        lang (:lang ctx)]
     {:send-text [{:chat-id chat-id
-                  :text    (translate :ru :accepted)
+                  :text    (translate lang :accepted)
                   :options {:reply_markup {:remove_keyboard true}}}
                  {:chat-id chat-id
-                  :text    (translate :ru :invalid-location-message)
-                  :options {:reply_markup invalid-location-markup}}]}))
+                  :text    (translate lang :invalid-location-message)
+                  :options {:reply_markup (invalid-location-markup lang)}}]}))
 
 
 (defn location-handler
@@ -90,6 +94,7 @@
 (defn update-location
   [ctx location-info]
   (let [update (:update ctx)
+        lang (:lang ctx)
         client (:client ctx)
         message (:message update)
         chat-id (:id (:from message))
@@ -103,7 +108,7 @@
                                          :latitude  (:latitude location)
                                          :kitchen   (:kitchen location-info)})]}
      :send-text {:chat-id chat-id
-                 :text    (translate :ru :new-location-message (u/text-from-address (:address location-info)))
+                 :text    (translate lang :new-location-message (u/text-from-address (:address location-info)))
                  :options {:reply_markup {:remove_keyboard true}}}}))
 
 
