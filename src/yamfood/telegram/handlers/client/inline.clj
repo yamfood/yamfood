@@ -1,10 +1,11 @@
 (ns yamfood.telegram.handlers.client.inline
   (:require
     [environ.core :refer [env]]
+    [yamfood.core.kitchens.core :as k]
     [yamfood.core.products.core :as p]
     [yamfood.telegram.dispatcher :as d]
     [yamfood.telegram.handlers.utils :as u]
-    [yamfood.core.kitchens.core :as k]))
+    [yamfood.telegram.translation.core :refer [translate]]))
 
 
 (defn product-description
@@ -30,7 +31,7 @@
    :id                    99999
    :input_message_content {:message_text "Обновить локацию"}
    :title                 address
-   :description           "Коснитесь чтобы обновить\n"
+   :description           (translate :ru :update-location-inline-button)
    :thumb_url             "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/320/apple/114/round-pushpin_1f4cd.png"})
 
 

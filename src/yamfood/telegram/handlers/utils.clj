@@ -1,26 +1,11 @@
 (ns yamfood.telegram.handlers.utils
   (:require
+    [clojure.edn :as edn]
     [clojure.string :as str]
     [environ.core :refer [env]]
-    [clojure.edn :as edn]))
+    [yamfood.telegram.handlers.emojies :as e]
+    [yamfood.telegram.translation.core :refer [translate]]))
 
-
-(def location-emoji "\uD83D\uDCCD")
-(def money-emoji "\uD83D\uDCB0")
-(def cash-emoji "\uD83D\uDCB5")
-(def card-emoji "\uD83D\uDCB3")
-(def comment-emoji "\uD83D\uDCAC")
-(def basket-emoji "\uD83E\uDDFA")
-(def food-emoji "\uD83E\uDD57")
-(def energy-emoji "\uD83D\uDD0B")
-(def cancel-emoji "❌")
-(def phone-emoji "\uD83D\uDCDE")
-(def finish-emoji "✅")
-(def client-emoji "\uD83D\uDE03")
-(def order-emoji "\uD83D\uDDD2️")
-(def refresh-emoji "\uD83D\uDD04️")
-(def settings-emoji "⚙️")
-(def back-emoji "⬅️")
 
 (def menu-step "menu")
 (def phone-step "phone")
@@ -57,17 +42,17 @@
   (let [category (:category state)]
     (if category
       [{:text (str (:emoji state) " " category) :switch_inline_query_current_chat (:emoji state)}]
-      [{:text "\uD83C\uDF7D Еще?" :switch_inline_query_current_chat ""}])))
+      [{:text (translate :ru :more-button) :switch_inline_query_current_chat ""}])))
 
 
 (defn product-not-in-basket-markup
   [state]
   (let [basket-cost (:basket_cost state)]
     {:inline_keyboard
-     [[{:text "Хочу" :callback_data (str "want/" (:id state))}]
+     [[{:text (translate :ru :add-product-button) :callback_data (str "want/" (:id state))}]
       (more-button state)
-      [{:text (format (str basket-emoji " Корзина (%s сум)") (fmt-values basket-cost)) :callback_data "basket"}]
-      [{:text (str back-emoji " Назад") :callback_data "menu"}]]}))
+      [{:text (translate :ru :product-basket-button (fmt-values basket-cost)) :callback_data "basket"}]
+      [{:text (translate :ru :product-menu-button) :callback_data "menu"}]]}))
 
 
 (defn basket-product-controls
@@ -83,8 +68,8 @@
     {:inline_keyboard
      [(basket-product-controls "detail" (:id state) (:count_in_basket state))
       (more-button state)
-      [{:text (format (str basket-emoji " Корзина (%s сум)") (fmt-values basket-cost)) :callback_data "basket"}]
-      [{:text (str back-emoji " Назад") :callback_data "menu"}]]}))
+      [{:text (translate :ru :product-basket-button (fmt-values basket-cost)) :callback_data "basket"}]
+      [{:text (translate :ru :product-menu-button) :callback_data "menu"}]]}))
 
 
 (defn product-detail-markup
@@ -141,7 +126,7 @@
   [products]
   (doall
     (map
-      #(format (str food-emoji " %d x %s\n") (:count %) (:name %))
+      #(format (str e/food-emoji " %d x %s\n") (:count %) (:name %))
       products)))
 
 

@@ -5,7 +5,8 @@
     [yamfood.telegram.dispatcher :as d]
     [yamfood.core.clients.core :as clients]
     [yamfood.telegram.handlers.utils :as u]
-    [yamfood.telegram.handlers.client.core :as c]))
+    [yamfood.telegram.handlers.client.core :as c]
+    [yamfood.telegram.translation.core :refer [translate]]))
 
 
 (defn start-handler
@@ -39,12 +40,12 @@
     {:inline_keyboard
      (conj (apply conj []
                   (if (empty? categories)
-                    [[{:text                             "\uD83C\uDF7D Что поесть?"
+                    [[{:text                             (translate :ru :menu-button)
                        :switch_inline_query_current_chat ""}]]
                     (categories-in-markup categories)))
-           [{:text (str u/location-emoji " Зона покрытия")
+           [{:text (translate :ru :regions-button)
              :url  u/map-url}]
-           [{:text          (str u/settings-emoji " Настройки")
+           [{:text          (translate :ru :settings-button)
              :callback_data "settings"}])}))
 
 
@@ -61,7 +62,7 @@
      (merge
        {:send-text {:chat-id chat-id
                     :options {:reply_markup (menu-markup categories)}
-                    :text    "Готовим и бесплатно доставляем за 30 минут"}
+                    :text    (translate :ru :hello-message)}
         :run       {:function clients/update-payload!
                     :args     [(:id client)
                                (assoc (:payload client) :step u/menu-step)]}}

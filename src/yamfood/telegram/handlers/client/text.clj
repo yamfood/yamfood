@@ -1,7 +1,8 @@
 (ns yamfood.telegram.handlers.client.text
   (:require
     [yamfood.telegram.dispatcher :as d]
-    [yamfood.telegram.handlers.utils :as u]))
+    [yamfood.telegram.handlers.utils :as u]
+    [yamfood.telegram.translation.core :refer [translate]]))
 
 
 (def update-location-text "Обновить локацию")
@@ -18,7 +19,7 @@
       (= (:step (:payload client)) u/phone-confirmation-step) {:dispatch {:args [:c/confirm-phone]}}
       (= text update-location-text) {:dispatch {:args [:c/request-location]}}
       :else {:send-text {:chat-id chat-id
-                         :text    "Не понял"}})))
+                         :text    (translate :ru :unhandled-text)}})))
 
 
 (d/register-event-handler!

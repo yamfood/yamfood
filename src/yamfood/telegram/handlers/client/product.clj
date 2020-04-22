@@ -5,7 +5,8 @@
     [yamfood.core.baskets.core :as baskets]
     [yamfood.telegram.handlers.utils :as u]
     [yamfood.core.clients.core :as clients]
-    [yamfood.core.products.core :as products]))
+    [yamfood.core.products.core :as products]
+    [yamfood.telegram.translation.core :refer [translate]]))
 
 
 (defn want-handler
@@ -20,7 +21,7 @@
                        :args       [(:basket_id client) product-id]
                        :next-event :c/update-markup}
      :answer-callback {:callback_query_id (:id query)
-                       :text              "Добавлено в корзину"}}))
+                       :text              (translate :ru :added-to-basket-message)}}))
 
 
 (defn detail-inc-handler
@@ -62,11 +63,9 @@
 
 (defn product-caption
   [product]
-  (format (str u/food-emoji " *%s* \n\n"
-               u/money-emoji "%s сум  " u/energy-emoji "%s кКал")
-          (:name product)
-          (u/fmt-values (:price product))
-          (u/fmt-values (:energy product))))
+  (translate :ru :product-caption {:name   (:name product)
+                                   :price  (u/fmt-values (:price product))
+                                   :energy (u/fmt-values (:energy product))}))
 
 
 (defn product-detail-options

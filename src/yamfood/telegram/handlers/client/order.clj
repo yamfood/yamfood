@@ -6,7 +6,9 @@
     [yamfood.core.baskets.core :as bsk]
     [yamfood.telegram.handlers.utils :as u]
     [yamfood.core.clients.core :as clients]
-    [yamfood.telegram.handlers.client.core :as c]))
+    [yamfood.telegram.handlers.emojies :as e]
+    [yamfood.telegram.handlers.client.core :as c]
+    [yamfood.telegram.translation.core :refer [translate]]))
 
 
 (defn order-confirmation-state
@@ -41,26 +43,25 @@
   [order-state]
   (let [payment (get-in order-state [:client :payload :payment])]
     {:inline_keyboard
-     [[{:text u/location-emoji :callback_data "request-location"}
+     [[{:text e/location-emoji :callback_data "request-location"}
        (cond
-         (= payment u/card-payment) {:text u/card-emoji :callback_data "switch-payment-type"}
-         :else {:text u/cash-emoji :callback_data "switch-payment-type"})
-       {:text u/comment-emoji :callback_data "change-comment"}]
-      [{:text (str u/basket-emoji " Корзина") :callback_data "basket"}]
-      [{:text "✅ Подтвердить" :callback_data "create-order"}]]}))
+         (= payment u/card-payment) {:text e/card-emoji :callback_data "switch-payment-type"}
+         :else {:text e/cash-emoji :callback_data "switch-payment-type"})
+       {:text e/comment-emoji :callback_data "change-comment"}]
+      [{:text (translate :ru :oc-basket-button) :callback_data "basket"}]
+      [{:text (translate :ru :oc-create-order-button) :callback_data "create-order"}]]}))
 
 
 (defn pre-order-text
   [order-state]
-  (format (str "*Детали вашего заказа:* \n\n"
-               u/money-emoji " %s сум (%s)\n"
-               u/comment-emoji " `%s` \n\n"
-               u/location-emoji " %s")
-          (u/fmt-values (:total_cost (:basket order-state)))
-          (or (get-in order-state [:client :payload :payment :label]) "Наличными")
-          (or (:comment (:payload (:client order-state))) "Пусто...")
-          (u/text-from-address
-            (get-in order-state [:client :payload :location :address]))))
+  (translate :ru :oc-message
+             (u/fmt-values (:total_cost (:basket order-state)))
+             (or (get-in order-state [:client :payload :payment :label])
+                 "Наличными")
+             (or (:comment (:payload (:client order-state)))
+                 (translate :ru :oc-empty-comment-text))
+             (u/text-from-address
+               (get-in order-state [:client :payload :location :address]))))
 
 
 (defn order-detail-handler
@@ -157,7 +158,7 @@
   (format (str "*Заказ №%s:*\n\n"
                (apply str (u/order-products-text (:products order)))
                "\n"
-               u/money-emoji " %s сум (Наличными)\n\n"
+               e/money-emoji " %s сум (Наличными)\n\n"
                "Ваш заказ готовится, курьер приедет через 30 минут")
           (:id order)
           (u/fmt-values (:total_cost order))))
@@ -193,7 +194,7 @@
 
 
 (def invoice-reply-markup
-  {:inline_keyboard [[{:text "Оплатить" :pay true}]]})
+  {:inline_keyboard [[{:text (translate :ru :pay-button) :pay true}]]})
 
 
 (defn send-invoice
@@ -206,7 +207,7 @@
           chat-id (u/chat-id update)
           message-id (:message_id (:message (:callback_query update)))]
       {:send-invoice   {:chat-id     chat-id
-                        :title       (str "Оплатить заказ №" (:id order))
+                        :title       (translate :ru :invoice-title (:id order))
                         :description (invoice-description order)
                         :payload     {:order_id (:id order)}
                         :currency    "UZS"

@@ -16,6 +16,7 @@
                  [environ "1.1.0"]
                  [clj-http "3.10.0"]
                  [morse "0.4.3"]
+                 [tongue "0.2.9"]
 
                  [migratus "1.2.4"]
                  [clj-postgresql "0.7.0"]

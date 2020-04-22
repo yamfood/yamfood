@@ -3,7 +3,9 @@
     [yamfood.telegram.dispatcher :as d]
     [yamfood.core.clients.core :as clients]
     [yamfood.core.baskets.core :as baskets]
-    [yamfood.telegram.handlers.utils :as u]))
+    [yamfood.telegram.handlers.utils :as u]
+    [yamfood.telegram.handlers.emojies :as e]
+    [yamfood.telegram.translation.core :refer [translate]]))
 
 
 (defn basket-inc-handler
@@ -48,7 +50,7 @@
 (defn basket-product-markup
   [val product]
   (apply conj val [[{:callback_data "nothing"
-                     :text          (format (str u/food-emoji " %d x %s")
+                     :text          (format (str e/food-emoji " %d x %s")
                                             (:count product)
                                             (:name product))}]
 
@@ -62,7 +64,7 @@
 (defn basket-detail-products-markup
   [basket-state]
   (cond
-    (empty? (:products basket-state)) [[{:text          "К сожалению, ваша корзина пока пуста :("
+    (empty? (:products basket-state)) [[{:text          (translate :ru :empty-basket-text)
                                          :callback_data "nothing"}]]
     :else (reduce basket-product-markup [] (:products basket-state))))
 
@@ -73,14 +75,14 @@
         total_energy (:total_energy basket-state)]
     {:inline_keyboard
      (conj (basket-detail-products-markup basket-state)
-           [{:text (str u/back-emoji " В меню") :callback_data "menu"}]
-           [{:text          (format (str u/money-emoji " %s сум "
-                                         u/energy-emoji " %s кКал")
+           [{:text (translate :ru :basket-menu-button) :callback_data "menu"}]
+           [{:text          (format (str e/money-emoji " %s сум "
+                                         e/energy-emoji " %s кКал")
                                     (u/fmt-values total_cost)
                                     (u/fmt-values total_energy))
              :callback_data "nothing"}]
            (if (not (empty? (:products basket-state)))
-             [{:text "✅ Далее" :callback_data "to-order"}]
+             [{:text (translate :ru :to-order-button) :callback_data "to-order"}]
              []))}))
 
 
@@ -92,7 +94,7 @@
         chat-id (u/chat-id update)
         message-id (:message_id (:message query))]
     {:send-text      {:chat-id chat-id
-                      :text    "Ваша корзина:"
+                      :text    (translate :ru :basket-message)
                       :options {:reply_markup (basket-detail-markup basket-state)}}
      :delete-message {:chat-id    chat-id
                       :message-id message-id}

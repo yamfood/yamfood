@@ -4,12 +4,13 @@
     [yamfood.core.clients.core :as clients]
     [yamfood.telegram.handlers.utils :as u]
     [yamfood.core.regions.core :as regions]
-    [yamfood.telegram.handlers.client.core :as c]))
+    [yamfood.telegram.handlers.client.core :as c]
+    [yamfood.telegram.translation.core :refer [translate]]))
 
 
 (def markup-for-request-location
   {:resize_keyboard true
-   :keyboard        [[{:text             "Отправить текущее положение"
+   :keyboard        [[{:text             (translate :ru :send-current-location-button)
                        :request_location true}]]})
 
 
@@ -20,9 +21,7 @@
         chat-id (u/chat-id update)
         message-id (:message_id (:message query))]
     (merge {:send-text {:chat-id chat-id
-                        :text    (str "*куда доставить?*\n\n"
-                                      "нажмите отправить локацию или отправьте локацию вручную\n\n"
-                                      "_не забудьте включить локацию на своем телефоне..._")
+                        :text    (translate :ru :request-location-message)
                         :options {:parse_mode   "markdown"
                                   :reply_markup markup-for-request-location}}}
            (when query
@@ -32,11 +31,11 @@
 
 (def invalid-location-markup
   {:inline_keyboard
-   [[{:text "Карта обслуживания"
+   [[{:text (translate :ru :invalid-location-regions-button)
       :url  u/map-url}]
-    [{:text          (str u/back-emoji " Меню")
+    [{:text          (translate :ru :invalid-location-menu-button)
       :callback_data "menu"}]
-    [{:text          (str u/basket-emoji " Корзина")
+    [{:text          (translate :ru :invalid-location-basket-button)
       :callback_data "basket"}]]})
 
 
@@ -44,10 +43,10 @@
   [ctx]
   (let [chat-id (u/chat-id (:update ctx))]
     {:send-text [{:chat-id chat-id
-                  :text    "Принято"
+                  :text    (translate :ru :accepted)
                   :options {:reply_markup {:remove_keyboard true}}}
                  {:chat-id chat-id
-                  :text    "К сожалению, мы не обслуживаем данный регион"
+                  :text    (translate :ru :invalid-location-message)
                   :options {:reply_markup invalid-location-markup}}]}))
 
 
@@ -104,7 +103,7 @@
                                          :latitude  (:latitude location)
                                          :kitchen   (:kitchen location-info)})]}
      :send-text {:chat-id chat-id
-                 :text    (str "Новый адресс: " (u/text-from-address (:address location-info)))
+                 :text    (translate :ru :new-location-message (u/text-from-address (:address location-info)))
                  :options {:reply_markup {:remove_keyboard true}}}}))
 
 
