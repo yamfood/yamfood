@@ -71,6 +71,14 @@
         :pay-button                      "Оплатить"
         :invoice-title                   "Оплатить заказ №{1}"
 
+        ; Statuses
+        :status-on-kitchen               "Ваш заказ уже начал готовиться!"
+        :status-canceled                 "Заказ отменен ("
+        :status-on-way                   "Райдер уже в пути!"
+
+        ; Feedback
+        :request-feedback-message        "Оцените пожалуйста заказ!"
+
         ; Other
         :unhandled-text                  "Не понял"
         :blocked-message                 "Вы заблокированы, обратитесь в поддержку"

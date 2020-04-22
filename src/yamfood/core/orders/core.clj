@@ -94,6 +94,7 @@
                :clients.tid
                :clients.name
                :clients.phone
+               [(hs/raw "clients.payload->'lang'") :lang]
                [:riders.name :rider_name]
                [:riders.phone :rider_phone]
                [(order-total-sum-query :orders.id) :total_sum]

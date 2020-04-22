@@ -2,7 +2,8 @@
   (:require
     [morse.api :as t]
     [environ.core :refer [env]]
-    [yamfood.core.orders.core :as o]))
+    [yamfood.core.orders.core :as o]
+    [yamfood.telegram.translation.core :refer [translate]]))
 
 
 (defn feedback-request-markup
@@ -23,6 +24,4 @@
       (env :bot-token)
       chat-id
       {:reply_markup (feedback-request-markup order-id)}
-      "Оцените пожалуйста заказ!")))
-
-
+      (translate (:lang order) :request-feedback-message))))
