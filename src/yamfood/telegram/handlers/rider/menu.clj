@@ -3,7 +3,8 @@
     [yamfood.telegram.dispatcher :as d]
     [yamfood.telegram.handlers.utils :as u]
     [yamfood.core.riders.core :as r]
-    [yamfood.telegram.handlers.rider.core :as c]))
+    [yamfood.telegram.handlers.rider.core :as c]
+    [yamfood.telegram.handlers.emojies :as e]))
 
 
 (defn rider-menu-text
@@ -22,7 +23,7 @@
 
 (def rider-menu-markup
   {:inline_keyboard
-   [[{:text (str u/refresh-emoji " Обновить") :callback_data "refresh-menu"}]]})
+   [[{:text (str e/refresh-emoji " Обновить") :callback_data "refresh-menu"}]]})
 
 
 (defn rider-menu-handler

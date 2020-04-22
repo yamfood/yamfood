@@ -2,13 +2,14 @@
   (:require
     [yamfood.core.orders.core :as o]
     [yamfood.telegram.dispatcher :as d]
-    [yamfood.telegram.handlers.utils :as u]))
+    [yamfood.telegram.handlers.utils :as u]
+    [yamfood.telegram.handlers.emojies :as e]))
 
 
 (defn order-description
   [order]
-  (format (str u/client-emoji " %s\n"
-               u/comment-emoji " %s")
+  (format (str e/client-emoji " %s\n"
+               e/comment-emoji " %s")
           (:name order)
           (:comment order)))
 

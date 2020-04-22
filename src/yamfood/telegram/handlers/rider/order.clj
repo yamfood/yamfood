@@ -4,6 +4,7 @@
     [yamfood.core.riders.core :as r]
     [yamfood.telegram.dispatcher :as d]
     [yamfood.telegram.handlers.utils :as u]
+    [yamfood.telegram.handlers.emojies :as e]
     [yamfood.telegram.handlers.rider.core :as c]))
 
 
@@ -11,10 +12,10 @@
   [order]
   (format
     (str "*---------- Заказ №%s ----------*\n\n"
-         u/client-emoji " %s\n"
-         u/phone-emoji " +%s\n"
-         u/money-emoji " %s\n\n"
-         u/comment-emoji " %s\n")
+         e/client-emoji " %s\n"
+         e/phone-emoji " +%s\n"
+         e/money-emoji " %s\n\n"
+         e/comment-emoji " %s\n")
     (:id order)
     (:name order)
     (:phone order)
@@ -28,11 +29,11 @@
 (defn- order-detail-markup
   [order]
   {:inline_keyboard
-   [[{:text          (str u/food-emoji " Продукты")
+   [[{:text          (str e/food-emoji " Продукты")
       :callback_data (str "order-products/" (:id order))}]
-    [{:text          (str u/finish-emoji " Завершить")
+    [{:text          (str e/finish-emoji " Завершить")
       :callback_data (str "finish-order/" (:id order))}
-     {:text          (str u/cancel-emoji " Отменить")
+     {:text          (str e/cancel-emoji " Отменить")
       :callback_data (str "cancel-order/" (:id order))}]]})
 
 
