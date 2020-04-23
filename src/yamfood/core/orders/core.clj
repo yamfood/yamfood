@@ -113,6 +113,7 @@
             :products.name
             :products.price
             :products.payload
+            :order_products.comment
             :order_products.count
             [(hs/call :* :order_products.count :products.price) :total]]
    :from   [:order_products :products]

@@ -211,8 +211,10 @@
 
 (s/def ::product_id int?)
 (s/def ::count int?)
+(s/def ::comment string?)
 (s/def ::order-products
-  (s/keys :req-un [::product_id ::count]))
+  (s/keys :req-un [::product_id ::count]
+          :opt-un [::comment]))
 
 (s/def ::products (s/coll-of ::order-products))
 
