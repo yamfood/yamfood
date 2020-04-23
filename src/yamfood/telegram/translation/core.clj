@@ -58,8 +58,8 @@
         :basket-menu-button              (str e/back-emoji " В меню")
         :to-order-button                 "✅ Далее"
 
-        ; Order
-        :oc-basket-button                (str e/basket-emoji " Корзина")
+        ; Order Confirmation
+        :oc-basket-button                (str e/back-emoji " Корзина")
         :oc-create-order-button          "✅ Подтвердить"
         :oc-empty-comment-text           "Пусто..."
         :oc-message                      (str "*Детали вашего заказа:* \n\n"
@@ -146,7 +146,7 @@
         :to-order-button                 "✅ [en] Далее"
 
         ; Order
-        :oc-basket-button                (str e/basket-emoji " [en] Корзина")
+        :oc-basket-button                (str e/back-emoji " [en] Корзина")
         :oc-create-order-button          "✅ [en] Подтвердить"
         :oc-empty-comment-text           "[en] Пусто..."
         :oc-message                      (str "*[en] Детали вашего заказа:* \n\n"
