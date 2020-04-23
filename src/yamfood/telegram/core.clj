@@ -48,7 +48,7 @@
 
 
 (comment
-  (let [webhook-url "https://b3184c60.ngrok.io"]
+  (let [webhook-url "https://a1c67e80.ngrok.io"]
     (morse.api/set-webhook (env :bot-token) (str webhook-url "/updates/client"))
     (morse.api/set-webhook (env :rider-bot-token) (str webhook-url "/updates/rider"))))
 

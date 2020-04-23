@@ -1,7 +1,7 @@
 (ns yamfood.core.utils)
 
 
-(defn keywordize
+(defn- keywordize
   [data]
   (into
     {}

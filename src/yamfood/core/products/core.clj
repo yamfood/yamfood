@@ -2,6 +2,7 @@
   (:require
     [honeysql.core :as hs]
     [honeysql.helpers :as hh]
+    [yamfood.core.utils :as cu]
     [clojure.java.jdbc :as jdbc]
     [yamfood.core.db.core :as db]))
 
@@ -35,7 +36,8 @@
   ([]
    (->> all-products-query
         (hs/format)
-        (jdbc/query db/db)))
+        (jdbc/query db/db)
+        (map #(cu/keywordize-field % :category))))
   ([kitchen-id]
    (->> (-> all-products-query
             (hh/merge-where
@@ -43,7 +45,8 @@
                      :products.id
                      (disabled-products-query kitchen-id)]]))
         (hs/format)
-        (jdbc/query db/db))))
+        (jdbc/query db/db)
+        (map #(cu/keywordize-field % :category)))))
 
 
 (def basket-cost-query "
@@ -92,7 +95,8 @@
   [basket-id name]
   (->> (product-detail-state-by-name-query basket-id name)
        (jdbc/query db/db)
-       (first)))
+       (first)
+       (#(cu/keywordize-field % :category))))
 
 
 (defn state-for-product-detail!
@@ -132,7 +136,8 @@
   []
   (->> categories-list-query
        (hs/format)
-       (jdbc/query db/db)))
+       (jdbc/query db/db)
+       (map #(cu/keywordize-field % :name))))
 
 
 (defn products-by-category-emoji!

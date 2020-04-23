@@ -34,11 +34,16 @@
   (str/replace (format "%,d" amount) "," " "))
 
 
+(defn translated
+  [lang map]
+  (get map lang "Not translated!!!"))
+
+
 (defn more-button
   [lang state]
   (let [category (:category state)]
     (if category
-      [{:text (str (:emoji state) " " category) :switch_inline_query_current_chat (:emoji state)}]
+      [{:text (str (:emoji state) " " (translated lang category) :switch_inline_query_current_chat (:emoji state))}]
       [{:text (translate lang :more-button) :switch_inline_query_current_chat ""}])))
 
 

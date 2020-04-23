@@ -18,20 +18,21 @@
 
 
 (defn categories-reducer
-  [r category]
-  (let [current (last r)
-        c (count current)
-        emoji (:emoji category)
-        text (str emoji " " (:name category))
-        next {:text text :switch_inline_query_current_chat emoji}]
-    (cond
-      (= c 1) (conj (pop r) [(first current) next])
-      :else (conj r [next]))))
+  [lang]
+  (fn [r category]
+    (let [current (last r)
+          c (count current)
+          emoji (:emoji category)
+          text (str emoji " " (u/translated lang (:name category)))
+          next {:text text :switch_inline_query_current_chat emoji}]
+      (cond
+        (= c 1) (conj (pop r) [(first current) next])
+        :else (conj r [next])))))
 
 
 (defn categories-in-markup
-  [categories]
-  (reduce categories-reducer [] categories))
+  [lang categories]
+  (reduce (categories-reducer lang) [] categories))
 
 
 (defn menu-markup
@@ -42,7 +43,7 @@
                   (if (empty? categories)
                     [[{:text                             (translate lang :menu-button)
                        :switch_inline_query_current_chat ""}]]
-                    (categories-in-markup categories)))
+                    (categories-in-markup lang categories)))
            [{:text (translate lang :regions-button)
              :url  u/map-url}]
            [{:text          (translate lang :settings-button)

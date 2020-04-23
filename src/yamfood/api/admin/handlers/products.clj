@@ -17,12 +17,16 @@
 
 (defn products-list
   [_]
-  {:body (p/all-products!)})
+  {:body
+   (->> (p/all-products!)
+        (map #(assoc % :category (:ru (:category %)))))})
 
 
 (defn categories-list
   [_]
-  {:body (p/all-categories!)})
+  {:body
+   (->> (p/all-categories!)
+        (map #(assoc % :name (:ru (:name %)))))})
 
 
 (s/def ::create-product
