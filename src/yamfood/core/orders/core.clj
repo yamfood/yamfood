@@ -100,6 +100,8 @@
                [(order-total-sum-query :orders.id) :total_sum]
                [(order-current-status-query :orders.id) :status]
                :orders.comment
+               :orders.notes
+               :orders.delivery_cost
                :orders.address]
    :from      [:orders]
    :left-join [:riders [:= :orders.rider_id :riders.id]
@@ -351,17 +353,35 @@
 
 
 (defn update-order-products!
-  [order-id products]
-  (let [products (map
-                   #(assoc % :order_id order-id)
-                   products)]
+  ([order-id products]
+   (update-order-products! db/db order-id products))
+  ([c order-id products]
+   (let [products (map
+                    #(assoc % :order_id order-id)
+                    products)]
+     (jdbc/with-db-transaction
+       [t-con c]
+       (jdbc/delete!
+         t-con
+         "order_products"
+         ["order_products.order_id = ?" order-id])
+       (jdbc/insert-multi!
+         t-con
+         "order_products"
+         products)))))
+
+
+(defn update!
+  [order-id order]
+  (let [products (:products order)
+        order (dissoc order :products)]
     (jdbc/with-db-transaction
       [t-con db/db]
-      (jdbc/delete!
-        t-con
-        "order_products"
-        ["order_products.order_id = ?" order-id])
-      (jdbc/insert-multi!
-        t-con
-        "order_products"
-        products))))
+      (when products
+        (update-order-products! t-con order-id products))
+      (when (seq order)
+        (jdbc/update!
+          t-con
+          "orders"
+          order
+          ["orders.id = ?" order-id])))))

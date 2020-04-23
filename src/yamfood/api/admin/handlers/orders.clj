@@ -221,22 +221,26 @@
           :opt-un [::comment]))
 
 (s/def ::products (s/coll-of ::order-products))
+(s/def ::notes string?)
+(s/def ::address string?)
+(s/def ::delivery_cost int?)
 
 (s/def ::patch-order
-  (s/keys :req-un [::products]))
+  (s/keys :opt-un [::products ::notes ::address ::delivery_cost]))
 
 
 (defn patch-order
   [request]
   (let [order-id (u/str->int (:id (:params request)))
         order (o/order-by-id! order-id)
+        body (:body request)
         valid? (and
                  order
                  (= (:status order) "new")
-                 (s/valid? ::patch-order (:body request)))]
+                 (s/valid? ::patch-order body))]
     (if valid?
       (try
-        (o/update-order-products! order-id (:products (:body request)))
+        (o/update! order-id body)
         {:body (o/order-by-id! order-id)}
         (catch Exception e
           (println e)
