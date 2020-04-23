@@ -16,13 +16,14 @@
 
 
 (defn query-result-from-product
-  [product]
-  {:type                  "article"
-   :id                    (:id product)
-   :input_message_content {:message_text (:name product)}
-   :title                 (:name product)
-   :description           (product-description product)
-   :thumb_url             (:thumbnail product)})
+  [lang]
+  (fn [product]
+    {:type                  "article"
+     :id                    (:id product)
+     :input_message_content {:message_text (str (:id product))}
+     :title                 (u/translated lang (:name product))
+     :description           (product-description product)
+     :thumb_url             (:thumbnail product)}))
 
 
 (defn current-location-inline-result
@@ -51,6 +52,7 @@
                     :next-event :c/inline}})))
   ([ctx products]
    (let [update (:update ctx)
+         lang (:lang ctx)
          address (get-in ctx [:client :payload :location :address])]
      {:answer-inline
       {:inline-query-id (:id (:inline_query update))
@@ -59,7 +61,7 @@
                           [(current-location-inline-result
                              (:lang ctx)
                              (u/text-from-address address))]
-                          (map query-result-from-product products))}})))
+                          (map (query-result-from-product lang) products))}})))
 
 
 (d/register-event-handler!

@@ -125,11 +125,13 @@
 
 
 (defn order-products-text
-  [products]
-  (doall
-    (map
-      #(format (str e/food-emoji " %d x %s\n") (:count %) (:name %))
-      products)))
+  ([lang products]
+   (doall
+     (map
+       #(format (str e/food-emoji " %d x %s\n")
+                (:count %)
+                (translated lang (:name %)))
+       products))))
 
 
 (defn text-from-address

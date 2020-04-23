@@ -4,7 +4,8 @@
     [clojure.java.jdbc :as jdbc]
     [yamfood.core.db.core :as db]
     [yamfood.core.clients.core :as clients]
-    [yamfood.core.products.core :as products]))
+    [yamfood.core.products.core :as products]
+    [yamfood.core.utils :as cu]))
 
 
 (defn- basket-products-query
@@ -35,7 +36,8 @@
 (defn- basket-products!
   [basket-id]
   (->> (basket-products-query basket-id)
-       (jdbc/query db/db)))
+       (jdbc/query db/db)
+       (map #(cu/keywordize-field % :name))))
 
 
 (defn basket-totals!

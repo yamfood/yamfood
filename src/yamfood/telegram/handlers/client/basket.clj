@@ -48,17 +48,18 @@
 
 
 (defn basket-product-markup
-  [val product]
-  (apply conj val [[{:callback_data "nothing"
-                     :text          (format (str e/food-emoji " %d x %s")
-                                            (:count product)
-                                            (:name product))}]
+  [lang]
+  (fn [val product]
+    (apply conj val [[{:callback_data "nothing"
+                       :text          (format (str e/food-emoji " %d x %s")
+                                              (:count product)
+                                              (u/translated lang (:name product)))}]
 
-                   (u/basket-product-controls
-                     "basket"
-                     (:id product)
-                     (format "%s сум"
-                             (u/fmt-values (* (:price product) (:count product)))))]))
+                     (u/basket-product-controls
+                       "basket"
+                       (:id product)
+                       (format "%s сум"
+                               (u/fmt-values (* (:price product) (:count product)))))])))
 
 
 (defn basket-detail-products-markup
@@ -66,7 +67,9 @@
   (cond
     (empty? (:products basket-state)) [[{:text          (translate lang :empty-basket-text)
                                          :callback_data "nothing"}]]
-    :else (reduce basket-product-markup [] (:products basket-state))))
+    :else (reduce (basket-product-markup lang)
+                  []
+                  (:products basket-state))))
 
 
 (defn basket-detail-markup

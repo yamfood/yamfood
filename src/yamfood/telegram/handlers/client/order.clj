@@ -159,20 +159,21 @@
   [lang order]
   (translate lang :active-order-message
              (:id order)
-             (apply str (u/order-products-text (:products order)))
+             (apply str (u/order-products-text lang (:products order)))
              (u/fmt-values (:total_cost order))
              (translate lang (keyword (:payment order)))))
 
 
 (defn product-price
-  [product]
-  {:label  (format "%d x %s" (:count product) (:name product))
-   :amount (* (:price product) (:count product) 100)})
+  [lang]
+  (fn [product]
+    {:label  (format "%d x %s" (:count product) (u/translated lang (:name product)))
+     :amount (* (:price product) (:count product) 100)}))
 
 
 (defn order-prices
-  [order]
-  (map product-price (:products order)))
+  [lang order]
+  (map (product-price lang) (:products order)))
 
 
 (defn active-order
@@ -190,8 +191,8 @@
 
 
 (defn invoice-description
-  [order]
-  (format (str (apply str (u/order-products-text (:products order))))))
+  [lang order]
+  (format (str (apply str (u/order-products-text lang (:products order))))))
 
 
 (defn invoice-reply-markup
@@ -211,10 +212,10 @@
           message-id (:message_id (:message (:callback_query update)))]
       {:send-invoice   {:chat-id     chat-id
                         :title       (translate lang :invoice-title (:id order))
-                        :description (invoice-description order)
+                        :description (invoice-description lang order)
                         :payload     {:order_id (:id order)}
                         :currency    "UZS"
-                        :prices      (order-prices order)
+                        :prices      (order-prices lang order)
                         :options     {:reply_markup (invoice-reply-markup lang)}}
        :delete-message {:chat-id    chat-id
                         :message-id message-id}})))

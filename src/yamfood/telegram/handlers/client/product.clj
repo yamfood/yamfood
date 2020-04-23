@@ -66,7 +66,7 @@
 
 (defn product-caption
   [lang product]
-  (translate lang :product-caption {:name   (:name product)
+  (translate lang :product-caption {:name   (u/translated lang (:name product))
                                     :price  (u/fmt-values (:price product))
                                     :energy (u/fmt-values (:energy product))}))
 

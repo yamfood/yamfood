@@ -17,5 +17,4 @@
 
     [yamfood.telegram.handlers.rider.menu]
     [yamfood.telegram.handlers.rider.order]
-    [yamfood.telegram.handlers.rider.inline]
     [yamfood.telegram.handlers.rider.callback]))

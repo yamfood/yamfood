@@ -155,7 +155,8 @@
   (->> (-> all-products-query
            (hh/merge-where [:= :categories.emoji emoji]))
        (hs/format)
-       (jdbc/query db/db)))
+       (jdbc/query db/db)
+       (map keywordize-json-fields)))
 
 
 (defn create-product!

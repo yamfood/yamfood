@@ -1,10 +1,10 @@
 (ns yamfood.telegram.handlers.rider.menu
   (:require
+    [yamfood.core.riders.core :as r]
     [yamfood.telegram.dispatcher :as d]
     [yamfood.telegram.handlers.utils :as u]
-    [yamfood.core.riders.core :as r]
-    [yamfood.telegram.handlers.rider.core :as c]
-    [yamfood.telegram.handlers.emojies :as e]))
+    [yamfood.telegram.handlers.emojies :as e]
+    [yamfood.telegram.handlers.rider.core :as c]))
 
 
 (defn rider-menu-text
