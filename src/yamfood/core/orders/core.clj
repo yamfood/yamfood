@@ -129,9 +129,13 @@
 
 (defn products-by-order-id!
   [order-id]
-  (->> (products-by-order-id-query order-id)
-       (jdbc/query db/db)
-       (map cu/keywordize-field)))
+  (let [keywordize-fn (fn [product]
+                        (-> product
+                            (cu/keywordize-field)
+                            (cu/keywordize-field :name)))]
+    (->> (products-by-order-id-query order-id)
+         (jdbc/query db/db)
+         (map keywordize-fn))))
 
 
 (defn add-products!

@@ -70,7 +70,11 @@
 (defn order-details
   [request]
   (let [order-id (u/str->int (:id (:params request)))]
-    {:body (o/order-by-id! order-id)}))
+    {:body (update
+             (o/order-by-id! order-id)
+             :products
+             (fn [products]
+               (map #(update % :name :ru) products)))}))
 
 
 (defn accept-order
