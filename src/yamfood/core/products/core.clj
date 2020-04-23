@@ -32,12 +32,19 @@
    :where  [:= :disabled_products.kitchen_id kitchen-id]})
 
 
+(defn keywordize-json-fields
+  [product]
+  (-> product
+      (cu/keywordize-field :category)
+      (cu/keywordize-field :name)))
+
+
 (defn all-products!
   ([]
    (->> all-products-query
         (hs/format)
         (jdbc/query db/db)
-        (map #(cu/keywordize-field % :category))))
+        (map keywordize-json-fields)))
   ([kitchen-id]
    (->> (-> all-products-query
             (hh/merge-where
@@ -46,7 +53,7 @@
                      (disabled-products-query kitchen-id)]]))
         (hs/format)
         (jdbc/query db/db)
-        (map #(cu/keywordize-field % :category)))))
+        (map keywordize-json-fields))))
 
 
 (def basket-cost-query "
@@ -96,7 +103,7 @@
   (->> (product-detail-state-by-name-query basket-id name)
        (jdbc/query db/db)
        (first)
-       (#(cu/keywordize-field % :category))))
+       (keywordize-json-fields)))
 
 
 (defn state-for-product-detail!
@@ -104,7 +111,7 @@
   (->> (product-detail-state-by-id-query basket-id id)
        (jdbc/query db/db)
        (first)
-       (#(cu/keywordize-field % :category))))
+       (keywordize-json-fields)))
 
 
 (def categories-list-query
@@ -122,7 +129,7 @@
        (hs/format)
        (jdbc/query db/db)
        (first)
-       (#(cu/keywordize-field % :category))))
+       (keywordize-json-fields)))
 
 
 (defn product-by-id!
@@ -132,7 +139,7 @@
        (hs/format)
        (jdbc/query db/db)
        (first)
-       (#(cu/keywordize-field % :category))))
+       (keywordize-json-fields)))
 
 
 (defn all-categories!

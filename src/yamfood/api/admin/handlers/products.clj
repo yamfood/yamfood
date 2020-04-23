@@ -8,25 +8,37 @@
 
 (s/def ::photo string?)
 (s/def ::thumbnail string?)
-(s/def ::name string?)
+
+(s/def ::ru string?)
+(s/def ::uz string?)
+(s/def ::en string?)
+(s/def ::name
+  (s/keys :req-un [::ru ::uz ::en]))
 (s/def ::energy int?)
 (s/def ::price int?)
 (s/def ::position int?)
 (s/def ::category_id (s/nilable int?))
 
 
+(defn set-translations
+  [product]
+  (-> product
+      (update :category :ru)
+      (update :name :ru)))
+
+
 (defn products-list
   [_]
   {:body
    (->> (p/all-products!)
-        (map #(assoc % :category (:ru (:category %)))))})
+        (map set-translations))})
 
 
 (defn categories-list
   [_]
   {:body
    (->> (p/all-categories!)
-        (map #(assoc % :name (:ru (:name %)))))})
+        (map #(update % :name :ru)))})
 
 
 (s/def ::create-product
@@ -34,19 +46,10 @@
           :opt-un [::energy ::category_id ::position]))
 
 
-(defn validate-create-product!
-  [body]
-  (let [valid? (s/valid? ::create-product body)
-        name (:name body)]
-    (if valid?
-      (nil? (p/product-by-name! name))
-      false)))
-
-
 (defn create-product
   [request]
   (let [body (:body request)
-        valid? (validate-create-product! body)]
+        valid? (s/valid? ::create-product body)]
     (if valid?
       (try
         {:body (p/create-product! body)}
@@ -80,22 +83,12 @@
      ::position]))
 
 
-(defn validate-patch-product!
-  [body product-id]
-  (let [valid? (s/valid? ::patch-product body)
-        name (:name body)]
-    (if valid?
-      (let [product (p/product-by-name! name)]
-        (or (nil? product) (= (:id product) product-id)))
-      false)))
-
-
 (defn patch-product
   [request]
   (let [product-id (u/str->int (:id (:params request)))
         product (p/product-by-id! product-id)
         body (:body request)
-        valid? (validate-patch-product! body product-id)]
+        valid? (s/valid? ::patch-product body)]
     (if product
       (if valid?
         (do
