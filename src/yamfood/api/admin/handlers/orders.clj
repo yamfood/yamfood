@@ -213,20 +213,24 @@
 (s/def ::count int?)
 (s/def ::order-products
   (s/keys :req-un [::product_id ::count]))
-(s/def ::patch-order-products (s/coll-of ::order-products))
+
+(s/def ::products (s/coll-of ::order-products))
+
+(s/def ::patch-order
+  (s/keys :req-un [::products]))
 
 
-(defn patch-order-products
+(defn patch-order
   [request]
   (let [order-id (u/str->int (:id (:params request)))
         order (o/order-by-id! order-id)
         valid? (and
                  order
                  (= (:status order) "new")
-                 (s/valid? ::patch-order-products (:body request)))]
+                 (s/valid? ::patch-order (:body request)))]
     (if valid?
       (try
-        (o/update-order-products! order-id (:body request))
+        (o/update-order-products! order-id (:products (:body request)))
         {:body (o/order-by-id! order-id)}
         (catch Exception e
           (println e)
@@ -239,10 +243,11 @@
 (c/defroutes
   routes
   (c/GET "/:id{[0-9]+}/" [] order-details)
+  (c/PATCH "/:id{[0-9]+}/" [] patch-order)
+
   (c/POST "/:id{[0-9]+}/accept/" [] accept-order)
   (c/POST "/:id{[0-9]+}/cancel/" [] cancel-order)
   (c/GET "/:id{[0-9]+}/products/" [] order-available-products)
-  (c/PATCH "/:id{[0-9]+}/products/" [] patch-order-products)
 
   (c/GET "/active/" [] active-orders-list)
   (c/GET "/finished/" [] finished-orders))
