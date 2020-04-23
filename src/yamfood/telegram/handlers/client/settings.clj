@@ -26,7 +26,7 @@
   [lang]
   {:inline_keyboard
    [[(language-button lang :ru)
-     (language-button lang :uz)
+     ;(language-button lang :uz)
      (language-button lang :en)]
     [{:text          (translate lang :settings-change-phone-button)
       :callback_data "request-phone"}]

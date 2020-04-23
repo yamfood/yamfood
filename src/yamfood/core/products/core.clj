@@ -121,7 +121,8 @@
            (hh/merge-where [:= :products.name name]))
        (hs/format)
        (jdbc/query db/db)
-       (first)))
+       (first)
+       (#(cu/keywordize-field % :category))))
 
 
 (defn product-by-id!
@@ -130,7 +131,8 @@
            (hh/merge-where [:= :products.id id]))
        (hs/format)
        (jdbc/query db/db)
-       (first)))
+       (first)
+       (#(cu/keywordize-field % :category))))
 
 
 (defn all-categories!
