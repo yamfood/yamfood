@@ -103,7 +103,8 @@
   [basket-id id]
   (->> (product-detail-state-by-id-query basket-id id)
        (jdbc/query db/db)
-       (first)))
+       (first)
+       (#(cu/keywordize-field % :category))))
 
 
 (def categories-list-query
