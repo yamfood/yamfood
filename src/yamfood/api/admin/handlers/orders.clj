@@ -233,7 +233,8 @@
   [request]
   (let [order-id (u/str->int (:id (:params request)))
         order (o/order-by-id! order-id)
-        body (:body request)
+        body (select-keys (:body request)
+                          [:products :notes :address :delivery-cost])
         valid? (and
                  order
                  (= (:status order) "new")
