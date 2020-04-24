@@ -76,6 +76,7 @@
 
         ; Payments
         :pay-button                      "Оплатить"
+        :invoice-cancel-button           "Назад"
         :invoice-title                   "Оплатить заказ №{1}"
 
         ; Statuses
@@ -163,6 +164,7 @@
 
         ; Payments
         :pay-button                      "[en] Оплатить"
+        :invoice-cancel-button           "[en] Назад"
         :invoice-title                   "[en] Оплатить заказ №{1}"
 
         ; Statuses

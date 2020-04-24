@@ -198,7 +198,10 @@
 
 (defn invoice-reply-markup
   [lang]
-  {:inline_keyboard [[{:text (translate lang :pay-button) :pay true}]]})
+  {:inline_keyboard [[{:text (translate lang :pay-button)
+                       :pay  true}]
+                     [{:text          (translate lang :invoice-cancel-button)
+                       :callback_data "basket"}]]})
 
 
 (defn send-invoice
