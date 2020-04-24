@@ -69,8 +69,12 @@
 
 (defn product-detail-state-query
   [basket-id]
-  {:select    [:products.id :products.name :products.price
-               :products.photo :products.thumbnail
+  {:select    [:products.id
+               :products.name
+               :products.description
+               :products.price
+               :products.photo
+               :products.thumbnail
                :products.energy
                :categories.emoji
                [:categories.name :category]

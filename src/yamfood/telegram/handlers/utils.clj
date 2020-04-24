@@ -36,7 +36,7 @@
 
 (defn translated
   [lang map]
-  (get map lang "Not translated!!!"))
+  (get map lang))
 
 
 (defn more-button

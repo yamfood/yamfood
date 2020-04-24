@@ -66,9 +66,15 @@
 
 (defn product-caption
   [lang product]
-  (translate lang :product-caption {:name   (u/translated lang (:name product))
-                                    :price  (u/fmt-values (:price product))
-                                    :energy (u/fmt-values (:energy product))}))
+  (let [description (u/translated lang (:description product))]
+    (translate lang
+               :product-caption
+               {:name        (u/translated lang (:name product))
+                :description (if (empty? description)
+                               nil
+                               (str description "\n\n"))
+                :price       (u/fmt-values (:price product))
+                :energy      (u/fmt-values (:energy product))})))
 
 
 (defn product-detail-options
