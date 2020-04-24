@@ -290,24 +290,26 @@
 
 
 (defn insert-order-query
-  [client-id lon lat address comment kitchen-id payment]
-  ["insert into orders (client_id, location, address, comment, kitchen_id, payment) values (?, POINT (?, ?), ?, ?, ?, ?) ;"
+  [client-id lon lat address comment kitchen-id payment delivery_cost]
+  ["insert into orders (client_id, location, address, comment, kitchen_id, payment, delivery_cost) values (?, POINT (?, ?), ?, ?, ?, ?, ?) ;"
    client-id
    lon lat
    address
    comment
    kitchen-id
-   payment])
+   payment
+   delivery_cost])
 
 
 (defn insert-order!
-  [client-id lon lat address comment kitchen-id payment]
+  [client-id lon lat address comment kitchen-id payment delivery-cost]
   (let [query (insert-order-query client-id
                                   lon lat
                                   address
                                   comment
                                   kitchen-id
-                                  payment)]
+                                  payment
+                                  delivery-cost)]
     (jdbc/execute! db/db query {:return-keys ["id"]})))
 
 
@@ -318,7 +320,7 @@
 
 (defn create-order!
   ; TODO: Use transaction!
-  [basket-id location address comment payment]
+  [basket-id location address comment payment delivery-cost]
   (let [client (clients/client-with-basket-id! basket-id)
         kitchen (kitchens/nearest-kitchen! (:longitude location)
                                            (:latitude location))
@@ -328,7 +330,8 @@
                                      address
                                      comment
                                      (:id kitchen)
-                                     payment))]
+                                     payment
+                                     delivery-cost))]
     (-> (products-from-basket! basket-id)
         (prepare-basket-products-to-order order-id)
         (insert-products!))

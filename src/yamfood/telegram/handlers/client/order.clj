@@ -125,12 +125,13 @@
                     u/cash-payment)
         comment (:comment payload)
         address (:address location)
-        card? (= payment u/card-payment)]
+        card? (= payment u/card-payment)
+        delivery-cost (get-in ctx [:params :delivery-cost])]
     (merge
       {:run            [(merge {:function ord/create-order!
                                 :args     [basket-id location
                                            (u/text-from-address address)
-                                           comment payment]}
+                                           comment payment delivery-cost]}
                                (if card?
                                  {:next-event :c/send-invoice}
                                  {:next-event :c/active-order}))

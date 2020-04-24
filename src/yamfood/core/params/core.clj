@@ -25,7 +25,8 @@
 
 (def default-params
   {:disable-card false
-   :verify-phone true})
+   :verify-phone true
+   :delivery-cost 10000})
 
 
 (defn params!
