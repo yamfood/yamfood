@@ -10,6 +10,7 @@
 (def all-products-query
   {:select    [:products.id
                :products.name
+               :products.description
                :products.price
                :products.photo
                :products.position
@@ -36,6 +37,7 @@
   [product]
   (-> product
       (cu/keywordize-field :category)
+      (cu/keywordize-field :description)
       (cu/keywordize-field :name)))
 
 

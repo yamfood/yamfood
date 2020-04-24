@@ -14,6 +14,8 @@
 (s/def ::en string?)
 (s/def ::name
   (s/keys :req-un [::ru ::uz ::en]))
+(s/def ::description
+  (s/keys :req-un [::ru ::uz ::en]))
 (s/def ::energy int?)
 (s/def ::price int?)
 (s/def ::position int?)
@@ -43,7 +45,7 @@
 
 (s/def ::create-product
   (s/keys :req-un [::photo ::thumbnail ::name ::price]
-          :opt-un [::energy ::category_id ::position]))
+          :opt-un [::energy ::category_id ::position ::description]))
 
 
 (defn create-product
@@ -77,6 +79,7 @@
     [::photo
      ::thumbnail
      ::name
+     ::description
      ::price
      ::energy
      ::category_id
