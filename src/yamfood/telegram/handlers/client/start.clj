@@ -44,8 +44,8 @@
                     [[{:text                             (translate lang :menu-button)
                        :switch_inline_query_current_chat ""}]]
                     (categories-in-markup lang categories)))
-           [{:text (translate lang :regions-button)
-             :url  u/map-url}]
+           [{:text (translate lang :invalid-location-basket-button)
+             :callback_data "basket"}]
            [{:text          (translate lang :settings-button)
              :callback_data "settings"}])}))
 
