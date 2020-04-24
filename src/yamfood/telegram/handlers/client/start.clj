@@ -44,17 +44,24 @@
                     [[{:text                             (translate lang :menu-button)
                        :switch_inline_query_current_chat ""}]]
                     (categories-in-markup lang categories)))
-           [{:text (translate lang :invalid-location-basket-button)
+           [{:text          (translate lang :invalid-location-basket-button)
              :callback_data "basket"}]
            [{:text          (translate lang :settings-button)
              :callback_data "settings"}])}))
 
 
 (defn menu-handler
-  ([_]
-   {:run {:function   p/all-categories!
-          :args       []
-          :next-event :c/menu}})
+  ([ctx]
+   (let [client (:client ctx)
+         location (get-in client [:payload :location])]
+     (if location
+       {:run {:function   p/all-categories!
+              :args       []
+              :next-event :c/menu}}
+       {:run      {:function clients/update-payload!
+                   :args     [(:id client)
+                              (assoc (:payload client) :step u/menu-step)]}
+        :dispatch {:args [:c/request-location]}})))
   ([ctx categories]
    (let [client (:client ctx)
          lang (:lang ctx)
