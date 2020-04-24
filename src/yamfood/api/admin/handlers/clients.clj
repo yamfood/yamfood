@@ -3,39 +3,28 @@
     [yamfood.utils :as u]
     [compojure.core :as c]
     [clojure.spec.alpha :as s]
-    [clojure.data.json :as json]
     [yamfood.api.pagination :as p]
+    [yamfood.core.specs.core :as cs]
     [yamfood.core.clients.core :as clients]))
-
-
-(def labels
-  {:id              "ID"
-   :phone           "Номер телефона"
-   :tid             "Telegram ID"
-   :payload         "Мета"
-   :is_blocked      "Заблокирован?"
-   :active_order_id "ID активного заказа"
-   :basket_id       "ID корзины"})
-
-
-(defn fmt-client-details
-  [client]
-  (map
-    #(hash-map :label ((first %) labels)
-               :value (json/write-str (second %)))
-    (seq client)))
 
 
 (defn client-detail
   [request]
   (let [client-id (u/str->int (:id (:params request)))]
     {:body (-> (clients/client-with-id! client-id)
-               (fmt-client-details))}))
+               (update :data [{:label "Количество завершенных заказов"
+                               :value "1000"}
+                              {:label "Количество отмененных заказов"
+                               :value "100"}
+                              {:label "Средний чек"
+                               :value "100 000 сум"}]))}))
 
 
 (s/def ::is_blocked boolean?)
+(s/def ::name string?)
 (s/def ::client-patch
-  (s/keys :opt-un [::is_blocked]))
+  (s/keys :opt-un [::is_blocked ::cs/phone ::name]))
+
 
 (defn client-patch
   [request]
