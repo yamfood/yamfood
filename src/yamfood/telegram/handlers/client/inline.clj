@@ -10,9 +10,8 @@
 
 (defn product-description
   [product]
-  (format "%s сум, %s кКал"
-          (u/fmt-values (:price product))
-          (u/fmt-values (:energy product))))
+  (format "%s сум"
+          (u/fmt-values (:price product))))
 
 
 (defn query-result-from-product

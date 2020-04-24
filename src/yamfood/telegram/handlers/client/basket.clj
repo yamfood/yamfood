@@ -74,15 +74,12 @@
 
 (defn basket-detail-markup
   [lang basket-state]
-  (let [total_cost (:total_cost basket-state)
-        total_energy (:total_energy basket-state)]
+  (let [total_cost (:total_cost basket-state)]
     {:inline_keyboard
      (conj (basket-detail-products-markup lang basket-state)
            [{:text (translate lang :basket-menu-button) :callback_data "menu"}]
-           [{:text          (format (str e/money-emoji " %s сум "
-                                         e/energy-emoji " %s кКал")
-                                    (u/fmt-values total_cost)
-                                    (u/fmt-values total_energy))
+           [{:text          (format (str e/money-emoji " %s сум ")
+                                    (u/fmt-values total_cost))
              :callback_data "nothing"}]
            (if (not (empty? (:products basket-state)))
              [{:text (translate lang :to-order-button) :callback_data "to-order"}]

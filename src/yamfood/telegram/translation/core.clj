@@ -50,7 +50,7 @@
         :product-basket-button           (str e/basket-emoji " Корзина ({1} сум)")
         :product-menu-button             (str e/back-emoji " Назад")
         :product-caption                 (str e/food-emoji " *{name}* \n\n"
-                                              e/money-emoji "{price} сум  " e/energy-emoji "{energy} кКал")
+                                              e/money-emoji "{price} сум")
 
         ; Basket
         :basket-message                  "Ваша корзина:"
@@ -137,7 +137,7 @@
         :product-basket-button           (str e/basket-emoji " [en] Корзина ({1} сум)")
         :product-menu-button             (str e/back-emoji " [en] Назад")
         :product-caption                 (str e/food-emoji " [en] *{name}* \n\n"
-                                              e/money-emoji "{price} сум  " e/energy-emoji "{energy} кКал")
+                                              e/money-emoji "{price} сум")
 
         ; Basket
         :basket-message                  "[en] Ваша корзина:"
