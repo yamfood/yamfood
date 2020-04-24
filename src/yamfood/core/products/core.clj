@@ -110,8 +110,8 @@
   [basket-id id]
   (->> (product-detail-state-by-id-query basket-id id)
        (jdbc/query db/db)
-       (first)
-       (keywordize-json-fields)))
+       (map keywordize-json-fields)
+       (first)))
 
 
 (def categories-list-query
