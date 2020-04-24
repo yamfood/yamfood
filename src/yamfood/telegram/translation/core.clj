@@ -16,7 +16,7 @@
                                               "Мы отправим смс с кодом для подтверждения")
 
         ; Start
-        :hello-message                   "Готовим и бесплатно доставляем за 30 минут"
+        :hello-message                   "С чего начнем?"
         :menu-button                     "\uD83C\uDF7D Что поесть?"
         :regions-button                  (str e/location-emoji " Зона покрытия")
         :settings-button                 (str e/settings-emoji " Настройки")
@@ -104,7 +104,7 @@
                                               "Мы отправим смс с кодом для подтверждения")
 
         ; Start
-        :hello-message                   "[en] Готовим и бесплатно доставляем за 30 минут"
+        :hello-message                   "[en] С чего начнем?"
         :menu-button                     "\uD83C\uDF7D [en] Что поесть?"
         :regions-button                  (str e/location-emoji " [en] Зона покрытия")
         :settings-button                 (str e/settings-emoji " [en] Настройки")
