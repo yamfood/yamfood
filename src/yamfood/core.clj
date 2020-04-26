@@ -9,6 +9,7 @@
     [yamfood.core.db.init :as db]
     [yamfood.tasks.core :as tasks]
     [yamfood.telegram.core :as telegram]
+    [yamfood.core.params.core :as params]
     [ring.adapter.jetty :refer [run-jetty]]
     [ring.middleware.json :refer [wrap-json-body]]))
 
@@ -31,6 +32,7 @@
 
 (defn -main []
   (db/init)
+  (params/sync-params!)
   (tasks/run-tasks!)
   (let [port (Integer. (or (env :port) 666))]
     (http/start-server #'app {:port port :join? false})))
