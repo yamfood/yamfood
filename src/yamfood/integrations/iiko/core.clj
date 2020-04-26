@@ -7,15 +7,15 @@
 
 
 (defn iiko-context!
-  [access-token organization-id]
+  [params access-token organization-id]
   (let [iiko-payment-types (:paymentTypes
                              (api/iiko-payment-types! access-token
                                                       organization-id))]
     {:access-token    access-token
      :organization-id organization-id
      :city            "Ташкент"
-     :home            "1"
-     :street          "Wok & Street"
+     :home            (get :iiko-home params)
+     :street          (get :iiko-street params)
      :payments        {:cash (:id (first (filter #(= (:code %) "CASH") iiko-payment-types)))
                        :card (:id (first (filter #(= (:code %) "PAYME") iiko-payment-types)))}}))
 
@@ -28,6 +28,6 @@
         organization-id (-> (api/organizations! access-token)
                             (first)
                             :id)
-        context (iiko-context! access-token organization-id)
+        context (iiko-context! params access-token organization-id)
         order (utils/order->iiko context order)]
     (api/create-order! access-token order)))

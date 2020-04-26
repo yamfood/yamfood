@@ -33,6 +33,14 @@
    :iiko-user-secret {:name    "IIKO User Secret"
                       :docs    ""
                       :default (env :iiko-user-secret)
+                      :adapter nil}
+   :iiko-home        {:name    "IIKO Home"
+                      :docs    ""
+                      :default ""
+                      :adapter nil}
+   :iiko-street      {:name    "IIKO Street"
+                      :docs    ""
+                      :default ""
                       :adapter nil}})
 
 
