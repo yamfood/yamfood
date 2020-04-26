@@ -67,21 +67,26 @@
   {:body (get-active-orders!)})
 
 
+(defn order-by-id!
+  [order-id]
+  (update
+    (o/order-by-id! order-id)
+    :products
+    (fn [products]
+      (map #(update % :name :ru) products))))
+
+
 (defn order-details
   [request]
   (let [order-id (u/str->int (:id (:params request)))]
-    {:body (update
-             (o/order-by-id! order-id)
-             :products
-             (fn [products]
-               (map #(update % :name :ru) products)))}))
+    {:body (order-by-id! order-id)}))
 
 
 (defn accept-order
   [request]
   (let [admin-id (:id (:admin request))
         order-id (u/str->int (:id (:params request)))
-        order (o/order-by-id! order-id)
+        order (order-by-id! order-id)
         acceptable? (= (:new o/order-statuses) (:status order))]
     (if acceptable?
       (do
@@ -102,7 +107,7 @@
 (defn cancel-order
   [request]
   (let [order-id (u/str->int (:id (:params request)))
-        order (o/order-by-id! order-id)
+        order (order-by-id! order-id)
         cancelable? (u/in? o/cancelable-order-statuses
                            (:status order))
         valid? (and
@@ -202,7 +207,7 @@
 (defn order-available-products
   [request]
   (let [order-id (u/str->int (:id (:params request)))
-        order (o/order-by-id! order-id)]
+        order (order-by-id! order-id)]
     (if order
       (try
         {:body (products/all-products! (:kitchen_id order))}
@@ -232,7 +237,7 @@
 (defn patch-order
   [request]
   (let [order-id (u/str->int (:id (:params request)))
-        order (o/order-by-id! order-id)
+        order (order-by-id! order-id)
         body (select-keys (:body request)
                           [:products :notes :address :delivery-cost])
         valid? (and
@@ -242,7 +247,7 @@
     (if valid?
       (try
         (o/update! order-id body)
-        {:body (o/order-by-id! order-id)}
+        {:body (order-by-id! order-id)}
         (catch Exception e
           (println e)
           {:body   {:error "Unexpected error"}
