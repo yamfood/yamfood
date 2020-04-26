@@ -210,7 +210,8 @@
         order (order-by-id! order-id)]
     (if order
       (try
-        {:body (products/all-products! (:kitchen_id order))}
+        {:body (->> (products/all-products! (:kitchen_id order))
+                    (map #(update % :name :ru)))}
         (catch Exception e
           {:body   {:error "Unexpected error"}
            :status 500}))
