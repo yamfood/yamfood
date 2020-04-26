@@ -1,6 +1,7 @@
 (ns yamfood.integrations.iiko.core
   (:require
     [environ.core :refer [env]]
+    [yamfood.core.params.core :as p]
     [yamfood.integrations.iiko.api :as api]
     [yamfood.integrations.iiko.utils :as utils]))
 
@@ -21,8 +22,9 @@
 
 (defn create-order!
   [order]
-  (let [access-token (api/get-access-token! (env :iiko-user-id)
-                                            (env :iiko-user-secret))
+  (let [params (p/params!)
+        access-token (api/get-access-token! (:iiko-user-id params)
+                                            (:iiko-user-secret params))
         organization-id (-> (api/organizations! access-token)
                             (first)
                             :id)
