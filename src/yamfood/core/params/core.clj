@@ -8,11 +8,13 @@
 
 
 (def params-query
-  {:select [:params.name
-            :params.key
-            :params.value
-            :params.docs]
-   :from   [:params]})
+  {:select   [:params.id
+              :params.name
+              :params.key
+              :params.value
+              :params.docs]
+   :from     [:params]
+   :order-by [:params.id]})
 
 
 (def all-params
@@ -32,6 +34,22 @@
                       :docs    ""
                       :default (env :iiko-user-secret)
                       :adapter nil}})
+
+
+(defn params-detail-list!
+  []
+  (->> (-> params-query
+           (hs/format))
+       (jdbc/query db/db)))
+
+
+(defn update!
+  [id param]
+  (jdbc/update!
+    db/db
+    "params"
+    param
+    ["id = ?" id]))
 
 
 (defn params-reducer
