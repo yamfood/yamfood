@@ -1,9 +1,9 @@
 (ns yamfood.utils
-  (:require [clojure.edn :as edn]
-            [clj-time.format :as timef]
-            [clj-time.coerce :as timec])
-  (:import (java.util UUID)
-           (java.text SimpleDateFormat)))
+  (:require
+    [clojure.edn :as edn])
+  (:import
+    (java.util UUID)
+    (java.text SimpleDateFormat)))
 
 
 (defn uuid [] (str (UUID/randomUUID)))
