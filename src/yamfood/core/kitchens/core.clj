@@ -6,7 +6,8 @@
     [clj-time.coerce :as timec]
     [clojure.java.jdbc :as jdbc]
     [clj-postgresql.core :as pg]
-    [yamfood.core.db.core :as db]))
+    [yamfood.core.db.core :as db]
+    [yamfood.core.utils :as cu]))
 
 
 (def kitchen-query
@@ -91,7 +92,8 @@
   (->> (-> disabled-products-query
            (hh/merge-where [:= :disabled_products.kitchen_id kitchen-id])
            (hs/format))
-       (jdbc/query db/db)))
+       (jdbc/query db/db)
+       (map #(cu/keywordize-field % :name))))
 
 
 (defn add-disabled-product!
