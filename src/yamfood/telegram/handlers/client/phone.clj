@@ -1,5 +1,6 @@
 (ns yamfood.telegram.handlers.client.phone
   (:require
+    [clojure.string :as str]
     [clojure.spec.alpha :as s]
     [yamfood.core.sms.core :as sms]
     [yamfood.core.specs.core :as cs]
@@ -7,6 +8,13 @@
     [yamfood.core.clients.core :as clients]
     [yamfood.telegram.handlers.utils :as u]
     [yamfood.telegram.translation.core :refer [translate]]))
+
+
+(defn generate-confirmation-code
+  [digits-count]
+  (str/join (map (fn [_]
+                   (str (rand-int 10)))
+                 (range digits-count))))
 
 
 (defn request-phone-markup
@@ -61,21 +69,15 @@
         client (:client ctx)
         chat-id (u/chat-id update)
         phone (get-phone update)
-        code "0000"]
+        code (generate-confirmation-code 4)]
     (if phone
-      {:run       [{:function clients/update-payload!
-                    :args     [(:id client)
-                               (merge
-                                 (assoc
-                                   (:payload client)
-                                   :unconfirmed-phone
-                                   phone)
-                                 (assoc
-                                   (:payload client)
-                                   :step
-                                   u/phone-confirmation-step))]}
-                   {:function sms/create!
-                    :args     [phone (translate lang :confirmation-code code)]}]
+      {:run       [{:function sms/create!
+                    :args     [phone (translate lang :confirmation-code code)]}
+                   {:function clients/update-payload!
+                    :args     [(:id client) (-> (:payload client)
+                                                (assoc :unconfirmed-phone phone)
+                                                (assoc :step u/phone-confirmation-step)
+                                                (assoc :code code))]}]
        :send-text [{:chat-id chat-id
                     :options {:parse_mode   "markdown"
                               :reply_markup {:remove_keyboard true}}
@@ -96,7 +98,8 @@
         text (:text (:message update))
         client (:client ctx)
         phone (:unconfirmed-phone (:payload client))
-        valid? (= text "0000")]
+        code (get-in client [:payload :code])
+        valid? (= text code)]
     (if valid?
       {:run       {:function clients/update-phone!
                    :args     [(:id client) phone]}
