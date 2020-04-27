@@ -29,7 +29,8 @@
     (assoc
       kitchen
       :disabled_products
-      (k/kitchen-disabled-products! kitchen-id))))
+      (->> (k/kitchen-disabled-products! kitchen-id)
+           (map #(update % :name :ru))))))
 
 
 (defn kitchen-detail
