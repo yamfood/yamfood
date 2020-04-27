@@ -48,3 +48,11 @@
     "sms"
     row
     ["id = ?" sms-id]))
+
+
+(defn create!
+  [phone text]
+  (jdbc/insert!
+    db/db
+    "sms"
+    {:phone phone :text text}))

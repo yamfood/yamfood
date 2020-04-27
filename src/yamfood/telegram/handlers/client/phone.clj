@@ -1,6 +1,7 @@
 (ns yamfood.telegram.handlers.client.phone
   (:require
     [clojure.spec.alpha :as s]
+    [yamfood.core.sms.core :as sms]
     [yamfood.core.specs.core :as cs]
     [yamfood.telegram.dispatcher :as d]
     [yamfood.core.clients.core :as clients]
@@ -59,19 +60,22 @@
         lang (:lang ctx)
         client (:client ctx)
         chat-id (u/chat-id update)
-        phone (get-phone update)]
+        phone (get-phone update)
+        code "0000"]
     (if phone
-      {:run       {:function clients/update-payload!
-                   :args     [(:id client)
-                              (merge
-                                (assoc
-                                  (:payload client)
-                                  :unconfirmed-phone
-                                  phone)
-                                (assoc
-                                  (:payload client)
-                                  :step
-                                  u/phone-confirmation-step))]}
+      {:run       [{:function clients/update-payload!
+                    :args     [(:id client)
+                               (merge
+                                 (assoc
+                                   (:payload client)
+                                   :unconfirmed-phone
+                                   phone)
+                                 (assoc
+                                   (:payload client)
+                                   :step
+                                   u/phone-confirmation-step))]}
+                   {:function sms/create!
+                    :args     [phone (translate lang :confirmation-code code)]}]
        :send-text [{:chat-id chat-id
                     :options {:parse_mode   "markdown"
                               :reply_markup {:remove_keyboard true}}

@@ -93,7 +93,8 @@
         :blocked-message                 "Вы заблокированы, обратитесь в службу поддержки"
         :accepted                        "Принято"
         :card                            "Картой"
-        :cash                            "Наличными"}
+        :cash                            "Наличными"
+        :confirmation-code               "Ваш код подтверждения WOK {1}"}
    :en {; Registration
         :send-contact-button             "Send a contact"
         :change-phone-button             "Change phone number"
@@ -181,7 +182,8 @@
         :blocked-message                 "You are blocked, please contact the support service"
         :accepted                        "Accepted"
         :card                            "By card"
-        :cash                            "In cash"}
+        :cash                            "In cash"
+        :confirmation-code               "Your WOK confirmation code is {1}"}
    :uz {; Registration
         :send-contact-button             "Telefon raqamini yuborish"
         :change-phone-button             "Telefon raqamini o'zgartirish"
@@ -270,7 +272,8 @@
         :blocked-message                 "Siz bloklangindiz, qo'llab-quvvatlash xizmatiga murojaat qiling"
         :accepted                        "Qabul qilindi"
         :card                            "Karta bilan"
-        :cash                            "Naqd pul bilan"}})
+        :cash                            "Naqd pul bilan"
+        :confirmation-code               "Sizning WOK tasdiqlash kodi {1}"}})
 
 
 (def translate
