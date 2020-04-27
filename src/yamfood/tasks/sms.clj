@@ -11,10 +11,11 @@
         sms {:message-id id
              :text       (:text sms)
              :phone      (:phone sms)}
-        params (p/params!)]
-    (if (= (sms-api/send-sms! params sms) 200)
+        params (p/params!)
+        result (sms-api/send-sms! params sms)]
+    (if (= result 200)
       (sms-core/update! id {:is_sent true})
-      (println "Error in sending sms"))))
+      (sms-core/update! id {:error (str result)}))))
 
 
 (defn sms-daemon!
@@ -24,6 +25,3 @@
     (doall
       (->> (sms-core/sms-to-send! 50)
            (pmap send-sms!)))))
-
-
-(sms-daemon!)
