@@ -3,4 +3,6 @@
     [yamfood.integrations.sms.playmobile :as pm]))
 
 
-(def send-sms! pm/send!)
+(defn send-sms!
+  [params sms]
+  (pm/send! params sms))
