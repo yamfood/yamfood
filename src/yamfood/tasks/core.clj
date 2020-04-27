@@ -1,6 +1,7 @@
 (ns yamfood.tasks.core
   (:require
     [overtone.at-at :as at]
+    [yamfood.tasks.sms :as sms]
     [yamfood.tasks.announcements :as a]))
 
 
@@ -9,4 +10,5 @@
 
 
 (defn run-tasks! []
-  (at/every 5000 #(a/announcements-daemon!) pool))
+  (at/every 5000 #(a/announcements-daemon!) pool)
+  (at/every 5000 #(sms/sms-daemon!) pool))
