@@ -123,7 +123,8 @@
 
 (defn kitchen-products
   [_]
-  {:body (p/all-products!)})
+  {:body (->> (p/all-products!)
+              (map #(update % :name :ru)))})
 
 
 (c/defroutes
