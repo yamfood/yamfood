@@ -33,6 +33,11 @@
   {:body (a/all-admins!)})
 
 
+(defn me
+  [request]
+  {:body (:admin request)})
+
+
 (s/def ::admin-create
   (s/keys :req-un [::name ::login ::password]
           :opt-un [::payload]))
@@ -96,7 +101,11 @@
   routes
   (c/GET "/" [] admins-list)
   (c/POST "/" [] create-admin)
+
+  (c/GET "/me/" [] me)
+
   (c/PATCH "/:id{[0-9]+}/" [] patch-admin)
   (c/DELETE "/:id{[0-9]+}/" [] delete-admin)
+
   (c/GET "/permissions/" [] permissions-list))
 
