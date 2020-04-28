@@ -1,5 +1,6 @@
 (ns yamfood.telegram.handlers.client.feedback
   (:require
+    [yamfood.core.orders.core :as o]
     [yamfood.telegram.dispatcher :as d]
     [yamfood.telegram.handlers.utils :as u]))
 
@@ -9,9 +10,9 @@
   (let [query (:callback_query (:update ctx))
         params (u/callback-params (:data query))
         order-id (u/parse-int (first params))
-        rate (u/parse-int (second params))]
-    {:run      {:function #(println %1 %2)
-                :args     [order-id rate]}
+        rate (second params)]
+    {:run      {:function o/update!
+                :args     [order-id {:rate rate}]}
      :dispatch {:args [:c/menu]}}))
 
 
