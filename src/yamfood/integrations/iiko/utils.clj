@@ -25,8 +25,9 @@
 
 (defn product->item
   [product]
-  {:id     (:iiko_id (:payload product))
-   :amount (:count product)})
+  {:id      (:iiko_id (:payload product))
+   :amount  (:count product)
+   :comment (:comment product)})
 
 
 (defn get-iiko-payment-type
