@@ -18,11 +18,12 @@
                  [morse "0.4.3"]
                  [tongue "0.2.9"]
 
-                 [migratus "1.2.4"]
+                 [migratus "1.2.8"]
                  [clj-postgresql "0.7.0"]
                  [org.clojure/java.jdbc "0.7.10"]
                  [honeysql "0.9.6"]]
   :plugins [[lein-cloverage "1.0.10"]]
+  :aot :all
   :uberjar-name "yamfood.jar"
   :profiles
   {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]

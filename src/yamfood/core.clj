@@ -11,7 +11,8 @@
     [yamfood.telegram.core :as telegram]
     [yamfood.core.params.core :as params]
     [ring.adapter.jetty :refer [run-jetty]]
-    [ring.middleware.json :refer [wrap-json-body]]))
+    [ring.middleware.json :refer [wrap-json-body]])
+  (:gen-class))
 
 
 (c/defroutes
