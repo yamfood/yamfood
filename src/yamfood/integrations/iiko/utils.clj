@@ -23,6 +23,24 @@
        (map #(select-keys % [:id :name]))))
 
 
+(defn products
+  [nomenclature category-id]
+  (->> (filter
+         #(and (= (:parentGroup %) category-id)
+               (:isIncludedInMenu %))
+         (:products nomenclature))
+       (sort-by :order)
+       (map #(select-keys % [:id :name :price :order]))))
+
+
+(defn iiko->product
+  [iiko-product]
+  {:name     {:ru (:name iiko-product)}
+   :payload  {:iiko_id (:id iiko-product)}
+   :price    (:price iiko-product)
+   :position (:order iiko-product)})
+
+
 (defn product->item
   [product]
   {:id      (:iiko_id (:payload product))

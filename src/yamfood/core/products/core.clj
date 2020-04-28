@@ -188,6 +188,15 @@
       product)))
 
 
+(defn multiple-create-products!
+  [products]
+  (first
+    (jdbc/insert-multi!
+      db/db
+      "products"
+      products)))
+
+
 (defn update!
   [product-id row]
   (jdbc/update!
