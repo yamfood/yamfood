@@ -13,9 +13,14 @@
 
 
 (def permissions
-  {:can-see-products "can_see_products"
-   :can-see-clients  "can_see_clients"
-   :can-see-riders   "can_see_riders"})
+  {:can-see-kitchens      "Кухни"
+   :can-see-products      "Продукты"
+   :can-see-clients       "Клиенты"
+   :can-see-riders        "Курьеры"
+   :can-see-announcements "Объявления"
+   :can-see-orders        "Заказы"
+   :can-see-admins        "Администраторы"
+   :can-see-settings      "Настройки"})
 
 
 (defn permissions-list

@@ -9,14 +9,15 @@
 
 
 (def admin-query
-  {:select [:admins.id
-            :admins.name
-            :admins.login
-            :admins.password
-            :admins.token
-            :admins.payload]
-   :from   [:admins]
-   :where  [:= :admins.is_active true]})
+  {:select   [:admins.id
+              :admins.name
+              :admins.login
+              :admins.password
+              :admins.token
+              :admins.payload]
+   :from     [:admins]
+   :where    [:= :admins.is_active true]
+   :order-by [:admins.id]})
 
 
 (defn admin-by-credentials-query
