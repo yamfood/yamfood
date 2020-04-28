@@ -76,14 +76,9 @@
         message (:message update)
         text (:text message)
         chat-id (:id (:from message))
-        rider (:rider ctx)
         order-id (u/parse-int text)]
     (if order-id
-      (if (= (:active-order rider) nil)
-        (assign-order ctx order-id)
-        {:send-text {:chat-id chat-id
-                     :text    "У вас уже есть активный заказ"}})
-
+      (assign-order ctx order-id)
       {:send-text {:chat-id chat-id
                    :text    "Отправьте номер заказа"}})))
 
@@ -101,7 +96,7 @@
    (let [update (:update ctx)
          query (:callback_query update)]
      {:answer-callback {:callback_query_id (:id query)
-                        :text              (apply str (u/order-products-text products))
+                        :text              (apply str (u/order-products-text :ru products))
                         :show_alert        true}})))
 
 
