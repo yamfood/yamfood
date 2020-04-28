@@ -35,7 +35,7 @@
            (assoc :limit limit)
            (hh/merge-where [:and
                             [:< :sms.created_at :current_timestamp]
-                            [:= :sms.error nil]
+                            [:= :sms.error ""]
                             [:= :sms.is_sent false]])
            (hs/format))
        (jdbc/query db/db)))
