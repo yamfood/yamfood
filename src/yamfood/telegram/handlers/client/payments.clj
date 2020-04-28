@@ -20,9 +20,10 @@
   (let [update (:update ctx)
         payment (:successful_payment (:message update))
         payload (json/read-str (:invoice_payload payment) :key-fn keyword)
+        payment-id (:provider_payment_charge_id payment)
         order-id (:order_id payload)]
     {:run      [{:function o/pay-order!
-                 :args     [order-id]}
+                 :args     [order-id payment-id]}
                 {:function bsk/clear-basket!
                  :args     [(:basket_id (:client ctx))]}]
      :dispatch {:args [:c/active-order order-id]}}))

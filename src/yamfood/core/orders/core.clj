@@ -346,7 +346,7 @@
 
 
 (defn pay-order!
-  [order-id]
+  [order-id payment-id]
   (jdbc/with-db-transaction
     [t-con db/db]
     (jdbc/update! t-con "orders"
@@ -354,7 +354,8 @@
                   ["id = ?" order-id])
     (jdbc/insert! t-con "order_logs"
                   {:order_id order-id
-                   :status   (:new order-statuses)})))
+                   :status   (:new order-statuses)
+                   :payload  {:payment_id payment-id}})))
 
 
 (defn update-order-products!
