@@ -183,6 +183,7 @@
    (ended-orders! offset limit nil))
   ([offset limit where]
    (->> (-> (ended-orders-query offset limit)
+            (assoc :order-by [[:cte_orders.id :desc]])
             (hh/merge-where where))
         (hs/format)
         (jdbc/query db/db)
