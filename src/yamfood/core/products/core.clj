@@ -156,6 +156,20 @@
        (map #(cu/keywordize-field % :name))))
 
 
+(defn categories-with-products!
+  []
+  (->> (-> categories-list-query
+           (update :from #(into % [:products]))
+           (update :select #(into % [[:%count.products.id :products_count]]))
+           (assoc :group-by [:categories.id])
+           (hh/merge-where [:and
+                            [:= :products.is_active true]
+                            [:= :products.category_id :categories.id]])
+           (hs/format))
+       (jdbc/query db/db)
+       (map #(cu/keywordize-field % :name))))
+
+
 (defn products-by-category-emoji!
   [emoji]
   (->> (-> all-products-query

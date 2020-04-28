@@ -55,7 +55,7 @@
    (let [client (:client ctx)
          location (get-in client [:payload :location])]
      (if location
-       {:run {:function   p/all-categories!
+       {:run {:function   p/categories-with-products!
               :args       []
               :next-event :c/menu}}
        {:run      {:function clients/update-payload!
