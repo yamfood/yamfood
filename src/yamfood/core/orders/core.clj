@@ -102,6 +102,7 @@
                :orders.comment
                :orders.notes
                :orders.delivery_cost
+               :orders.rate
                :orders.address]
    :from      [:orders]
    :left-join [:riders [:= :orders.rider_id :riders.id]
