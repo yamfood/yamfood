@@ -111,17 +111,12 @@
             :next-event :r/finish-order}}))
   ([ctx order]
    (let [update (:update ctx)
-         query (:callback_query update)
-         chat-id (u/chat-id update)
-         message-id (:message_id (:message query))
          rider (:rider ctx)]
-     {:run            {:function r/finish-order!
-                       :args     [(:id order) (:id rider)]}
-      :dispatch       {:args        [:r/menu]
-                       :rebuild-ctx {:function c/build-ctx!
-                                     :update   update}}
-      :delete-message {:chat-id    chat-id
-                       :message-id message-id}})))
+     {:run      {:function r/finish-order!
+                 :args     [(:id order) (:id rider)]}
+      :dispatch {:args        [:r/menu]
+                 :rebuild-ctx {:function c/build-ctx!
+                               :update   update}}})))
 
 
 (defn cancel-order!
@@ -135,17 +130,12 @@
             :next-event :r/cancel-order}}))
   ([ctx order]
    (let [update (:update ctx)
-         query (:callback_query update)
-         chat-id (u/chat-id update)
-         message-id (:message_id (:message query))
          rider (:rider ctx)]
-     {:run            {:function r/cancel-order!
-                       :args     [(:id order) (:id rider)]}
-      :dispatch       {:args        [:r/menu]
-                       :rebuild-ctx {:function c/build-ctx!
-                                     :update   update}}
-      :delete-message {:chat-id    chat-id
-                       :message-id message-id}})))
+     {:run      {:function r/cancel-order!
+                 :args     [(:id order) (:id rider)]}
+      :dispatch {:args        [:r/menu]
+                 :rebuild-ctx {:function c/build-ctx!
+                               :update   update}}})))
 
 
 (d/register-event-handler!
