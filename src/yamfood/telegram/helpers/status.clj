@@ -11,12 +11,13 @@
 
 (defn notify-order-accepted!
   [order-id]
-  (let [order (o/order-by-id! order-id)]
+  (let [order (o/order-by-id! order-id)
+        lang (or (:lang order) :ru)]
     (t/send-text
       token
       (:tid order)
       {:parse_mode "markdown"}
-      (translate (:lang order) :status-on-kitchen))))
+      (translate lang :status-on-kitchen))))
 
 
 (defn notify-order-canceled!
@@ -24,8 +25,9 @@
    (notify-order-canceled! order-id nil))
   ([order-id reason]
    (let [order (o/order-by-id! order-id)
+         lang (or (:lang order) :ru)
          reason (or reason
-                    (translate (:lang order) :status-canceled))]
+                    (translate lang :status-canceled))]
      (t/send-text
        token
        (:tid order)
@@ -35,9 +37,10 @@
 
 (defn notify-order-on-way!
   [order-id]
-  (let [order (o/order-by-id! order-id)]
+  (let [order (o/order-by-id! order-id)
+        lang (or (:lang order) :ru)]
     (t/send-text
       token
       (:tid order)
       {:parse_mode "markdown"}
-      (translate (:lang order) :status-on-way))))
+      (translate lang :status-on-way))))

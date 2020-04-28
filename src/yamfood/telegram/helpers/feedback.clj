@@ -19,9 +19,10 @@
 (defn send-feedback-request!
   [order-id]
   (let [order (o/order-by-id! order-id)
+        lang (or (:lang order) :ru)
         chat-id (:tid order)]
     (t/send-text
       (env :bot-token)
       chat-id
       {:reply_markup (feedback-request-markup order-id)}
-      (translate (:lang order) :request-feedback-message))))
+      (translate lang :request-feedback-message))))
