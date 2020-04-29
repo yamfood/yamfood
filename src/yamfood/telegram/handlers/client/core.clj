@@ -14,9 +14,9 @@
          client (clients/client-with-tid!
                   (:id bot)
                   (u/tid-from-update update))]
-     {:token          token
-      :bot            bot
-      :payments-token (env :payments-token)
+     {:bot            bot
+      :token          token
+      :payments-token (:payments_token bot)
       :update         update
       :params         (p/params!)
       :client         client
