@@ -157,7 +157,7 @@
         :oc-message                      (str "*Details of your order:* \n\n"
                                               e/food-emoji " {price} sum\n"
                                               e/delivery-emoji " {delivery} sum\n"
-                                              e/money-emoji " {total} sum ({price})\n"
+                                              e/money-emoji " {total} sum ({payment})\n"
                                               e/comment-emoji " `{comment}` \n\n"
                                               e/location-emoji " {address}")
 
