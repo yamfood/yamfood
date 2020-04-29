@@ -120,7 +120,7 @@
        (first)))
 
 
-(def categories-list-query
+(def all-categories-query
   {:select    [:categories.id
                :categories.name
                [:bots.name :bot]
@@ -129,6 +129,14 @@
    :left-join [:bots
                [:= :bots.id :categories.bot_id]]
    :order-by  [:categories.position :categories.bot_id]})
+
+
+(def categories-list-query
+  {:select   [:categories.id
+              :categories.name
+              :categories.emoji]
+   :from     [:categories]
+   :order-by [:categories.position :categories.bot_id]})
 
 
 (defn product-by-name!
@@ -153,7 +161,7 @@
 
 (defn all-categories!
   []
-  (->> categories-list-query
+  (->> all-categories-query
        (hs/format)
        (jdbc/query db/db)
        (map #(cu/keywordize-field % :name))))

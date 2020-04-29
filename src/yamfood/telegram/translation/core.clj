@@ -64,9 +64,11 @@
         :oc-create-order-button          "✅ Подтвердить"
         :oc-empty-comment-text           "Пусто"
         :oc-message                      (str "*Детали вашего заказа:* \n\n"
-                                              e/money-emoji " {1} сум ({2})\n"
-                                              e/comment-emoji " `{3}` \n\n"
-                                              e/location-emoji " {4}")
+                                              e/food-emoji " {price} сум\n"
+                                              e/delivery-emoji " {delivery} сум\n"
+                                              e/money-emoji " {total} сум ({payment})\n\n"
+                                              e/comment-emoji " `{comment}` \n\n"
+                                              e/location-emoji " {address}")
 
         ; Active Order
         :active-order-message            (str "*Заказ №{1}:*\n\n"
@@ -153,9 +155,11 @@
         :oc-create-order-button          "✅ Confirm"
         :oc-empty-comment-text           "Empty"
         :oc-message                      (str "*Details of your order:* \n\n"
-                                              e/money-emoji " {1} sum ({2})\n"
-                                              e/comment-emoji " `{3}` \n\n"
-                                              e/location-emoji " {4}")
+                                              e/food-emoji " {price} sum\n"
+                                              e/delivery-emoji " {delivery} sum\n"
+                                              e/money-emoji " {total} sum ({price})\n"
+                                              e/comment-emoji " `{comment}` \n\n"
+                                              e/location-emoji " {address}")
 
         ; Active Order
         :active-order-message            (str "*Order №{1}:*\n\n"
@@ -243,9 +247,11 @@
         :oc-create-order-button          "✅ Tasdiqlash"
         :oc-empty-comment-text           "Bo'sh"
         :oc-message                      (str "*Buyurtmaning tafsilotlari:* \n\n"
-                                              e/money-emoji " {1} so'm ({2})\n"
-                                              e/comment-emoji " `{3}` \n\n"
-                                              e/location-emoji " {4}")
+                                              e/food-emoji " {price} so'm\n"
+                                              e/delivery-emoji " {delivery} so'm\n"
+                                              e/money-emoji " {total} so'm ({payment})\n"
+                                              e/comment-emoji " `{comment}` \n\n"
+                                              e/location-emoji " {address}")
 
         ; Active Order
         :active-order-message            (str "*Buyurtma №{1}:*\n\n"

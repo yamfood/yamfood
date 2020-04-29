@@ -8,6 +8,7 @@
 (def comment-emoji "\uD83D\uDCAC")
 (def basket-emoji "\uD83E\uDDFA")
 (def food-emoji "\uD83E\uDD57")
+(def delivery-emoji "🛵")
 (def energy-emoji "\uD83D\uDD0B")
 (def cancel-emoji "❌")
 (def phone-emoji "\uD83D\uDCDE")

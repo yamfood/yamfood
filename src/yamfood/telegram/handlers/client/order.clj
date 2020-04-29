@@ -55,24 +55,29 @@
 
 
 (defn pre-order-text
-  [lang order-state]
-  (translate lang :oc-message
-             (u/fmt-values (:total_cost (:basket order-state)))
-             (translate lang (keyword (or (get-in order-state [:client :payload :payment])
-                                          "cash")))
-             (or (:comment (:payload (:client order-state)))
-                 (translate lang :oc-empty-comment-text))
-             (u/text-from-address
-               (get-in order-state [:client :payload :location :address]))))
+  [lang params order-state]
+  (let [price (:total_cost (:basket order-state))
+        delivery (:delivery-cost params)]
+    (translate lang :oc-message
+               {:price    (u/fmt-values price)
+                :payment  (translate lang (keyword (or (get-in order-state [:client :payload :payment])
+                                                       "cash")))
+                :comment  (or (:comment (:payload (:client order-state)))
+                              (translate lang :oc-empty-comment-text))
+                :delivery (u/fmt-values delivery)
+                :total    (u/fmt-values (+ delivery price))
+                :address  (u/text-from-address
+                            (get-in order-state [:client :payload :location :address]))})))
 
 
 (defn order-detail-handler
   [ctx order-state]
   (let [update (:update ctx)
+        params (:params ctx)
         lang (:lang ctx)
         chat-id (u/chat-id update)]
     {:send-text {:chat-id chat-id
-                 :text    (pre-order-text lang order-state)
+                 :text    (pre-order-text lang params order-state)
                  :options {:reply_markup (order-confirmation-markup lang order-state)
                            :parse_mode   "markdown"}}}))
 
@@ -86,11 +91,12 @@
   ([ctx order-state]
    (let [query (:callback_query (:update ctx))
          lang (:lang ctx)
+         params (:params ctx)
          chat-id (:id (:from query))
          message-id (:message_id (:message query))]
      {:edit-message {:chat-id    chat-id
                      :message-id message-id
-                     :text       (pre-order-text lang order-state)
+                     :text       (pre-order-text lang params order-state)
                      :options    {:reply_markup (order-confirmation-markup lang order-state)
                                   :parse_mode   "markdown"}}})))
 
