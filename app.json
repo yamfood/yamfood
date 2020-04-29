@@ -13,9 +13,6 @@
     "RIDER_BOT_TOKEN": {
       "description": "Rider's bot token"
     },
-    "PAYMENTS_TOKEN": {
-      "description": "Payments token"
-    },
     "APP_NAME": {
       "description": "Copy app name here"
     },
