@@ -11,5 +11,5 @@
 
 (c/defroutes
   routes
-  (c/POST "/" [] bots-list))
+  (c/GET "/" [] bots-list))
 
