@@ -121,11 +121,14 @@
 
 
 (def categories-list-query
-  {:select   [:categories.id
-              :categories.name
-              :categories.emoji]
-   :from     [:categories]
-   :order-by [:categories.position]})
+  {:select    [:categories.id
+               :categories.name
+               [:bots.name :bot]
+               :categories.emoji]
+   :from      [:categories]
+   :left-join [:bots
+               [:= :bots.id :categories.bot_id]]
+   :order-by  [:categories.position :categories.bot_id]})
 
 
 (defn product-by-name!

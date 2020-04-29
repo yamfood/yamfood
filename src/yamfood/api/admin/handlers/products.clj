@@ -36,11 +36,18 @@
         (map set-translations))})
 
 
+(defn fmt-category
+  [category]
+  (-> category
+      (update :name :ru)
+      (#(assoc % :name (format "[%s] %s" (:bot %) (:name %))))))
+
+
 (defn categories-list
   [_]
   {:body
    (->> (p/all-categories!)
-        (map #(update % :name :ru)))})
+        (map fmt-category))})
 
 
 (s/def ::create-product
