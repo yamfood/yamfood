@@ -7,11 +7,12 @@
 
 
 (def bots-query
-  {:select [:bots.id
-            :bots.token
-            :bots.name]
-   :from   [:bots]
-   :where  [:= :bots.is_active true]})
+  {:select   [:bots.id
+              :bots.token
+              :bots.name]
+   :from     [:bots]
+   :where    [:= :bots.is_active true]
+   :order-by [:bots.id]})
 
 
 (defn bot-by-token!
@@ -31,3 +32,10 @@
        (jdbc/query db/db)
        (first)))
 
+
+(defn all-bots!
+  []
+  (->> (-> bots-query
+           (assoc :select [:bots.id :bots.name])
+           (hs/format))
+       (jdbc/query db/db)))
