@@ -23,7 +23,7 @@
   (let [params (:params request)
         folder (get params "folder" "default")
         file-name (get params "file-name")
-        file-type (second (str/split file-name #"\."))
+        file-type (last (str/split file-name #"\."))
         file-name (str (u/uuid) "." file-type)
         key (str folder "/" file-name)]
     {}
