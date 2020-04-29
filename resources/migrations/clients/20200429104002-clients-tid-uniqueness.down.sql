@@ -1,0 +1,1 @@
+alter table clients add constraint clients_tid_key unique (tid);
