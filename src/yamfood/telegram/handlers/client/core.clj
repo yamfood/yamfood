@@ -2,23 +2,27 @@
   (:require
     [environ.core :refer [env]]
     [yamfood.core.params.core :as p]
+    [yamfood.core.bots.core :as bots]
     [yamfood.telegram.dispatcher :as d]
     [yamfood.core.clients.core :as clients]
     [yamfood.telegram.handlers.utils :as u]))
 
 
 (defn build-ctx!
-  [update]
-  (let [client (clients/client-with-tid!
-                 (u/tid-from-update update))]
-    {:token          (env :bot-token)
-     :payments-token (env :payments-token)
-     :update         update
-     :params         (p/params!)
-     :client         client
-     :lang           (keyword (get-in client
-                                      [:payload :lang]
-                                      :ru))}))
+  ([token update]
+   (let [bot (bots/bot-by-token! token)
+         client (clients/client-with-tid!
+                  (:id bot)
+                  (u/tid-from-update update))]
+     {:token          token
+      :bot            bot
+      :payments-token (env :payments-token)
+      :update         update
+      :params         (p/params!)
+      :client         client
+      :lang           (keyword (get-in client
+                                       [:payload :lang]
+                                       :ru))})))
 
 
 (defn process-message
@@ -39,12 +43,12 @@
 
 
 (defn client-update-handler!
-  [update]
+  [token update]
   (let [message (:message update)
         inline-query (:inline_query update)
         callback-query (:callback_query update)
         pre-checkout-query (:pre_checkout_query update)
-        ctx (build-ctx! update)
+        ctx (build-ctx! token update)
         blocked? (:is_blocked (:client ctx))]
     (if (not blocked?)
       (do

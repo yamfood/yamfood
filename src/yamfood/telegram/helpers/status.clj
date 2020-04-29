@@ -3,18 +3,17 @@
     [morse.api :as t]
     [environ.core :refer [env]]
     [yamfood.core.orders.core :as o]
+    [yamfood.core.bots.core :as bots]
     [yamfood.telegram.translation.core :refer [translate]]))
-
-
-(def token (env :bot-token))
 
 
 (defn notify-order-accepted!
   [order-id]
   (let [order (o/order-by-id! order-id)
+        bot (bots/bot-by-id! (:bot_id order))
         lang (or (:lang order) :ru)]
     (t/send-text
-      token
+      (:token bot)
       (:tid order)
       {:parse_mode "markdown"}
       (translate lang :status-on-kitchen))))
@@ -25,11 +24,12 @@
    (notify-order-canceled! order-id nil))
   ([order-id reason]
    (let [order (o/order-by-id! order-id)
+         bot (bots/bot-by-id! (:bot_id order))
          lang (or (:lang order) :ru)
          reason (or reason
                     (translate lang :status-canceled))]
      (t/send-text
-       token
+       (:token bot)
        (:tid order)
        {:parse_mode "markdown"}
        reason))))
@@ -38,9 +38,10 @@
 (defn notify-order-on-way!
   [order-id]
   (let [order (o/order-by-id! order-id)
+        bot (bots/bot-by-id! (:bot_id order))
         lang (or (:lang order) :ru)]
     (t/send-text
-      token
+      (:token bot)
       (:tid order)
       {:parse_mode "markdown"}
       (translate lang :status-on-way))))

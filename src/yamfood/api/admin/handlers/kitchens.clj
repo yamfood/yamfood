@@ -15,6 +15,7 @@
   (s/keys :req-un [::longitude ::latitude]))
 (s/def ::start_at cs/timestamp?)
 (s/def ::end_at cs/timestamp?)
+(s/def ::bot_id int?)
 (s/def ::payload map?)
 
 
@@ -44,7 +45,7 @@
 
 
 (s/def ::create-kitchen
-  (s/keys :req-un [::name ::location]
+  (s/keys :req-un [::name ::bot_id ::location]
           :opt-un [::start_at ::end_at ::payload]))
 
 
@@ -72,7 +73,7 @@
 (s/def ::patch-kitchen
   (s/keys :opt-un [::name ::location
                    ::start_at ::end_at
-                   ::payload]))
+                   ::payload ::bot_id]))
 
 
 (defn patch-kitchen

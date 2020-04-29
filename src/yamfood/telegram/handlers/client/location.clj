@@ -60,7 +60,8 @@
          message (:message update)
          location (:location message)]
      {:run {:function   regions/location-info!
-            :args       [(:longitude location)
+            :args       [(:id (:bot ctx))
+                         (:longitude location)
                          (:latitude location)]
             :next-event :c/location}}))
   ([ctx location-info]
@@ -74,13 +75,16 @@
                    (cond
                      (= step u/order-confirmation-step) {:args        [:c/order-confirmation-state]
                                                          :rebuild-ctx {:function c/build-ctx!
-                                                                       :update   (:update ctx)}}
+                                                                       :update   (:update ctx)
+                                                                       :token    (:token ctx)}}
                      (= step u/basket-step) {:args        [:c/basket]
                                              :rebuild-ctx {:function c/build-ctx!
-                                                           :update   (:update ctx)}}
+                                                           :update   (:update ctx)
+                                                           :token    (:token ctx)}}
                      :else {:args        [:c/menu]
                             :rebuild-ctx {:function c/build-ctx!
-                                          :update   (:update ctx)}})]}
+                                          :update   (:update ctx)
+                                          :token    (:token ctx)}})]}
        {:run      {:function clients/update-payload!
                    :args     [(:id client)
                               (assoc

@@ -1,0 +1,1 @@
+alter table clients add constraint clients_tid_bot_id_key unique (tid, bot_id);

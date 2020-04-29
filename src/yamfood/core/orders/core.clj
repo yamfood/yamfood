@@ -87,6 +87,8 @@
   {:select    [:orders.id
                :orders.location
                :orders.payment
+               [:bots.id :bot_id]
+               [:bots.name :bot_name]
                [:kitchens.id :kitchen_id]
                [:kitchens.name :kitchen]
                [:kitchens.payload :kitchen_payload]
@@ -107,7 +109,8 @@
    :from      [:orders]
    :left-join [:riders [:= :orders.rider_id :riders.id]
                :clients [:= :orders.client_id :clients.id]
-               :kitchens [:= :orders.kitchen_id :kitchens.id]]
+               :kitchens [:= :orders.kitchen_id :kitchens.id]
+               :bots [:= :clients.bot_id :bots.id]]
    :order-by  [:id]})
 
 
@@ -322,16 +325,14 @@
 
 (defn create-order!
   ; TODO: Use transaction!
-  [basket-id location address comment payment delivery-cost]
+  [basket-id kitchen-id location address comment payment delivery-cost]
   (let [client (clients/client-with-basket-id! basket-id)
-        kitchen (kitchens/nearest-kitchen! (:longitude location)
-                                           (:latitude location))
         order-id (:id (insert-order! (:id client)
                                      (:longitude location)
                                      (:latitude location)
                                      address
                                      comment
-                                     (:id kitchen)
+                                     kitchen-id
                                      payment
                                      delivery-cost))]
     (-> (products-from-basket! basket-id)

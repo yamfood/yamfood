@@ -4,11 +4,8 @@
     [environ.core :refer [env]]))
 
 
-(def token (env :bot-token))
-
-
 (defn send-push!
-  [tid image text]
+  [tid token image text]
   (t/send-photo
     token
     tid
