@@ -31,12 +31,6 @@
    :where  [:= :baskets.client_id :clients.id]})
 
 
-(defn client-with-tid-query
-  [tid]
-  (hs/format (hh/merge-where client-query [:= :clients.tid tid])))
-
-
-
 (defn client-with-id-query
   [id]
   (hs/format (hh/merge-where client-query [:= :clients.id id])))
@@ -56,8 +50,12 @@
 
 
 (defn client-with-tid!
-  [tid]
-  (->> (client-with-tid-query tid)
+  [bot-id tid]
+  (->> (-> client-query
+           (hh/merge-where [:and
+                            [:= :clients.tid tid]
+                            [:= :clients.bot_id bot-id]])
+           (hs/format))
        (jdbc/query db/db)
        (map cu/keywordize-field)
        (first)))
@@ -116,8 +114,8 @@
 
 
 (defn insert-client!
-  [tid name payload]
-  (first (jdbc/insert! db/db "clients" {:tid tid :name name :payload payload})))
+  [tid bot-id name payload]
+  (first (jdbc/insert! db/db "clients" {:tid tid :name name :bot_id bot-id :payload payload})))
 
 
 (defn init-basket!
@@ -126,10 +124,10 @@
 
 
 (defn create-client!
-  ([tid name]
-   (create-client! tid name {}))
-  ([tid name payload]
-   (let [client (insert-client! tid name payload)]
+  ([tid bot-id name]
+   (create-client! tid bot-id name {}))
+  ([tid bot-id name payload]
+   (let [client (insert-client! tid bot-id name payload)]
      (init-basket! (:id client)))))
 
 
@@ -143,11 +141,6 @@
 (defn update!
   [client-id row]
   (jdbc/update! db/db "clients" row ["id = ?" client-id]))
-
-
-(defn update-by-tid!
-  [tid row]
-  (jdbc/update! db/db "clients" row ["tid = ?" tid]))
 
 
 (defn update-location!

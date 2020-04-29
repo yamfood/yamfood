@@ -23,12 +23,13 @@
 
 (defn client-handler!
   [request]
-  (log-debug request)
-  (try
-    (client/client-update-handler! (:body request))
-    (catch Exception e
-      (log-error request e)))
-  {:body "OK"})
+  (let [token (:token (:params request))]
+    (log-debug request)
+    (try
+      (client/client-update-handler! token (:body request))
+      (catch Exception e
+        (log-error request e)))
+    {:body "OK"}))
 
 
 (defn rider-handler!
@@ -43,12 +44,13 @@
 
 (c/defroutes
   telegram-routes
-  (c/POST "/client" [] client-handler!)
+  (c/POST "/client/:token/" [] client-handler!)
   (c/POST "/rider" [] rider-handler!))
 
 
 (comment
-  (let [webhook-url "https://a1c67e80.ngrok.io"]
-    (morse.api/set-webhook (env :bot-token) (str webhook-url "/updates/client"))
+  (let [client-token (env :bot-token)
+        webhook-url "https://18efd466.ngrok.io"]
+    (morse.api/set-webhook client-token (str webhook-url (format "/updates/client/%s/" client-token)))
     (morse.api/set-webhook (env :rider-bot-token) (str webhook-url "/updates/rider"))))
 

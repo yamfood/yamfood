@@ -16,6 +16,7 @@
 
 (def announcement-query
   {:select   [:announcements.id
+              :announcements.bot_id
               :announcements.image_url
               :announcements.text
               :announcements.status

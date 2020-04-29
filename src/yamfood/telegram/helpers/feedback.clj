@@ -1,8 +1,8 @@
 (ns yamfood.telegram.helpers.feedback
   (:require
     [morse.api :as t]
-    [environ.core :refer [env]]
     [yamfood.core.orders.core :as o]
+    [yamfood.core.bots.core :as bots]
     [yamfood.telegram.translation.core :refer [translate]]))
 
 
@@ -19,10 +19,11 @@
 (defn send-feedback-request!
   [order-id]
   (let [order (o/order-by-id! order-id)
+        bot (bots/bot-by-id! (:bot_id order))
         lang (or (:lang order) :ru)
         chat-id (:tid order)]
     (t/send-text
-      (env :bot-token)
+      (:token bot)
       chat-id
       {:reply_markup (feedback-request-markup order-id)}
       (translate lang :request-feedback-message))))

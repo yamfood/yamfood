@@ -56,7 +56,7 @@
          location (get-in client [:payload :location])]
      (if location
        {:run {:function   p/categories-with-products!
-              :args       []
+              :args       [(:id (:bot ctx))]
               :next-event :c/menu}}
        {:run      {:function clients/update-payload!
                    :args     [(:id client)
@@ -84,6 +84,7 @@
   [ctx]
   (let [update (:update ctx)
         tid (u/chat-id update)
+        bot-id (get-in ctx [:bot :id])
         from (:from (:message update))
         name (str (:first_name from) " " (:last_name from))
         utm (u/utm update)]
@@ -91,10 +92,11 @@
       {:dispatch {:args [:c/request-phone]}}
 
       {:run      {:function clients/create-client!
-                  :args     [tid name (if utm {:utm utm} {})]}
+                  :args     [tid bot-id name (if utm {:utm utm} {})]}
        :dispatch {:args        [:c/request-phone]
                   :rebuild-ctx {:function c/build-ctx!
-                                :update   (:update ctx)}}})))
+                                :update   (:update ctx)
+                                :token    (:token ctx)}}})))
 
 
 (d/register-event-handler!

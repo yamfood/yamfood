@@ -157,12 +157,13 @@
 
 
 (defn categories-with-products!
-  []
+  [bot-id]
   (->> (-> categories-list-query
            (update :from #(into % [:products]))
            (update :select #(into % [[:%count.products.id :products_count]]))
            (assoc :group-by [:categories.id])
            (hh/merge-where [:and
+                            [:= :categories.bot_id bot-id]
                             [:= :products.is_active true]
                             [:= :products.category_id :categories.id]])
            (hs/format))

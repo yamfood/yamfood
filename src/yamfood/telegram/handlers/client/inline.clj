@@ -40,7 +40,8 @@
    (let [update (:update ctx)
          query (:inline_query update)
          location (get-in ctx [:client :payload :location])
-         kitchen-id (:id (k/nearest-kitchen! (:longitude location)
+         kitchen-id (:id (k/nearest-kitchen! (:id (:bot ctx))
+                                             (:longitude location)
                                              (:latitude location)))]
      (cond
        (= (:query query) "") {:run {:function   p/all-products!

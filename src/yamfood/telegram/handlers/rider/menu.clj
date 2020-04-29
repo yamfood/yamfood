@@ -96,7 +96,8 @@
                      :options {:reply_markup {:remove_keyboard true}}}
          :dispatch  {:args        [:r/menu]
                      :rebuild-ctx {:function c/build-ctx!
-                                   :update   update}}}))))
+                                   :update   update
+                                   :token    (:token ctx)}}}))))
 
 
 (d/register-event-handler!

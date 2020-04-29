@@ -62,7 +62,8 @@
                              :lang (keyword language))]}
      :dispatch {:args        [:c/settings]
                 :rebuild-ctx {:function c/build-ctx!
-                              :update   (:update ctx)}}}))
+                              :update   (:update ctx)
+                              :token    (:token ctx)}}}))
 
 
 (d/register-event-handler!

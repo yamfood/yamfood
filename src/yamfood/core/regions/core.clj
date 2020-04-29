@@ -24,10 +24,10 @@
 
 
 (defn location-info!
-  [lon lat]
+  [bot-id lon lat]
   {:region  (region-by-location! lon lat)
    :address (geo/get-address! lon lat)
-   :kitchen (k/nearest-kitchen! lon lat)})
+   :kitchen (k/nearest-kitchen! bot-id lon lat)})
 
 
 (defn all-regions-query

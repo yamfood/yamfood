@@ -4,10 +4,10 @@
     [honeysql.core :as hs]
     [honeysql.helpers :as hh]
     [clj-time.coerce :as timec]
+    [yamfood.core.utils :as cu]
     [clojure.java.jdbc :as jdbc]
     [clj-postgresql.core :as pg]
-    [yamfood.core.db.core :as db]
-    [yamfood.core.utils :as cu]))
+    [yamfood.core.db.core :as db]))
 
 
 (def kitchen-query
@@ -24,10 +24,10 @@
 
 (def open-kitchens-where
   [:case
-   [:> :kitchens.start_at :kitchens.end_at]
-   [(hs/raw "now()::time not between kitchens.end_at and kitchens.start_at")]
    [:< :kitchens.start_at :kitchens.end_at]
-   [(hs/raw "now()::time between kitchens.start_at and kitchens.end_at")]])
+   [(hs/raw "(current_timestamp::time with time zone at time zone 'utc') between kitchens.start_at and kitchens.end_at")]
+   [:> :kitchens.start_at :kitchens.end_at]
+   [(hs/raw "(current_timestamp::time with time zone at time zone 'utc') not between kitchens.start_at and kitchens.end_at")]])
 
 
 (defn fmt-kitchen
@@ -58,21 +58,14 @@
   "ST_Distance(geometry(kitchens.location), geometry(point(%s, %s)))")
 
 
-(defn nearest-kitchen-query
-  [lon lat]
-  (-> (assoc
-        kitchen-query
-        :order-by
-        [(hs/raw
-           (format
-             kitchens-distance-function-query
-             lon lat))])
-      (hh/merge-where open-kitchens-where)))
-
-
 (defn nearest-kitchen!
-  [lon lat]
-  (->> (nearest-kitchen-query lon lat)
+  [bot-id lon lat]
+  (->> (-> kitchen-query
+           (assoc :order-by [(hs/raw (format kitchens-distance-function-query lon lat))])
+           (hh/merge-where [:and
+                            [:= :kitchens.is_disabled false]
+                            [:= :kitchens.bot_id bot-id]])
+           (hh/merge-where open-kitchens-where))
        (hs/format)
        (jdbc/query db/db)
        (map fmt-kitchen)

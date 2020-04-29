@@ -9,6 +9,7 @@
 
 
 (s/def ::text string?)
+(s/def ::bot_id int?)
 (s/def ::image_url string?)
 (s/def ::send_at cs/timestamp?)
 
@@ -39,7 +40,7 @@
 
 
 (s/def ::create-announcement
-  (s/keys :req-un [::text ::image_url]
+  (s/keys :req-un [::text ::bot_id ::image_url]
           :opt-un [::send_at]))
 
 

@@ -7,9 +7,6 @@
     "heroku-postgresql:hobby-dev"
   ],
   "env": {
-    "BOT_TOKEN": {
-      "description": "Client's bot token"
-    },
     "LIQ_TOKEN": {
       "description": "Token for reverse geocoding on LocationIQ"
     },

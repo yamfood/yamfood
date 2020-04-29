@@ -8,7 +8,8 @@
     [yamfood.core.clients.core :as clients]
     [yamfood.telegram.handlers.emojies :as e]
     [yamfood.telegram.handlers.client.core :as c]
-    [yamfood.telegram.translation.core :refer [translate]]))
+    [yamfood.telegram.translation.core :refer [translate]]
+    [yamfood.core.kitchens.core :as k]))
 
 
 (defn order-confirmation-state
@@ -36,7 +37,8 @@
         (:location (:payload client)) {:dispatch {:args [:c/order-confirmation-state]}}
         :else {:dispatch {:args        [:c/request-location]
                           :rebuild-ctx {:function c/build-ctx!
-                                        :update   (:update ctx)}}}))))
+                                        :update   (:update ctx)
+                                        :token    (:token ctx)}}}))))
 
 
 (defn order-confirmation-markup
@@ -107,39 +109,52 @@
                        :args     [(:id client) (assoc payload :payment new-payment)]}
      :dispatch        {:args        [:c/update-order-confirmation]
                        :rebuild-ctx {:function c/build-ctx!
-                                     :update   (:update ctx)}}
+                                     :update   (:update ctx)
+                                     :token    (:token ctx)}}
      :answer-callback {:callback_query_id (:id query)
                        :text              " "}}))
 
 
 (defn create-order-handler
-  [ctx]
-  (let [update (:update ctx)
-        query (:callback_query update)
-        chat-id (:id (:from query))
-        message-id (:message_id (:message query))
-        basket-id (:basket_id (:client ctx))
-        payload (:payload (:client ctx))
-        location (:location payload)
-        payment (or (:payment payload)
-                    u/cash-payment)
-        comment (:comment payload)
-        address (:address location)
-        card? (= payment u/card-payment)
-        delivery-cost (get-in ctx [:params :delivery-cost])]
-    (merge
-      {:run            [(merge {:function ord/create-order!
-                                :args     [basket-id location
-                                           (u/text-from-address address)
-                                           comment payment delivery-cost]}
-                               (if card?
-                                 {:next-event :c/send-invoice}
-                                 {:next-event :c/active-order}))
-                        (when (not card?)
-                          {:function bsk/clear-basket!
-                           :args     [basket-id]})]
-       :delete-message {:chat-id    chat-id
-                        :message-id message-id}})))
+  ([ctx]
+   (let [payload (:payload (:client ctx))
+         location (:location payload)]
+     {:run {:function   k/nearest-kitchen!
+            :args       [(:id (:bot ctx))
+                         (:longitude location)
+                         (:latitude location)]
+            :next-event :c/create-order}}))
+  ([ctx kitchen]
+   (let [update (:update ctx)
+         query (:callback_query update)
+         chat-id (:id (:from query))
+         message-id (:message_id (:message query))
+         basket-id (:basket_id (:client ctx))
+         payload (:payload (:client ctx))
+         location (:location payload)
+         payment (or (:payment payload)
+                     u/cash-payment)
+         comment (:comment payload)
+         address (:address location)
+         card? (= payment u/card-payment)
+         delivery-cost (get-in ctx [:params :delivery-cost])]
+     (if kitchen
+       (merge
+         {:run            [(merge {:function ord/create-order!
+                                   :args     [basket-id (:id kitchen) location
+                                              (u/text-from-address address)
+                                              comment payment delivery-cost]}
+                                  (if card?
+                                    {:next-event :c/send-invoice}
+                                    {:next-event :c/active-order}))
+                           (when (not card?)
+                             {:function bsk/clear-basket!
+                              :args     [basket-id]})]
+          :delete-message {:chat-id    chat-id
+                           :message-id message-id}})
+       {:answer-callback {:callback_query_id (:id query)
+                          :show_alert        true
+                          :text              "К сожалению, на данный момент все кухни закрыты :("}}))))
 
 
 (def write-comment-text "Напишите свой комментарий к заказу")
