@@ -13,6 +13,7 @@
 (def kitchen-query
   {:select   [:kitchens.id
               :kitchens.name
+              :kitchens.bot_id
               [:bots.name :bot]
               :kitchens.location
               :kitchens.start_at
