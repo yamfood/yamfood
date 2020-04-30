@@ -11,8 +11,13 @@
         password (:password body)
         admin (a/admin-by-credentials! login password)]
     (if admin
-      (let [token (a/update-admin-token! (:id admin))]
-        {:body {:token token}})
+      (try
+        (a/update-admin-token! (:id admin))
+        {:body (a/admin-by-credentials! login password)}
+        (catch Exception e
+          (println e)
+          {:body   {:error "Unexpected error"}
+           :status 500}))
       {:body   {:request (str request)
                 :error   "Incorrect credentials"}
        :status 403})))
