@@ -62,7 +62,7 @@
         ; Order Confirmation
         :oc-basket-button                (str e/back-emoji " Корзина")
         :oc-create-order-button          "✅ Подтвердить"
-        :oc-empty-comment-text           "Пусто"
+        :oc-empty-comment-text           "Укажите комментарий к адресу или к заказу"
         :oc-message                      (str "*Детали вашего заказа:* \n\n"
                                               e/food-emoji " {price} сум\n"
                                               e/delivery-emoji " {delivery} сум\n"
@@ -152,7 +152,7 @@
         ; Order Confirmation
         :oc-basket-button                (str e/back-emoji " Cart")
         :oc-create-order-button          "✅ Confirm"
-        :oc-empty-comment-text           "Empty"
+        :oc-empty-comment-text           "Enter a comment to the address or order"
         :oc-message                      (str "*Details of your order:* \n\n"
                                               e/food-emoji " {price} sum\n"
                                               e/delivery-emoji " {delivery} sum\n"
@@ -243,7 +243,7 @@
         ; Order Confirmation
         :oc-basket-button                (str e/back-emoji " Savat")
         :oc-create-order-button          "✅ Tasdiqlash"
-        :oc-empty-comment-text           "Bo'sh"
+        :oc-empty-comment-text           "Manzilga yoki buyurtmaga izoh kiriting"
         :oc-message                      (str "*Buyurtmaning tafsilotlari:* \n\n"
                                               e/food-emoji " {price} so'm\n"
                                               e/delivery-emoji " {delivery} so'm\n"
