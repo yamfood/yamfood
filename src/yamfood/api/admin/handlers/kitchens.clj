@@ -66,7 +66,7 @@
                           (:bot_id body))}
         (catch Exception e
           {:body   {:error "Unexpected error"}
-           :status 400}))
+           :status 500}))
       {:body   {:error "Incorrect input"}
        :status 400})))
 
@@ -84,13 +84,12 @@
         body (:body request)
         valid? (s/valid? ::patch-kitchen body)]
     (if (and kitchen valid?)
-      (do
-        (try
-          (k/update! kitchen-id body)
-          {:body (kitchen-details! kitchen-id)}
-          (catch Exception e
-            {:body   {:error "Unexpected error"}
-             :status 500})))
+      (try
+        (k/update! kitchen-id body)
+        {:body (kitchen-details! kitchen-id)}
+        (catch Exception e
+          {:body   {:error "Unexpected error"}
+           :status 500}))
       {:body   {:error "Invalid input or kitchen_id"}
        :status 400})))
 
