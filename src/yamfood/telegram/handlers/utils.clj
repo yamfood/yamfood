@@ -121,7 +121,10 @@
 
 
 (defn parse-int [s]
-  (edn/read-string s))
+  (let [result (read-string s)]
+    (if (number? result)
+      result
+      nil)))
 
 
 (defn order-products-text
