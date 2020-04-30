@@ -12,12 +12,12 @@
   [request]
   (let [client-id (u/str->int (:id (:params request)))]
     {:body (-> (clients/client-with-id! client-id)
-               (update :data [{:label "Количество завершенных заказов"
-                               :value "1000"}
-                              {:label "Количество отмененных заказов"
-                               :value "100"}
-                              {:label "Средний чек"
-                               :value "100 000 сум"}]))}))
+               (assoc :data [{:label "Количество завершенных заказов"
+                              :value "1000"}
+                             {:label "Количество отмененных заказов"
+                              :value "100"}
+                             {:label "Средний чек"
+                              :value "100 000 сум"}]))}))
 
 
 (s/def ::is_blocked boolean?)
