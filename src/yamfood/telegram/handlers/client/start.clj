@@ -79,7 +79,7 @@
          {:delete-message {:chat-id    chat-id
                            :message-id (:message_id (:message query))}})))))
 
-
+;{:update_id 220545420, :message {:message_id 11446, :from {:id 79225668, :is_bot false, :first_name "Рустам", :last_name "Бабаджанов", :username "kensay", :language_code "en"}, :chat {:id 79225668, :first_name "Рустам", :last_name "Бабаджанов", :username "kensay", :type "private"}, :date 1588228029, :text "/start", :entities [{:offset 0, :length 6, :type "bot_command"}]}}
 (defn registration-handler
   [ctx]
   (let [update (:update ctx)
@@ -87,12 +87,14 @@
         bot-id (get-in ctx [:bot :id])
         from (:from (:message update))
         name (str (:first_name from) " " (:last_name from))
+        lang (:language_code from)
         utm (u/utm update)]
     (if (:client ctx)
       {:dispatch {:args [:c/request-phone]}}
 
       {:run      {:function clients/create-client!
-                  :args     [tid bot-id name (if utm {:utm utm} {})]}
+                  :args     [tid bot-id name (if utm {:utm utm :lang lang}
+                                                     {:lang lang})]}
        :dispatch {:args        [:c/request-phone]
                   :rebuild-ctx {:function c/build-ctx!
                                 :update   (:update ctx)
