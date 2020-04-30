@@ -13,12 +13,14 @@
 (def kitchen-query
   {:select   [:kitchens.id
               :kitchens.name
+              [:bots.name :bot]
               :kitchens.location
               :kitchens.start_at
               :kitchens.end_at
               :kitchens.payload
               :kitchens.is_disabled]
-   :from     [:kitchens]
+   :from     [:kitchens :bots]
+   :where    [:= :kitchens.bot_id :bots.id]
    :order-by [:kitchens.id]})
 
 

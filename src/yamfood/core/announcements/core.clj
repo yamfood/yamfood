@@ -17,12 +17,15 @@
 (def announcement-query
   {:select   [:announcements.id
               :announcements.bot_id
+              [:bots.name :bot]
               :announcements.image_url
               :announcements.text
               :announcements.status
               :announcements.send_at]
-   :from     [:announcements]
-   :where    [:= :announcements.is_active true]
+   :from     [:announcements :bots]
+   :where    [:and
+              [:= :announcements.is_active true]
+              [:= :announcements.bot_id :bots.id]]
    :order-by [[:announcements.send_at :desc]]})
 
 
