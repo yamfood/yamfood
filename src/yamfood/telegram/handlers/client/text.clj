@@ -10,17 +10,14 @@
 (defn text-handler
   [ctx]
   (let [update (:update ctx)
-        lang (:lang ctx)
         message (:message update)
         client (:client ctx)
-        chat-id (:id (:from message))
         text (:text message)]
     (cond
       (= (:step (:payload client)) u/phone-step) {:dispatch {:args [:c/phone]}}
       (= (:step (:payload client)) u/phone-confirmation-step) {:dispatch {:args [:c/confirm-phone]}}
       (= text update-location-text) {:dispatch {:args [:c/request-location]}}
-      :else {:send-text {:chat-id chat-id
-                         :text    (translate lang :unhandled-text)}})))
+      :else {:dispatch {:args [:c/start]}})))
 
 
 (d/register-event-handler!
