@@ -19,39 +19,39 @@
 
 (def all-params
   {:delivery-cost       {:name    "Сумма за доставку"
-                         :docs    ""
+                         :docs    "Сумма за доставку по умолчанию"
                          :default "10000"
                          :adapter read-string}
    :iiko-enabled?       {:name    "Отправлять заказы в iiko?"
-                         :docs    ""
+                         :docs    "true - да | false - нет"
                          :default "false"
                          :adapter read-string}
    :iiko-user-id        {:name    "IIKO User ID"
-                         :docs    ""
+                         :docs    "Логин от системы IIKO"
                          :default (env :iiko-user-id)
                          :adapter nil}
    :iiko-user-secret    {:name    "IIKO User Secret"
-                         :docs    ""
+                         :docs    "Пароль от системы IIKO"
                          :default (env :iiko-user-secret)
                          :adapter nil}
    :iiko-home           {:name    "IIKO Home"
-                         :docs    ""
+                         :docs    "Дом, который будет подставляться в заказы для IIKO"
                          :default ""
                          :adapter nil}
    :iiko-street         {:name    "IIKO Street"
-                         :docs    ""
+                         :docs    "Улица,которая будет подставляться в заказы для IIKO"
                          :default ""
                          :adapter nil}
    :playmobile-url      {:name    "PlayMobile URL"
-                         :docs    ""
+                         :docs    "Адрес API"
                          :default "http://91.204.239.44/broker-api/send"
                          :adapter nil}
    :playmobile-login    {:name    "PlayMobile Логин"
-                         :docs    ""
+                         :docs    "Логин от системы SMS информирования"
                          :default ""
                          :adapter nil}
    :playmobile-password {:name    "PlayMobile Пароль"
-                         :docs    ""
+                         :docs    "Пароль от системы SMS информирования"
                          :default ""
                          :adapter nil}})
 
