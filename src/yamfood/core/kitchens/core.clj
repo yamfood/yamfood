@@ -108,13 +108,14 @@
 
 
 (defn create!
-  [name lon lat payload start_at end_at]
+  [name lon lat payload start_at end_at bot-id]
   (->> (jdbc/insert!
          db/db
          "kitchens"
          {:name     name
           :location (pg/point lon lat)
           :payload  payload
+          :bot-id   bot-id
           :start_at (timec/to-sql-time start_at)
           :end_at   (timec/to-sql-time end_at)})
        (map fmt-kitchen)

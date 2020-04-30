@@ -62,7 +62,8 @@
                           (:latitude location)
                           (:payload body)
                           (:start_at body)
-                          (:end_at body))}
+                          (:end_at body)
+                          (:bot_id body))}
         (catch Exception e
           {:body   {:error "Unexpected error"}
            :status 400}))
