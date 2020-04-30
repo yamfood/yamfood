@@ -183,9 +183,11 @@
 
 
 (defn products-by-category-emoji!
-  [emoji]
+  [bot-id emoji]
   (->> (-> all-products-query
-           (hh/merge-where [:= :categories.emoji emoji]))
+           (hh/merge-where [:and
+                            [:= :categories.bot_id bot-id]
+                            [:= :categories.emoji emoji]]))
        (hs/format)
        (jdbc/query db/db)
        (map keywordize-json-fields)))
