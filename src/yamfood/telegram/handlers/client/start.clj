@@ -36,15 +36,17 @@
 
 
 (defn menu-markup
-  [lang categories]
-  (let []
+  [lang state]
+  (let [categories (:categories state)]
     {:inline_keyboard
      (conj (apply conj []
                   (if (empty? categories)
                     [[{:text                             (translate lang :menu-button)
                        :switch_inline_query_current_chat ""}]]
                     (categories-in-markup lang categories)))
-           [{:text          (translate lang :invalid-location-basket-button)
+           [{:text          (translate lang
+                                       :product-basket-button
+                                       (u/fmt-values (:basket_cost state)))
              :callback_data "basket"}]
            [{:text          (translate lang :settings-button)
              :callback_data "settings"}])}))
@@ -55,14 +57,14 @@
    (let [client (:client ctx)
          location (get-in client [:payload :location])]
      (if location
-       {:run {:function   p/categories-with-products!
-              :args       [(:id (:bot ctx))]
+       {:run {:function   p/menu-state!
+              :args       [(:basket_id client) (:id (:bot ctx))]
               :next-event :c/menu}}
        {:run      {:function clients/update-payload!
                    :args     [(:id client)
                               (assoc (:payload client) :step u/menu-step)]}
         :dispatch {:args [:c/request-location]}})))
-  ([ctx categories]
+  ([ctx state]
    (let [client (:client ctx)
          lang (:lang ctx)
          update (:update ctx)
@@ -70,7 +72,7 @@
          query (:callback_query update)]
      (merge
        {:send-text {:chat-id chat-id
-                    :options {:reply_markup (menu-markup lang categories)}
+                    :options {:reply_markup (menu-markup lang state)}
                     :text    (translate lang :hello-message)}
         :run       {:function clients/update-payload!
                     :args     [(:id client)

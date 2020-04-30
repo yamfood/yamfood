@@ -58,13 +58,13 @@
         (map keywordize-json-fields))))
 
 
-(def basket-cost-query "
-  (select
-    coalesce(sum(products.price * basket_products.count), 0)
-  from basket_products,
-       products
-  where basket_products.basket_id = %d and
-        products.id = basket_products.product_id) as basket_cost")
+(defn basket-cost-query
+  [basket-id]
+  {:select [[(hs/raw "coalesce(sum(products.price * basket_products.count), 0)") :cost]]
+   :from   [:basket_products :products]
+   :where  [:and
+            [:= :basket_products.basket_id basket-id]
+            [:= :products.id :basket_products.product_id]]})
 
 
 (defn product-detail-state-query
@@ -78,8 +78,8 @@
                :products.energy
                :categories.emoji
                [:categories.name :category]
-               (hs/raw (format basket-cost-query basket-id))
-               (hs/raw "coalesce(basket_products.count, 0) as count_in_basket")]
+               [(basket-cost-query basket-id) :basket_cost]
+               [(hs/raw "coalesce(basket_products.count, 0)") :count_in_basket]]
    :from      [:products]
    :where     [:= :products.is_active true]
    :order-by  [:id]
@@ -90,26 +90,11 @@
    :limit     1})
 
 
-(defn- product-detail-state-by-name-query
-  [basket-id name]
-  (-> (product-detail-state-query basket-id)
-      (hh/merge-where [:= :products.name name])
-      (hs/format)))
-
-
 (defn- product-detail-state-by-id-query
   [basket-id product-id]
   (-> (product-detail-state-query basket-id)
       (hh/merge-where [:= :products.id product-id])
       (hs/format)))
-
-
-(defn product-detail-state-by-name!
-  [basket-id name]
-  (->> (product-detail-state-by-name-query basket-id name)
-       (jdbc/query db/db)
-       (first)
-       (keywordize-json-fields)))
 
 
 (defn state-for-product-detail!
@@ -227,3 +212,18 @@
     "products"
     {:is_active false}
     ["products.id = ?" product-id]))
+
+
+(defn basket-cost!
+  [basket-id]
+  (->> (basket-cost-query basket-id)
+       (hs/format)
+       (jdbc/query db/db)
+       (first)
+       (:cost)))
+
+
+(defn menu-state!
+  [basket-id bot-id]
+  {:categories  (categories-with-products! bot-id)
+   :basket_cost (basket-cost! basket-id)})
