@@ -22,6 +22,7 @@
 (def client-query
   {:select [:clients.id
             :clients.phone
+            :clients.name
             :clients.tid
             :clients.payload
             :clients.is_blocked
