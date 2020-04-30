@@ -1,11 +1,23 @@
 (ns yamfood.telegram.handlers.client.core
   (:require
+    [yamfood.utils :as utils]
     [environ.core :refer [env]]
     [yamfood.core.params.core :as p]
     [yamfood.core.bots.core :as bots]
     [yamfood.telegram.dispatcher :as d]
     [yamfood.core.clients.core :as clients]
     [yamfood.telegram.handlers.utils :as u]))
+
+
+(defn get-language
+  [client]
+  (let [supporting [:ru :en :uz]
+        client-lang (keyword (get-in client
+                                     [:payload :lang]
+                                     :ru))]
+    (if (utils/in? supporting client-lang)
+      client-lang
+      :en)))
 
 
 (defn build-ctx!
@@ -20,9 +32,7 @@
       :update         update
       :params         (p/params!)
       :client         client
-      :lang           (keyword (get-in client
-                                       [:payload :lang]
-                                       :ru))})))
+      :lang           (get-language client)})))
 
 
 (defn process-message
