@@ -58,6 +58,15 @@
         (map keywordize-json-fields))))
 
 
+(defn products-by-bot!
+  [bot-id]
+  (->> (-> all-products-query
+           (hh/merge-where [:= :categories.bot_id bot-id])
+           (hs/format))
+       (jdbc/query db/db)
+       (map keywordize-json-fields)))
+
+
 (defn basket-cost-query
   [basket-id]
   {:select [[(hs/raw "coalesce(sum(products.price * basket_products.count), 0)") :cost]]

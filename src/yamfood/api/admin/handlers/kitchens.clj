@@ -3,13 +3,11 @@
     [yamfood.utils :as u]
     [compojure.core :as c]
     [clojure.spec.alpha :as s]
+    [clj-time.format :as timef]
+    [clj-time.coerce :as timec]
     [yamfood.core.specs.core :as cs]
     [yamfood.core.kitchens.core :as k]
-    [clj-time.core :as time]
-    [clj-time.coerce :as timec]
-    [clj-time.format :as timef]
-    [yamfood.core.products.core :as p])
-  (:import (java.sql Time)))
+    [yamfood.core.products.core :as p]))
 
 
 (s/def ::name string?)
@@ -142,9 +140,11 @@
 
 
 (defn kitchen-products
-  [_]
-  {:body (->> (p/all-products!)
-              (map #(update % :name :ru)))})
+  [request]
+  (let [kitchen-id (u/str->int (:id (:params request)))
+        kitchen (k/kitchen-by-id! kitchen-id)]
+    {:body (->> (p/products-by-bot! (:bot_id kitchen))
+                (map #(update % :name :ru)))}))
 
 
 (c/defroutes
