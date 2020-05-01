@@ -15,7 +15,8 @@
         (let [rebuild-fn! (:function rebuild-ctx)
               update (:update rebuild-ctx)
               token (:token rebuild-ctx)
-              new-ctx (rebuild-fn! token update)]
+              new-ctx (if token (rebuild-fn! token update)
+                                (rebuild-ctx update))]
           (d/dispatch! new-ctx dispatch-args))
         (d/dispatch! ctx dispatch-args)))))
 
