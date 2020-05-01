@@ -5,7 +5,11 @@
     [clojure.spec.alpha :as s]
     [yamfood.core.specs.core :as cs]
     [yamfood.core.kitchens.core :as k]
-    [yamfood.core.products.core :as p]))
+    [clj-time.core :as time]
+    [clj-time.coerce :as timec]
+    [clj-time.format :as timef]
+    [yamfood.core.products.core :as p])
+  (:import (java.sql Time)))
 
 
 (s/def ::name string?)
@@ -19,19 +23,34 @@
 (s/def ::payload map?)
 
 
+(defn format-time
+  [time]
+  (->> time
+       (timec/from-sql-date)
+       (timef/unparse (timef/formatter "HH:mm"))))
+
+
+(defn format-working-hours
+  [kitchen]
+  (-> kitchen
+      (update :start_at format-time)
+      (update :end_at format-time)))
+
+
 (defn kitchens-list
   [_]
-  {:body (k/all-kitchens!)})
+  {:body (->> (k/all-kitchens!)
+              (map format-working-hours))})
+
 
 
 (defn kitchen-details!
   [kitchen-id]
   (let [kitchen (k/kitchen-by-id! kitchen-id)]
-    (assoc
-      kitchen
-      :disabled_products
-      (->> (k/kitchen-disabled-products! kitchen-id)
-           (map #(update % :name :ru))))))
+    (-> kitchen
+        (format-working-hours)
+        (assoc :disabled_products (->> (k/kitchen-disabled-products! kitchen-id)
+                                       (map #(update % :name :ru)))))))
 
 
 (defn kitchen-detail
