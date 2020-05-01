@@ -22,7 +22,7 @@
               :kitchens.is_disabled]
    :from     [:kitchens :bots]
    :where    [:= :kitchens.bot_id :bots.id]
-   :order-by [:kitchens.id]})
+   :order-by [:kitchens.id :bots.id]})
 
 
 (def open-kitchens-where
