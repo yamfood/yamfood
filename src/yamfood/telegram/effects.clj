@@ -16,7 +16,7 @@
               update (:update rebuild-ctx)
               token (:token rebuild-ctx)
               new-ctx (if token (rebuild-fn! token update)
-                                (rebuild-ctx update))]
+                                (rebuild-fn! update))]
           (d/dispatch! new-ctx dispatch-args))
         (d/dispatch! ctx dispatch-args)))))
 
