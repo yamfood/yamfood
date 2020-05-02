@@ -6,8 +6,7 @@
     [clojure.java.jdbc :as jdbc]
     [yamfood.core.db.core :as db]
     [yamfood.core.clients.core :as clients]
-    [yamfood.telegram.handlers.utils :as u]
-    [yamfood.core.kitchens.core :as kitchens]))
+    [yamfood.telegram.handlers.utils :as u]))
 
 
 (def order-statuses
@@ -93,6 +92,7 @@
                [:kitchens.name :kitchen]
                [:kitchens.payload :kitchen_payload]
                :orders.created_at
+               [:clients.id :client_id]
                :clients.tid
                :clients.name
                :clients.phone
@@ -111,7 +111,7 @@
                :clients [:= :orders.client_id :clients.id]
                :kitchens [:= :orders.kitchen_id :kitchens.id]
                :bots [:= :clients.bot_id :bots.id]]
-   :order-by  [:id]})
+   :order-by  [:orders.id]})
 
 
 (def order-products-query
@@ -159,6 +159,34 @@
    :select [:*]
    :from   [:cte_orders]
    :where  [:in :cte_orders.status active-order-statuses]})
+
+
+(defn client-finished-orders!
+  [client-id]
+  (->> (-> {:with   [[:cte_orders order-detail-query]]
+            :select [:%count.cte_orders.id]
+            :from   [:cte_orders]
+            :where  [:and
+                     [:= :cte_orders.client_id client-id]
+                     [:= :cte_orders.status (:finished order-statuses)]]}
+           (hs/format))
+       (jdbc/query db/db)
+       (first)
+       :count))
+
+
+(defn client-canceled-orders!
+  [client-id]
+  (->> (-> {:with   [[:cte_orders order-detail-query]]
+            :select [:%count.cte_orders.id]
+            :from   [:cte_orders]
+            :where  [:and
+                     [:= :cte_orders.client_id client-id]
+                     [:= :cte_orders.status (:canceled order-statuses)]]}
+           (hs/format))
+       (jdbc/query db/db)
+       (first)
+       :count))
 
 
 (defn active-orders!

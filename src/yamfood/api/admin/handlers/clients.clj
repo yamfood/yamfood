@@ -5,6 +5,7 @@
     [clojure.spec.alpha :as s]
     [yamfood.api.pagination :as p]
     [yamfood.core.specs.core :as cs]
+    [yamfood.core.orders.core :as o]
     [yamfood.core.clients.core :as clients]))
 
 
@@ -13,9 +14,9 @@
   (let [client-id (u/str->int (:id (:params request)))]
     {:body (-> (clients/client-with-id! client-id)
                (assoc :data [{:label "Количество завершенных заказов"
-                              :value "1000"}
+                              :value (o/client-finished-orders! client-id)}
                              {:label "Количество отмененных заказов"
-                              :value "100"}]))}))
+                              :value (o/client-canceled-orders! client-id)}]))}))
 
 
 (s/def ::is_blocked boolean?)
