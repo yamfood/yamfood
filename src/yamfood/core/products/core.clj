@@ -118,6 +118,7 @@
 (def all-categories-query
   {:select    [:categories.id
                :categories.name
+               [:bots.id :bot_id]
                [:bots.name :bot]
                :categories.emoji]
    :from      [:categories]
