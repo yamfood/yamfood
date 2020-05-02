@@ -15,15 +15,18 @@
          e/client-emoji " %s\n"
          e/phone-emoji " +%s\n"
          e/money-emoji " %s\n\n"
+         e/comment-emoji " %s\n\n"
          e/comment-emoji " %s\n")
     (:id order)
     (:name order)
     (:phone order)
-    (if (= (:payment order)
-           u/cash-payment)
-      (str (u/fmt-values (:total_cost order)) " сум")
+    (if (= (:payment order) u/cash-payment)
+      (str (u/fmt-values (+ (:total_cost order)
+                            (:delivery_cost order)))
+           " сум")
       "Оплачено картой")
-    (or (:comment order) "Пусто...")))
+    (or (:comment order) "Пусто...")
+    (:notes order)))
 
 
 (defn- order-detail-markup
