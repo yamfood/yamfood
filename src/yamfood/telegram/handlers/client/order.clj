@@ -2,14 +2,14 @@
   (:require
     [yamfood.core.orders.core :as o]
     [yamfood.core.orders.core :as ord]
+    [yamfood.core.kitchens.core :as k]
     [yamfood.telegram.dispatcher :as d]
     [yamfood.core.baskets.core :as bsk]
     [yamfood.telegram.handlers.utils :as u]
     [yamfood.core.clients.core :as clients]
     [yamfood.telegram.handlers.emojies :as e]
     [yamfood.telegram.handlers.client.core :as c]
-    [yamfood.telegram.translation.core :refer [translate]]
-    [yamfood.core.kitchens.core :as k]))
+    [yamfood.telegram.translation.core :refer [translate]]))
 
 
 (defn order-confirmation-state
