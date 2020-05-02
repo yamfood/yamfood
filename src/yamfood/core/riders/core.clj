@@ -231,6 +231,14 @@
   [order-id rider-id]
   (jdbc/with-db-transaction
     [t-con db/db]
-    (jdbc/insert! t-con "order_logs" {:order_id order-id
-                                      :status   (:on-kitchen o/order-statuses)
-                                      :payload  (db/map->jsonb {:rider_id rider-id})})))
+    (jdbc/insert!
+      t-con
+      "order_logs"
+      {:order_id order-id
+       :status   (:on-kitchen o/order-statuses)
+       :payload  (db/map->jsonb {:rider_id rider-id})})
+    (jdbc/update!
+      t-con
+      "orders"
+      {:rider_id nil}
+      ["orders.rider_id = ?" rider-id])))
