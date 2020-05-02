@@ -18,6 +18,7 @@
                :products.energy
                :products.category_id
                :categories.emoji
+               :categories.bot_id
                [:categories.name :category]]
    :from      [:products]
    :where     [:= :is_active true]
