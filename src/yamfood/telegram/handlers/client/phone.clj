@@ -69,10 +69,11 @@
         client (:client ctx)
         chat-id (u/chat-id update)
         phone (get-phone update)
-        code (generate-confirmation-code 4)]
+        code (generate-confirmation-code 4)
+        bot-name (:name (:bot ctx))]
     (if phone
       {:run       [{:function sms/create!
-                    :args     [phone (translate lang :confirmation-code code)]}
+                    :args     [phone (translate lang :confirmation-code bot-name code)]}
                    {:function clients/update-payload!
                     :args     [(:id client) (-> (:payload client)
                                                 (assoc :unconfirmed-phone phone)

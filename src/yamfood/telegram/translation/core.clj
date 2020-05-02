@@ -95,7 +95,7 @@
         :accepted                        "Принято"
         :card                            "Картой"
         :cash                            "Наличными"
-        :confirmation-code               "Ваш код подтверждения WOK {1}"}
+        :confirmation-code               "Ваш код подтверждения {1} {2}"}
    :en {; Registration
         :send-contact-button             "Send a contact"
         :change-phone-button             "Change phone number"
@@ -185,7 +185,7 @@
         :accepted                        "Accepted"
         :card                            "By card"
         :cash                            "In cash"
-        :confirmation-code               "Your WOK confirmation code is {1}"}
+        :confirmation-code               "Your {1} confirmation code is {2}"}
    :uz {; Registration
         :send-contact-button             "Telefon raqamini yuborish"
         :change-phone-button             "Telefon raqamini o'zgartirish"
@@ -276,7 +276,7 @@
         :accepted                        "Qabul qilindi"
         :card                            "Karta bilan"
         :cash                            "Naqd pul bilan"
-        :confirmation-code               "Sizning WOK tasdiqlash kodi {1}"}})
+        :confirmation-code               "Sizning {1} tasdiqlash kodi {2}"}})
 
 
 (def translate
