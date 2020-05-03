@@ -121,15 +121,17 @@
 
 
 (def order-products-query
-  {:select [:products.id
-            :products.name
-            :products.price
-            :products.payload
-            :order_products.comment
-            :order_products.count
-            [(hs/call :* :order_products.count :products.price) :total]]
-   :from   [:order_products :products]
-   :where  [:= :order_products.product_id :products.id]})
+  {:select    [:products.id
+               :products.name
+               :products.price
+               :products.payload
+               :order_products.comment
+               :order_products.count
+               :categories.is_delivery_free
+               [(hs/call :* :order_products.count :products.price) :total]]
+   :from      [:order_products :products]
+   :left-join [:categories [:= :categories.id :products.category_id]]
+   :where     [:= :order_products.product_id :products.id]})
 
 
 (defn products-by-order-id-query

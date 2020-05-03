@@ -197,8 +197,14 @@
 
 
 (defn order-prices
-  [lang order]
-  (map (product-price lang) (:products order)))
+  [lang params order]
+  (let [products (:products order)
+        delivery-cost (if (every? false? (map :is_delivery_free products))
+                        (:delivery-cost params)
+                        0)]
+    (into (map (product-price lang) (:products order))
+          [{:label "Доставка"
+            :amount (* delivery-cost 100)}])))
 
 
 (defn active-order
@@ -243,7 +249,7 @@
                         :description (invoice-description lang order)
                         :payload     {:order_id (:id order)}
                         :currency    "UZS"
-                        :prices      (order-prices lang order)
+                        :prices      (order-prices lang (:params ctx) order)
                         :options     {:reply_markup (invoice-reply-markup lang)}}
        :delete-message {:chat-id    chat-id
                         :message-id message-id}})))
