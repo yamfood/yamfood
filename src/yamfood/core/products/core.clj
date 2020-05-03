@@ -21,7 +21,7 @@
                :categories.bot_id
                [:categories.name :category]]
    :from      [:products]
-   :where     [:= :is_active true]
+   :where     [:= :products.is_active true]
    :left-join [:categories
                [:= :categories.id :products.category_id]]
    :order-by  [:categories.position :products.position]})
