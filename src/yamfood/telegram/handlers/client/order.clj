@@ -185,7 +185,7 @@
   (translate lang :active-order-message
              (:id order)
              (apply str (u/order-products-text lang (:products order)))
-             (u/fmt-values (+ (:total_cost order) (:delivery-cost order)))
+             (u/fmt-values (+ (:total_cost order) (:delivery_cost order)))
              (translate lang (keyword (:payment order)))))
 
 
