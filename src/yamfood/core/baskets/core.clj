@@ -10,16 +10,18 @@
 
 (defn- basket-products-query
   [basket-id]
-  (hs/format {:select   [:products.id
-                         :basket_products.count
-                         :products.name
-                         :products.price
-                         :products.energy]
-              :from     [:basket_products :products]
-              :where    [:and
-                         [:= :basket_products.basket_id basket-id]
-                         [:= :products.id :basket_products.product_id]]
-              :order-by [:id]}))
+  (hs/format {:select    [:products.id
+                          :basket_products.count
+                          :products.name
+                          :products.price
+                          :categories.is_delivery_free
+                          :products.energy]
+              :from      [:basket_products :products]
+              :where     [:and
+                          [:= :basket_products.basket_id basket-id]
+                          [:= :products.id :basket_products.product_id]]
+              :left-join [:categories [:= :products.category_id :categories.id]]
+              :order-by  [:id]}))
 
 
 (defn- basket-totals-query

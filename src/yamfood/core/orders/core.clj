@@ -68,9 +68,15 @@
 
 (defn- products-from-basket-query
   [basket-id]
-  (hs/format {:select [:product_id :count]
-              :from   [:basket_products]
-              :where  [:= :basket_id basket-id]}))
+  {:select    [:basket_products.product_id
+               :basket_products.count
+               :categories.is_delivery_free]
+   :from      [:basket_products :products]
+   :where     [:and
+               [:= :basket_products.basket_id basket-id]
+               [:= :basket_products.product_id :products.id]]
+   :left-join [:categories
+               [:= :products.category_id :categories.id]]})
 
 
 (defn order-current-status-query
@@ -311,17 +317,6 @@
       (#(order-by-id! (:id %)))))
 
 
-(defn products-from-basket!
-  [basket-id]
-  (->> (products-from-basket-query basket-id)
-       (jdbc/query db/db)))
-
-
-(defn prepare-basket-products-to-order
-  [basket-products order-id]
-  (map #(assoc % :order_id order-id) basket-products))
-
-
 (defn insert-order-query
   [client-id lon lat address comment kitchen-id payment delivery_cost]
   ["insert into orders (client_id, location, address, comment, kitchen_id, payment, delivery_cost) values (?, POINT (?, ?), ?, ?, ?, ?, ?) ;"
@@ -346,15 +341,16 @@
     (jdbc/execute! db/db query {:return-keys ["id"]})))
 
 
-(defn insert-products!
-  [products]
-  (jdbc/insert-multi! db/db "order_products" products))
-
-
 (defn create-order!
   ; TODO: Use transaction!
-  [basket-id kitchen-id location address comment payment delivery-cost]
+  [basket-id kitchen-id location address comment payment default-delivery-cost]
   (let [client (clients/client-with-basket-id! basket-id)
+        products (->> (products-from-basket-query basket-id)
+                      (hs/format)
+                      (jdbc/query db/db))
+        delivery-cost (if (every? false? (map :is_delivery_free products))
+                        default-delivery-cost
+                        0)
         order-id (:id (insert-order! (:id client)
                                      (:longitude location)
                                      (:latitude location)
@@ -363,9 +359,10 @@
                                      kitchen-id
                                      payment
                                      delivery-cost))]
-    (-> (products-from-basket! basket-id)
-        (prepare-basket-products-to-order order-id)
-        (insert-products!))
+    (->> products
+         (map #(select-keys % [:product_id :count]))
+         (map #(assoc % :order_id order-id))
+         (jdbc/insert-multi! db/db "order_products"))
     (when (= payment u/cash-payment)
       (jdbc/insert!
         db/db "order_logs"

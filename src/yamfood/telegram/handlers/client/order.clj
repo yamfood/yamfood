@@ -57,7 +57,10 @@
 (defn pre-order-text
   [lang params order-state]
   (let [price (:total_cost (:basket order-state))
-        delivery (:delivery-cost params)]
+        products (:products (:basket order-state))
+        delivery (if (every? false? (map :is_delivery_free products))
+                   (:delivery-cost params)
+                   0)]
     (translate lang :oc-message
                {:price    (u/fmt-values price)
                 :payment  (translate lang (keyword (or (get-in order-state [:client :payload :payment])
