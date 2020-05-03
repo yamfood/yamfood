@@ -122,6 +122,7 @@
                [:bots.name :bot]
                :categories.emoji]
    :from      [:categories]
+   :where     [:= :categories.is_active true]
    :left-join [:bots
                [:= :bots.id :categories.bot_id]]
    :order-by  [:categories.position :categories.bot_id]})
@@ -161,6 +162,43 @@
        (hs/format)
        (jdbc/query db/db)
        (map #(cu/keywordize-field % :name))))
+
+
+(defn category-by-id!
+  [category-id]
+  (->> (-> all-categories-query
+           (hh/merge-where [:= :categories.id category-id])
+           (hs/format))
+       (jdbc/query db/db)
+       (map #(cu/keywordize-field % :name))
+       (first)))
+
+
+(defn update-category!
+  [category-id category]
+  (jdbc/update!
+    db/db
+    "categories"
+    category
+    ["categories.id = ?" category-id]))
+
+
+(defn create-category!
+  [category]
+  (first
+    (jdbc/insert!
+      db/db
+      "categories"
+      category)))
+
+
+(defn delete-category!
+  [category-id]
+  (jdbc/update!
+    db/db
+    "categories"
+    {:is_active false}
+    ["categories.id = ?" category-id]))
 
 
 (defn categories-with-products!

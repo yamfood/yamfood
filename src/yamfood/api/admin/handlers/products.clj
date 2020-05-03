@@ -14,11 +14,15 @@
 (s/def ::en string?)
 (s/def ::name
   (s/keys :req-un [::ru ::uz ::en]))
+
 (s/def ::description
   (s/keys :opt-un [::ru ::uz ::en]))
+
 (s/def ::energy int?)
+(s/def ::bot_id int?)
 (s/def ::price int?)
 (s/def ::position int?)
+(s/def ::is_free_delivery boolean?)
 (s/def ::category_id (s/nilable int?))
 
 
@@ -48,6 +52,85 @@
   {:body
    (->> (p/all-categories!)
         (map fmt-category))})
+
+
+(defn category-details
+  [request]
+  (let [category-id (u/str->int (:id (:params request)))
+        category (p/category-by-id! category-id)]
+    (if category
+      {:body (fmt-category category)}
+      {:body   {:error "Not found"}
+       :status 404})))
+
+
+(s/def ::patch-category
+  (s/keys :opt-un [::name ::bot_id ::position ::is_delivery_free]))
+
+
+(defn patch-category
+  [request]
+  (let [category-id (u/str->int (:id (:params request)))
+        category (p/category-by-id! category-id)
+        body (select-keys (:body request) [:name
+                                           :emoji
+                                           :bot_id
+                                           :position
+                                           :is_delivery_free])
+        valid? (and category
+                    (s/valid? ::patch-category body))]
+    (if valid?
+      (try
+        (p/update-category! category-id body)
+        {:body (-> (p/category-by-id! category-id)
+                   (fmt-category))}
+        (catch Exception e
+          (println e)
+          {:body   {:error "Unexpected error"}
+           :status 500}))
+      {:body   {:error "Invalid input or category"}
+       :status 400})))
+
+
+(s/def ::create-category
+  (s/keys :req-un [::name ::bot_id ::position ::is_delivery_free]))
+
+
+(defn create-category
+  [request]
+  (let [body (select-keys (:body request) [:name
+                                           :emoji
+                                           :bot_id
+                                           :position
+                                           :is_delivery_free])
+        valid? (s/valid? ::create-category body)]
+    (if valid?
+      (try
+        (let [category (p/create-category! body)]
+          {:body (->> (p/category-by-id! (:id category))
+                      (fmt-category))})
+        (catch Exception e
+          (println e)
+          {:body   {:error "Unexpected error"}
+           :status 500}))
+      {:body   {:error "Invalid input"}
+       :status 400})))
+
+
+(defn delete-category
+  [request]
+  (let [category-id (u/str->int (:id (:params request)))
+        category (p/category-by-id! category-id)]
+    (if category
+      (try
+        (p/delete-category! category-id)
+        {:status 204}
+        (catch Exception e
+          (println e)
+          {:body   {:error "Unexpected error"}
+           :status 500}))
+      {:body   {:error "Not found"}
+       :status 404})))
 
 
 (s/def ::create-product
@@ -126,8 +209,14 @@
   routes
   (c/GET "/" [] products-list)
   (c/POST "/" [] create-product)
+
   (c/GET "/:id{[0-9]+}/" [] product-detail)
   (c/PATCH "/:id{[0-9]+}/" [] patch-product)
   (c/DELETE "/:id{[0-9]+}/" [] delete-product)
 
-  (c/GET "/categories/" [] categories-list))
+  (c/GET "/categories/" [] categories-list)
+  (c/POST "/categories/" [] create-category)
+
+  (c/GET "/categories/:id{[0-9]+}/" [] category-details)
+  (c/PATCH "/categories/:id{[0-9]+}/" [] patch-category)
+  (c/DELETE "/categories/:id{[0-9]+}/" [] delete-category))
