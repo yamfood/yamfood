@@ -185,7 +185,7 @@
   (translate lang :active-order-message
              (:id order)
              (apply str (u/order-products-text lang (:products order)))
-             (u/fmt-values (:total_cost order))
+             (u/fmt-values (+ (:total_cost order) (:delivery-cost order)))
              (translate lang (keyword (:payment order)))))
 
 
@@ -203,7 +203,7 @@
                         (:delivery-cost params)
                         0)]
     (into (map (product-price lang) (:products order))
-          [{:label "Доставка"
+          [{:label  "Доставка"
             :amount (* delivery-cost 100)}])))
 
 
