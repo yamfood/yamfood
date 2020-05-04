@@ -31,7 +31,7 @@
                [(clients-active-order-query :clients.id) :active_order_id]
                [:baskets.id :basket_id]]
    :from      [:clients :baskets]
-   :left-join [:bots [:bots.id :clients.bot_id]]
+   :left-join [:bots [:= :bots.id :clients.bot_id]]
    :where     [:= :baskets.client_id :clients.id]})
 
 
@@ -75,16 +75,19 @@
 
 (defn clients-list-query
   [offset limit]
-  {:select   [:clients.id
-              :clients.tid
-              :clients.name
-              :clients.phone
-              :clients.payload
-              :clients.is_blocked]
-   :from     [:clients]
-   :order-by [:clients.id]
-   :offset   offset
-   :limit    limit})
+  {:select    [:clients.id
+               :clients.tid
+               :clients.name
+               :clients.phone
+               :clients.payload
+               :clients.is_blocked
+               [:bots.name :bot]
+               [:bots.id :bot_id]]
+   :from      [:clients]
+   :order-by  [:clients.id]
+   :left-join [:bots [:= :bots.id :clients.bot_id]]
+   :offset    offset
+   :limit     limit})
 
 
 (def clients-count-query
