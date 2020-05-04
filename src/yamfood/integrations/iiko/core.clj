@@ -36,6 +36,14 @@
     (api/create-order! access-token order)))
 
 
+(defn check-order!
+  [order]
+  (let [params (p/params!)
+        access-token (api/get-access-token! (:iiko-user-id params)
+                                            (:iiko-user-secret params))]
+    (api/check-order! access-token order)))
+
+
 (comment
   (def nomenclature
     (let [params (p/params!)

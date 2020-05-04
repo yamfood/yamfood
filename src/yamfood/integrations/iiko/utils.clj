@@ -64,11 +64,12 @@
   {:organization       (:organization-id context)
    :deliveryTerminalId (get-in order [:kitchen_payload :deliveryTerminalId])
    :order              {:id            (u/uuid)
-                        :items         [(into (map product->item (:products order))
-                                              (when (not (= (:delivery_cost order) 0))
-                                                [{:id     (:delivery-id context)
-                                                  :amount (int (/ (:delivery_cost order)
-                                                                  (:delivery-cost context)))}]))]
+                        :items         (into (map product->item (:products order))
+                                             (when (not (= (:delivery_cost order) 0))
+                                               [{:id      (:delivery-id context)
+                                                 :comment ""
+                                                 :amount  (int (/ (:delivery_cost order)
+                                                                  (:delivery-cost context)))}]))
 
                         :payment_items [(get-iiko-payment-type context order)]
                         :phone         (:phone order)
