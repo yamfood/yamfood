@@ -91,6 +91,7 @@
         :request-feedback-message        "Оцените, пожалуйста, заказ!"
 
         ; Other
+        :inline-back-title               "Назад"
         :blocked-message                 "Вы заблокированы, обратитесь в службу поддержки"
         :accepted                        "Принято"
         :card                            "Картой"
@@ -181,6 +182,7 @@
         :request-feedback-message        "Please rate the order!"
 
         ; Other
+        :inline-back-title               "Back"
         :blocked-message                 "You are blocked, please contact the support service"
         :accepted                        "Accepted"
         :card                            "By card"
@@ -272,6 +274,7 @@
         :request-feedback-message        "Iltimos, buyurtmani baholang!"
 
         ; Other
+        :inline-back-title               "Orqaga"
         :blocked-message                 "Siz bloklangindiz, qo'llab-quvvatlash xizmatiga murojaat qiling"
         :accepted                        "Qabul qilindi"
         :card                            "Karta bilan"

@@ -35,6 +35,16 @@
    :thumb_url             "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/320/apple/114/round-pushpin_1f4cd.png"})
 
 
+(defn back-button-inline-result
+  [lang]
+  {:type                  "article"
+   :id                    88888
+   :input_message_content {:message_text "Назад"}
+   :title                 (translate lang "Back")
+   :description           ""
+   :thumb_url             "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/320/apple/237/leftwards-black-arrow_2b05.png"})
+
+
 (defn inline-query-handler
   ([ctx]
    (let [update (:update ctx)
@@ -57,11 +67,13 @@
      {:answer-inline
       {:inline-query-id (:id (:inline_query update))
        :options         {:cache_time 0}
-       :results         (into
-                          [(current-location-inline-result
-                             (:lang ctx)
-                             (u/text-from-address address))]
-                          (map (query-result-from-product lang) products))}})))
+       :results         (flatten
+                          (conj
+                            [(current-location-inline-result
+                               (:lang ctx)
+                               (u/text-from-address address))]
+                            (map (query-result-from-product lang) products)
+                            [(back-button-inline-result (:lang ctx))]))}})))
 
 
 (d/register-event-handler!
