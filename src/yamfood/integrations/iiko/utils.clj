@@ -77,6 +77,6 @@
                                         :home    (:home context)
                                         :street  (:street context)
                                         :comment (:address order)}
-                        :comment       (str "TGBOT " (:id order))}
+                        :comment       (format "TGBOT %s (%s)" (:id order) (:notes order))}
    :customer           {:name  (:name order)
                         :phone (:phone order)}})
