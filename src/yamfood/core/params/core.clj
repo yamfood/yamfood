@@ -38,6 +38,10 @@
                          :docs    "Дом, который будет подставляться в заказы для IIKO"
                          :default ""
                          :adapter nil}
+   :iiko-delivery-id    {:name    "IIKO Delivery ID"
+                         :docs    "ID позиции доставки из IIKO"
+                         :default ""
+                         :adapter nil}
    :iiko-street         {:name    "IIKO Street"
                          :docs    "Улица,которая будет подставляться в заказы для IIKO"
                          :default ""
