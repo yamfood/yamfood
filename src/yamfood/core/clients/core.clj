@@ -20,16 +20,19 @@
 
 
 (def client-query
-  {:select [:clients.id
-            :clients.phone
-            :clients.name
-            :clients.tid
-            :clients.payload
-            :clients.is_blocked
-            [(clients-active-order-query :clients.id) :active_order_id]
-            [:baskets.id :basket_id]]
-   :from   [:clients :baskets]
-   :where  [:= :baskets.client_id :clients.id]})
+  {:select    [:clients.id
+               :clients.phone
+               :clients.name
+               :clients.tid
+               :clients.payload
+               :clients.is_blocked
+               [:bots.id :bot_id]
+               [:bots.name :bot]
+               [(clients-active-order-query :clients.id) :active_order_id]
+               [:baskets.id :basket_id]]
+   :from      [:clients :baskets]
+   :left-join [:bots [:bots.id :clients.bot_id]]
+   :where     [:= :baskets.client_id :clients.id]})
 
 
 (defn client-with-id-query
