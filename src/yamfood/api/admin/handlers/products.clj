@@ -59,7 +59,7 @@
   (let [category-id (u/str->int (:id (:params request)))
         category (p/category-by-id! category-id)]
     (if category
-      {:body (fmt-category category)}
+      {:body category}
       {:body   {:error "Not found"}
        :status 404})))
 

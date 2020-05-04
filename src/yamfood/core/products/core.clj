@@ -118,9 +118,11 @@
 (def all-categories-query
   {:select    [:categories.id
                :categories.name
+               :categories.position
                [:bots.id :bot_id]
                [:bots.name :bot]
-               :categories.emoji]
+               :categories.emoji
+               :categories.is_delivery_free]
    :from      [:categories]
    :where     [:= :categories.is_active true]
    :left-join [:bots
