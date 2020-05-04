@@ -135,6 +135,7 @@
             :next-event :c/create-order}}))
   ([ctx kitchen]
    (let [update (:update ctx)
+         lang (:lang ctx)
          query (:callback_query update)
          chat-id (:id (:from query))
          message-id (:message_id (:message query))
@@ -163,7 +164,7 @@
                            :message-id message-id}})
        {:answer-callback {:callback_query_id (:id query)
                           :show_alert        true
-                          :text              "К сожалению, на данный момент все кухни закрыты :("}}))))
+                          :text              (translate lang :all-kitchens-closed)}}))))
 
 
 (def write-comment-text "Напишите свой комментарий к заказу")

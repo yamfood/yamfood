@@ -92,6 +92,8 @@
 
         ; Other
         :inline-back-title               "Назад"
+        :inline-back-description         "Коснитесь чтобы вернуться в меню"
+        :all-kitchens-closed             "К сожалению, на данный момент все кухни закрыты :("
         :blocked-message                 "Вы заблокированы, обратитесь в службу поддержки"
         :accepted                        "Принято"
         :card                            "Картой"
@@ -183,6 +185,8 @@
 
         ; Other
         :inline-back-title               "Back"
+        :inline-back-description         "Tap to return to the menu"
+        :all-kitchens-closed             "Unfortunately, all branches are currently closed :("
         :blocked-message                 "You are blocked, please contact the support service"
         :accepted                        "Accepted"
         :card                            "By card"
@@ -275,6 +279,8 @@
 
         ; Other
         :inline-back-title               "Orqaga"
+        :inline-back-description         "Menyuga qaytish uchun bosing"
+        :all-kitchens-closed             "Afsuski, hozirgi vaqtda barcha filiallar yopiq :(\n"
         :blocked-message                 "Siz bloklangindiz, qo'llab-quvvatlash xizmatiga murojaat qiling"
         :accepted                        "Qabul qilindi"
         :card                            "Karta bilan"

@@ -39,9 +39,9 @@
   [lang]
   {:type                  "article"
    :id                    88888
-   :input_message_content {:message_text "Назад"}
+   :input_message_content {:message_text (translate lang :inline-back-title)}
    :title                 (translate lang :inline-back-title)
-   :description           ""
+   :description           (translate lang :inline-back-description)
    :thumb_url             "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/320/apple/237/leftwards-black-arrow_2b05.png"})
 
 
