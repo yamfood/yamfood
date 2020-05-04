@@ -29,7 +29,9 @@
 
 
 (def cancelable-order-statuses
-  [(:new order-statuses)])
+  [(:new order-statuses)
+   (:on-kitchen order-statuses)
+   (:on-way order-statuses)])
 
 
 (defn fmt-order-location
