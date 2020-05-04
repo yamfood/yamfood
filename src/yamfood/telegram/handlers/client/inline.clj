@@ -58,7 +58,7 @@
                                     :args       [kitchen-id]
                                     :next-event :c/inline}}
        :else {:run {:function   p/products-by-category-emoji!
-                    :args       [(:id (:bot ctx)) (:query query)]
+                    :args       [(:id (:bot ctx)) kitchen-id (:query query)]
                     :next-event :c/inline}})))
   ([ctx products]
    (let [update (:update ctx)

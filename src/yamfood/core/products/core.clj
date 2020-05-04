@@ -229,11 +229,15 @@
 
 
 (defn products-by-category-emoji!
-  [bot-id emoji]
+  [bot-id kitchen-id emoji]
   (->> (-> all-products-query
            (hh/merge-where [:and
                             [:= :categories.bot_id bot-id]
-                            [:= :categories.emoji emoji]]))
+                            [:= :categories.emoji emoji]])
+           (hh/merge-where
+             [:not [:in
+                    :products.id
+                    (disabled-products-query kitchen-id)]]))
        (hs/format)
        (jdbc/query db/db)
        (map keywordize-json-fields)))
