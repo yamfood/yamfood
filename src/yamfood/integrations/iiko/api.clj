@@ -71,16 +71,18 @@
 (defn check-order!
   [access-token order]
   (let [url (format check-order-url access-token)
-        response (http/post url {:content-type :json
-                                 :body         (json/write-str order)})]
+        response (http/post url {:content-type          :json
+                                 :body                  (json/write-str order)
+                                 :throw-entire-message? true})]
     (http/success? response)))
 
 
 (defn create-order!
   [access-token order]
   (let [url (format create-order-url access-token)
-        response (http/post url {:content-type :json
-                                 :body         (json/write-str order)})]
+        response (http/post url {:content-type          :json
+                                 :body                  (json/write-str order)
+                                 :throw-entire-message? true})]
     (if (http/success? response)
       (json/read-str (:body response) :key-fn keyword))))
 
