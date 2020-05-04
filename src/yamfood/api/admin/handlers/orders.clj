@@ -11,6 +11,7 @@
     [yamfood.api.pagination :as p]
     [yamfood.core.admin.core :as a]
     [yamfood.core.orders.core :as o]
+    [yamfood.core.riders.core :as r]
     [yamfood.core.orders.core :as ord]
     [yamfood.core.products.core :as products]
     [yamfood.telegram.helpers.status :as status]))
@@ -219,6 +220,25 @@
        :status 404})))
 
 
+(defn fmt-order-log!
+  [log]
+  (let [payload (:payload log)
+        rider-id (get payload "rider_id")
+        admin-id (get payload "admin_id")
+        payment-id (get payload "payment_id")]
+    (assoc log :info (cond
+                       rider-id {:value (str "Курьер: " (:phone (r/rider-by-id! rider-id)))}
+                       admin-id {:value (str "Администратор: " (:name (a/admin-by-id! admin-id)))}
+                       payment-id {:value (str "Payme ID: " payment-id)}))))
+
+
+(defn order-logs
+  [request]
+  (let [order-id (u/str->int (:id (:params request)))
+        logs (map fmt-order-log! (o/order-logs-by-order-id! order-id))]
+    {:body logs}))
+
+
 (s/def ::product_id int?)
 (s/def ::count int?)
 (s/def ::comment string?)
@@ -265,6 +285,7 @@
   (c/POST "/:id{[0-9]+}/accept/" [] accept-order)
   (c/POST "/:id{[0-9]+}/cancel/" [] cancel-order)
   (c/GET "/:id{[0-9]+}/products/" [] order-available-products)
+  (c/GET "/:id{[0-9]+}/logs/" [] order-logs)
 
   (c/GET "/active/" [] active-orders-list)
   (c/GET "/finished/" [] finished-orders))

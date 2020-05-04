@@ -60,6 +60,15 @@
        (first)))
 
 
+(defn admin-by-id!
+  [admin-id]
+  (->> (-> admin-query
+           (hh/merge-where [:= :admins.id admin-id])
+           (hs/format))
+       (jdbc/query db/db)
+       (first)))
+
+
 (defn update-admin-token!
   [admin-id]
   (let [token (str/replace (uuid) "-" "")]

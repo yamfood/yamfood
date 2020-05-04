@@ -312,6 +312,19 @@
      :status   (:canceled order-statuses)}))
 
 
+(defn order-logs-by-order-id!
+  [order-id]
+  (->> (-> {:select   [:order_logs.id
+                       :order_logs.status
+                       :order_logs.created_at
+                       :order_logs.payload]
+            :from     [:order_logs]
+            :where    [:= :order_logs.order_id order-id]
+            :order-by [:order_logs.created_at]}
+           (hs/format))
+       (jdbc/query db/db)))
+
+
 (defn client-active-order!
   [client-id]
   (-> (orders-by-client-id! client-id)
