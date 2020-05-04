@@ -121,9 +121,12 @@
 
 
 (defn parse-int [s]
-  (let [result (read-string s)]
-    (if (number? result)
-      result
+  (try
+    (let [result (read-string s)]
+      (if (number? result)
+        result
+        nil))
+    (catch Exception e
       nil)))
 
 
