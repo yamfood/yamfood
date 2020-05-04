@@ -63,8 +63,10 @@
 (defn- assign-order
   [ctx order-id]
   (let [chat-id (u/chat-id (:update ctx))
-        order (o/order-by-id! order-id {:products? false})]
-    (if order
+        order (o/order-by-id! order-id {:products? false})
+        valid? (and order
+                    (= (:status order) (:on-kitchen o/order-statuses)))]
+    (if valid?
       (merge {:run {:function r/assign-rider-to-order!
                     :args     [order-id (:id (:rider ctx))]}}
              (send-order-detail ctx order))
