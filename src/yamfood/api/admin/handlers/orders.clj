@@ -95,11 +95,12 @@
         acceptable? (= (:new o/order-statuses) (:status order))]
     (if acceptable?
       (try
-        (o/accept-order! (:id order) admin-id)
         (when send-to-iiko? (iiko/create-order! order))
+        (o/accept-order! (:id order) admin-id)
         (status/notify-order-accepted! (:id order))
         {:body (get-active-orders!)}
         (catch Exception e
+          (println e)
           {:body   {:error "Unexpected error"}
            :status 500}))
       {:body   {:error "Can't accept order in this status"}
