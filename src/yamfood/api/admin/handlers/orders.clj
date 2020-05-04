@@ -32,7 +32,7 @@
 (defn add-latency
   [order]
   (let [created-at (tc/from-sql-date (:created_at order))
-        late-at (t/plus created-at (t/minutes 30))
+        late-at (t/plus created-at (t/minutes 60))
         latency (if (t/after? (t/now) late-at)
                   (t/in-minutes (t/interval late-at (t/now)))
                   nil)]
