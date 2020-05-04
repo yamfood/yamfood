@@ -60,12 +60,22 @@
 
 
 (defn products-by-bot!
-  [bot-id]
-  (->> (-> all-products-query
-           (hh/merge-where [:= :categories.bot_id bot-id])
-           (hs/format))
-       (jdbc/query db/db)
-       (map keywordize-json-fields)))
+  ([bot-id]
+   (->> (-> all-products-query
+            (hh/merge-where [:= :categories.bot_id bot-id])
+            (hs/format))
+        (jdbc/query db/db)
+        (map keywordize-json-fields)))
+  ([bot-id kitchen-id]
+   (->> (-> all-products-query
+            (hh/merge-where [:= :categories.bot_id bot-id])
+            (hh/merge-where
+              [:not [:in
+                     :products.id
+                     (disabled-products-query kitchen-id)]])
+            (hs/format))
+        (jdbc/query db/db)
+        (map keywordize-json-fields))))
 
 
 (defn basket-cost-query
