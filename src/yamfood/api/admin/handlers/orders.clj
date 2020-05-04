@@ -227,9 +227,9 @@
         admin-id (get payload "admin_id")
         payment-id (get payload "payment_id")]
     (assoc log :info (cond
-                       rider-id {:value (str "Курьер: " (:phone (r/rider-by-id! rider-id)))}
-                       admin-id {:value (str "Администратор: " (:name (a/admin-by-id! admin-id)))}
-                       payment-id {:value (str "Payme ID: " payment-id)}))))
+                       rider-id (str "Курьер: " (:phone (r/rider-by-id! rider-id)))
+                       admin-id (str "Администратор: " (:name (a/admin-by-id! admin-id)))
+                       payment-id (str "Payme ID: " payment-id)))))
 
 
 (defn order-logs
