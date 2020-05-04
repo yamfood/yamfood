@@ -147,11 +147,11 @@
 
 
 (defn menu-state!
-  [rider-id]
+  [rider-id delivery-cost]
   (let [rider (rider-by-id! rider-id)
         finished-orders-today (finished-orders-today-count! rider-id)]
     (merge rider {:finished-orders-today finished-orders-today
-                  :earned-money-today    (* finished-orders-today 10000)})))
+                  :earned-money-today    (* finished-orders-today delivery-cost)})))
 
 
 (defn update!

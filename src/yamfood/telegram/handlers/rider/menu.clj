@@ -28,10 +28,11 @@
 
 (defn rider-menu-handler
   ([ctx]
-   (let [rider (:rider ctx)]
+   (let [rider (:rider ctx)
+         delivery-cost (:delivery-cost (:params ctx))]
      (if (:id rider)
        {:run {:function   r/menu-state!
-              :args       [(:id rider)]
+              :args       [(:id rider) delivery-cost]
               :next-event :r/menu}}
        {:dispatch {:args [:r/registration]}})))
   ([ctx menu-state]
@@ -52,9 +53,10 @@
 
 (defn refresh-menu-handler
   ([ctx]
-   {:run {:function   r/menu-state!
-          :args       [(:id (:rider ctx))]
-          :next-event :r/refresh-menu}})
+   (let [delivery-cost (:delivery-cost (:params ctx))]
+     {:run {:function   r/menu-state!
+            :args       [(:id (:rider ctx)) delivery-cost]
+            :next-event :r/refresh-menu}}))
   ([ctx state]
    (let [update (:update ctx)
          chat-id (u/chat-id update)

@@ -3,6 +3,7 @@
     [environ.core :refer [env]]
     [yamfood.core.riders.core :as r]
     [yamfood.telegram.dispatcher :as d]
+    [yamfood.core.params.core :as params]
     [yamfood.telegram.handlers.utils :as u]))
 
 
@@ -10,6 +11,7 @@
   [update]
   {:token  (env :rider-bot-token)
    :update update
+   :params (params/params!)
    :rider  (r/rider-by-tid! (u/tid-from-update update))})
 
 
