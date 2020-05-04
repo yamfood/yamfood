@@ -14,7 +14,9 @@
     [yamfood.core.riders.core :as r]
     [yamfood.core.orders.core :as ord]
     [yamfood.core.products.core :as products]
-    [yamfood.telegram.helpers.status :as status]))
+    [yamfood.integrations.iiko.core :as iiko]
+    [yamfood.telegram.helpers.status :as status]
+    [yamfood.core.params.core :as params]))
 
 
 (defonce open-orders (atom {}))
@@ -88,12 +90,16 @@
   (let [admin-id (:id (:admin request))
         order-id (u/str->int (:id (:params request)))
         order (order-by-id! order-id)
+        params (params/params!)
+        send-to-iiko? (:iiko-enabled? params)
         acceptable? (= (:new o/order-statuses) (:status order))]
     (if acceptable?
-      (do
-        (if (do (o/accept-order! (:id order) admin-id)
-                (status/notify-order-accepted! (:id order)))
-          {:body (get-active-orders!)}
+      (try
+        (o/accept-order! (:id order) admin-id)
+        (when send-to-iiko? (iiko/create-order! order))
+        (status/notify-order-accepted! (:id order))
+        {:body (get-active-orders!)}
+        (catch Exception e
           {:body   {:error "Unexpected error"}
            :status 500}))
       {:body   {:error "Can't accept order in this status"}
