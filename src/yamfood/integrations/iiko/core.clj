@@ -15,6 +15,8 @@
     {:access-token    access-token
      :organization-id organization-id
      :city            "Ташкент"
+     :delivery-id     (:iiko-delivery-id params)
+     :delivery-cost   (:delivery-cost params)
      :home            (:iiko-home params)
      :street          (:iiko-street params)
      :payments        {:cash (:id (first (filter #(= (:code %) "CASH") iiko-payment-types)))

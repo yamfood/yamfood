@@ -64,7 +64,12 @@
   {:organization       (:organization-id context)
    :deliveryTerminalId (get-in order [:kitchen_payload :deliveryTerminalId])
    :order              {:id            (u/uuid)
-                        :items         (map product->item (:products order))
+                        :items         [(into (map product->item (:products order))
+                                              (when (not (= (:delivery_cost order) 0))
+                                                [{:id     (:delivery-id context)
+                                                  :amount (int (/ (:delivery_cost order)
+                                                                  (:delivery-cost context)))}]))]
+
                         :payment_items [(get-iiko-payment-type context order)]
                         :phone         (:phone order)
                         :address       {:city    (:city context)
@@ -74,5 +79,3 @@
                         :comment       (str "TGBOT " (:id order))}
    :customer           {:name  (:name order)
                         :phone (:phone order)}})
-
-
