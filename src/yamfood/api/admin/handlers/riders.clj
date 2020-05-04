@@ -48,7 +48,8 @@
   (let [rider-id (u/str->int (:id (:params request)))
         rider (r/rider-by-id! rider-id)]
     (if rider
-      {:body {"Баланс" (:deposit rider)}}
+      {:body (assoc rider :info [{:label "Баланс"
+                                  :value (:deposit rider)}])}
       {:body   {:error "Not found"}
        :status 404})))
 

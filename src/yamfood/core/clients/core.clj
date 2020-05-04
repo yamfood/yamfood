@@ -30,9 +30,9 @@
                [:bots.name :bot]
                [(clients-active-order-query :clients.id) :active_order_id]
                [:baskets.id :basket_id]]
-   :from      [:clients :baskets]
-   :left-join [:bots [:= :bots.id :clients.bot_id]]
-   :where     [:= :baskets.client_id :clients.id]})
+   :from      [:clients]
+   :left-join [:baskets [:= :baskets.client_id :clients.id]
+               :bots [:= :clients.bot_id :bots.id]]})
 
 
 (defn client-with-id-query
