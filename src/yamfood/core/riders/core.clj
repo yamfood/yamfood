@@ -129,16 +129,11 @@
        (first)))
 
 
-(defn finished-orders-count-query
-  [rider-id]
-  (-> (finished-orders-query rider-id)
-      (assoc :select [:%count.order_logs.id])))
-
-
 (defn finished-orders-today-count!
   [rider-id]
   (let [today (.toLocalDate (LocalDateTime/now))]
-    (->> (-> (finished-orders-count-query rider-id)
+    (->> (-> (finished-orders-query rider-id)
+             (assoc :select [(hs/raw "count(distinct order_id)")])
              (hh/merge-where [:> :order_logs.created_at today]))
          (hs/format)
          (jdbc/query db/db)
