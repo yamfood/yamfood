@@ -62,11 +62,13 @@
          chat-id (u/chat-id update)
          query (:callback_query update)
          message-id (:message_id (:message query))]
-     {:edit-message {:chat-id    chat-id
-                     :message-id message-id
-                     :text       (rider-menu-text state)
-                     :options    {:parse_mode   "markdown"
-                                  :reply_markup rider-menu-markup}}})))
+     {:edit-message    {:chat-id    chat-id
+                        :message-id message-id
+                        :text       (rider-menu-text state)
+                        :options    {:parse_mode   "markdown"
+                                     :reply_markup rider-menu-markup}}
+      :answer-callback {:callback_query_id (:id query)
+                        :text              " "}})))
 
 
 (def registration-markup
