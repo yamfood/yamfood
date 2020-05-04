@@ -15,8 +15,8 @@
     {:access-token    access-token
      :organization-id organization-id
      :city            "Ташкент"
-     :home            (get :iiko-home params)
-     :street          (get :iiko-street params)
+     :home            (:iiko-home params)
+     :street          (:iiko-street params)
      :payments        {:cash (:id (first (filter #(= (:code %) "CASH") iiko-payment-types)))
                        :card (:id (first (filter #(= (:code %) "PAYME") iiko-payment-types)))}}))
 
