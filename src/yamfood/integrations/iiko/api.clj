@@ -82,6 +82,7 @@
   (let [url (format create-order-url access-token)
         response (http/post url {:content-type          :json
                                  :body                  (json/write-str order)
+                                 :connection-timeout    5000
                                  :throw-entire-message? true})]
     (if (http/success? response)
       (json/read-str (:body response) :key-fn keyword))))

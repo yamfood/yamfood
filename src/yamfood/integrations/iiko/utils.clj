@@ -49,34 +49,34 @@
 
 
 (defn get-iiko-payment-type
-  [context order]
+  [context order delivery]
   (let [payment (:payment order)]
     (cond
-      (= payment "card") {:sum                   (:total_sum order)
-                          :paymentType           {:id (:card (:payments context))}
-                          :isProcessedExternally true}
-      (= payment "cash") {:sum         (:total_sum order)
-                          :paymentType {:id (:cash (:payments context))}})))
+      (= payment "card") [{:sum                   (+ (:total_sum order) delivery)
+                           :paymentType           {:id (:card (:payments context))}
+                           :isProcessedExternally true}]
+      (= payment "cash") nil)))
 
 
 (defn order->iiko
   [context order]
-  {:organization       (:organization-id context)
-   :deliveryTerminalId (get-in order [:kitchen_payload :deliveryTerminalId])
-   :order              {:id            (u/uuid)
-                        :items         (into (map product->item (:products order))
-                                             (when (not (= (:delivery_cost order) 0))
-                                               [{:id      (:delivery-id context)
-                                                 :comment ""
-                                                 :amount  (int (/ (:delivery_cost order)
-                                                                  (:delivery-cost context)))}]))
-
-                        :payment_items [(get-iiko-payment-type context order)]
-                        :phone         (:phone order)
-                        :address       {:city    (:city context)
-                                        :home    (:home context)
-                                        :street  (:street context)
-                                        :comment (:address order)}
-                        :comment       (format "TGBOT %s (%s)" (:id order) (:notes order))}
-   :customer           {:name  (:name order)
-                        :phone (:phone order)}})
+  (let [deliveries-count (int (/ (:delivery_cost order)
+                                 (:delivery-cost context)))]
+    {:organization       (:organization-id context)
+     :deliveryTerminalId (get-in order [:kitchen_payload :deliveryTerminalId])
+     :order              {:id           (u/uuid)
+                          :items        (into (map product->item (:products order))
+                                              (when (not (= (:delivery_cost order) 0))
+                                                [{:id      (:delivery-id context)
+                                                  :comment ""
+                                                  :amount  deliveries-count}]))
+                          :paymentItems (into [] (get-iiko-payment-type context order (* deliveries-count
+                                                                                         (:delivery-cost context))))
+                          :phone        (:phone order)
+                          :address      {:city    (:city context)
+                                         :home    (:home context)
+                                         :street  (:street context)
+                                         :comment (:address order)}
+                          :comment      (format "TGBOT %s (%s)" (:id order) (:notes order))}
+     :customer           {:name  (:name order)
+                          :phone (:phone order)}}))
