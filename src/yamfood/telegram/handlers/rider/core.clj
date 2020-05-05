@@ -21,12 +21,11 @@
         message (:message update)
         contact (:contact message)
         text (:text message)]
-    (if rider
-      (cond
-        (= text "/start") (d/dispatch! ctx [:r/menu])
-        contact (d/dispatch! ctx [:r/contact])
-        text (d/dispatch! ctx [:r/text]))
-      (d/dispatch! ctx [:r/menu]))))
+    (cond
+      (= text "/start") (d/dispatch! ctx [:r/menu])
+      contact (d/dispatch! ctx [:r/contact])
+      (and rider text) (d/dispatch! ctx [:r/text])
+      :else (d/dispatch! ctx [:r/menu]))))
 
 
 (defn rider-update-handler!
