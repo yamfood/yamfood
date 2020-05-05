@@ -307,11 +307,12 @@
 
 
 (defn cancel-order!
-  [order-id]
+  [order-id admin-id]
   (jdbc/insert!
     db/db "order_logs"
     {:order_id order-id
-     :status   (:canceled order-statuses)}))
+     :status   (:canceled order-statuses)
+     :payload  {:admin_id admin-id}}))
 
 
 (defn order-logs-by-order-id!

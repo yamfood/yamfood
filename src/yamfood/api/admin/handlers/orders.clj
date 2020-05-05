@@ -13,10 +13,10 @@
     [yamfood.core.orders.core :as o]
     [yamfood.core.riders.core :as r]
     [yamfood.core.orders.core :as ord]
+    [yamfood.core.params.core :as params]
     [yamfood.core.products.core :as products]
     [yamfood.integrations.iiko.core :as iiko]
-    [yamfood.telegram.helpers.status :as status]
-    [yamfood.core.params.core :as params]))
+    [yamfood.telegram.helpers.status :as status]))
 
 
 (defonce open-orders (atom {}))
@@ -122,11 +122,13 @@
                  cancelable?
                  (s/valid? ::cancel-order-body (:body request)))]
     (if valid?
-      (do
-        (if (do (o/cancel-order! (:id order))
-                (status/notify-order-canceled! (:id order)
-                                               (:reason (:body request))))
-          {:body (get-active-orders!)}
+      (try
+        (o/cancel-order! (:id order) (:id (:admin request)))
+        (status/notify-order-canceled! (:id order)
+                                       (:reason (:body request)))
+        {:body (get-active-orders!)}
+        (catch Exception e
+          (println e)
           {:body   {:error "Unexpected error"}
            :status 500}))
       {:body   {:error "Can't cancel order in this status"}
