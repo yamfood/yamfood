@@ -17,13 +17,16 @@
 
 (defn process-message
   [ctx update]
-  (let [message (:message update)
+  (let [rider (:rider ctx)
+        message (:message update)
         contact (:contact message)
         text (:text message)]
-    (cond
-      (= text "/start") (d/dispatch! ctx [:r/menu])
-      contact (d/dispatch! ctx [:r/contact])
-      text (d/dispatch! ctx [:r/text]))))
+    (if rider
+      (cond
+        (= text "/start") (d/dispatch! ctx [:r/menu])
+        contact (d/dispatch! ctx [:r/contact])
+        text (d/dispatch! ctx [:r/text]))
+      (d/dispatch! ctx [:r/menu]))))
 
 
 (defn rider-update-handler!

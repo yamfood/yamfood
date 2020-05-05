@@ -105,9 +105,10 @@
   (let [rider (->> (rider-by-tid-query tid)
                    (jdbc/query db/db)
                    (first))]
-    (assoc rider
-      :active-order
-      (o/active-order-by-rider-id! (:id rider)))))
+    (when rider
+      (assoc rider
+        :active-order
+        (o/active-order-by-rider-id! (:id rider))))))
 
 
 (defn rider-by-id!
