@@ -11,6 +11,8 @@
         action (u/callback-action (:data query))]
     (case action
       "send-menu" {:dispatch {:args [:r/menu]}}
+      "assign" {:dispatch {:args [:r/assign]}}
+      "decline" {:dispatch {:args [:r/decline]}}
       "refresh-menu" {:dispatch {:args [:r/refresh-menu]}}
       "order-detail" {:dispatch {:args [:r/order-detail]}}
       "order-products" {:dispatch {:args [:r/order-products]}}
