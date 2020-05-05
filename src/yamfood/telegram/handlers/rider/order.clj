@@ -40,52 +40,81 @@
       :callback_data (str "cancel-order/" (:id order))}]]})
 
 
-(defn send-order-detail
-  ([ctx]
-   (let [update (:update ctx)
-         query (:callback_query update)
-         data (:data query)
-         order-id (u/parse-int (first (u/callback-params data)))]
-     {:run {:function   o/order-by-id!
-            :args       [order-id]
-            :next-event :r/order-detail}}))
-  ([ctx order]
-   (let [chat-id (u/chat-id (:update ctx))]
-     {:send-location {:chat-id   chat-id
-                      :longitude (:longitude (:location order))
-                      :latitude  (:latitude (:location order))}
-      :send-text     {:chat-id chat-id
-                      :text    (order-detail-text order)
-                      :options {:parse_mode   "markdown"
-                                :reply_markup (order-detail-markup order)}}})))
-
-
-(defn- assign-order
-  [ctx order-id]
-  (let [chat-id (u/chat-id (:update ctx))
-        order (o/order-by-id! order-id {:products? false})
-        valid? (and order
-                    (= (:status order) (:on-kitchen o/order-statuses)))]
-    (if valid?
-      (merge {:run {:function r/assign-rider-to-order!
-                    :args     [order-id (:id (:rider ctx))]}}
-             (send-order-detail ctx order))
-
+(defn assign-order
+  [ctx]
+  (let [update (:update ctx)
+        chat-id (u/chat-id update)
+        query (:callback_query update)
+        order-id (u/parse-int (first (u/callback-params (:data query))))
+        order (o/order-by-id! order-id {:products? false})]
+    (if order
+      {:run      {:function r/assign-rider-to-order!
+                  :args     [order-id (:id (:rider ctx))]}
+       :dispatch {:args [:r/update-preview-markup order]}}
       {:send-text {:chat-id chat-id
                    :text    "Такого заказа не существует"}})))
 
 
-(defn rider-assign-order-handler
+(defn order-preview-markup
+  [order]
+  (let [order-id (:id order)]
+    {:inline_keyboard
+     [[{:text "Принять?" :callback_data "nothing"}]
+      [{:text "✅ Да" :callback_data (str "assign/" order-id)}
+       {:text "❌ Нет" :callback_data "decline"}]]}))
+
+
+(defn send-order-preview
+  ([ctx]
+   (let [update (:update ctx)
+         message (:message update)
+         text (:text message)
+         chat-id (:id (:from message))
+         order-id (u/parse-int text)]
+     (if order-id
+       {:run {:function   o/order-by-id!
+              :args       [order-id]
+              :next-event :r/text}}
+       {:send-text {:chat-id chat-id
+                    :text    "Отправьте номер заказа"}})))
+  ([ctx order]
+   (let [update (:update ctx)
+         message (:message update)
+         text (order-detail-text order)
+         chat-id (:id (:from message))
+         valid? (and order
+                     (= (:status order) (:on-kitchen o/order-statuses)))]
+     (if valid?
+       {:send-location {:chat-id   chat-id
+                        :longitude (:longitude (:location order))
+                        :latitude  (:latitude (:location order))}
+        :send-text     {:chat-id chat-id
+                        :text    text
+                        :options {:reply_markup (order-preview-markup order)
+                                  :parse_mode   "markdown"}}}
+       {:send-text {:chat-id chat-id
+                    :text    "Такого заказа не существует"}}))))
+
+
+(defn update-preview-markup
+  [ctx order]
+  (let [update (:update ctx)
+        query (:callback_query update)
+        chat-id (u/chat-id update)
+        message (:message query)]
+    {:edit-reply-markup {:chat_id      chat-id
+                         :message_id   (:message_id message)
+                         :reply_markup (order-detail-markup order)}}))
+
+
+(defn decline-order
   [ctx]
   (let [update (:update ctx)
-        message (:message update)
-        text (:text message)
-        chat-id (:id (:from message))
-        order-id (u/parse-int text)]
-    (if order-id
-      (assign-order ctx order-id)
-      {:send-text {:chat-id chat-id
-                   :text    "Отправьте номер заказа"}})))
+        query (:callback_query update)
+        chat-id (u/chat-id update)
+        message (:message query)]
+    {:delete-message {:chat-id    chat-id
+                      :message-id (:message_id message)}}))
 
 
 (defn order-products
@@ -145,7 +174,22 @@
 
 (d/register-event-handler!
   :r/text
-  rider-assign-order-handler)
+  send-order-preview)
+
+
+(d/register-event-handler!
+  :r/assign
+  assign-order)
+
+
+(d/register-event-handler!
+  :r/decline
+  decline-order)
+
+
+(d/register-event-handler!
+  :r/update-preview-markup
+  update-preview-markup)
 
 
 (d/register-event-handler!
@@ -161,8 +205,3 @@
 (d/register-event-handler!
   :r/cancel-order
   cancel-order!)
-
-
-(d/register-event-handler!
-  :r/order-detail
-  send-order-detail)
