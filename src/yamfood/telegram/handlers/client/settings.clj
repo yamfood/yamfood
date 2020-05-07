@@ -15,7 +15,7 @@
         data (if current? "nothing" (str "language/" (name button-language)))
         title (get
                 {:ru "Русский"
-                 :uz "Узбекча"
+                 :uz "O'zbekcha"
                  :en "English"}
                 button-language)]
     {:text          (str mark title)
