@@ -368,25 +368,27 @@
                       (jdbc/query db/db))
         delivery-cost (if (every? false? (map :is_delivery_free products))
                         default-delivery-cost
-                        0)
-        order-id (:id (insert-order! (:id client)
-                                     (:longitude location)
-                                     (:latitude location)
-                                     address
-                                     comment
-                                     kitchen-id
-                                     payment
-                                     delivery-cost))]
-    (->> products
-         (map #(select-keys % [:product_id :count]))
-         (map #(assoc % :order_id order-id))
-         (jdbc/insert-multi! db/db "order_products"))
-    (when (= payment u/cash-payment)
-      (jdbc/insert!
-        db/db "order_logs"
-        {:order_id order-id
-         :status   (:new order-statuses)}))
-    order-id))
+                        0)]
+    (if (seq products)
+      (let [order-id (:id (insert-order! (:id client)
+                                         (:longitude location)
+                                         (:latitude location)
+                                         address
+                                         comment
+                                         kitchen-id
+                                         payment
+                                         delivery-cost))]
+        (->> products
+             (map #(select-keys % [:product_id :count]))
+             (map #(assoc % :order_id order-id))
+             (jdbc/insert-multi! db/db "order_products"))
+        (when (= payment u/cash-payment)
+          (jdbc/insert!
+            db/db "order_logs"
+            {:order_id order-id
+             :status   (:new order-statuses)}))
+        order-id)
+      nil)))
 
 
 (defn pay-order!
