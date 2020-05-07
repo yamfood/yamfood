@@ -75,7 +75,8 @@
                                               "{2}"
                                               "\n"
                                               e/money-emoji " {3} сум ({4})\n\n"
-                                              "Ваш заказ принят, ожидайте подтверждения")
+                                              "Ваш заказ принят, ожидайте подтверждения в боте\n\n"
+                                              "Ждать звонка оператора больше не нужно \uD83D\uDE04")
 
         ; Payments
         :pay-button                      "Оплатить"
@@ -168,7 +169,8 @@
                                               "{2}"
                                               "\n"
                                               e/money-emoji " {3} sum ({4})\n\n"
-                                              "Your order is accepted, wait for confirmation")
+                                              "Your order is accepted, wait for confirmation in the bot\n\n"
+                                              "You no longer need to wait for the operator to call you \uD83D\uDE04")
 
         ; Payments
         :pay-button                      "Pay"
@@ -262,7 +264,8 @@
                                               "{2}"
                                               "\n"
                                               e/money-emoji " {3} so'm ({4})\n\n"
-                                              "Sizning buyurtmangiz qabul qilindi, tasdiqlashni kuting")
+                                              "Sizning buyurtmangiz qabul qilindi, botda tasdiqlashni kuting\n\n"
+                                              "Operator qo'ng'irog'ini kutish endi kerak emas \uD83D\uDE04")
 
         ; Payments
         :pay-button                      "To'lash"
