@@ -13,7 +13,7 @@
 (defn generate-confirmation-code
   [digits-count]
   (str/join (map (fn [_]
-                   (str (rand-int 10)))
+                   (str (+ 1 (rand-int 9))))
                  (range digits-count))))
 
 
@@ -69,7 +69,7 @@
         client (:client ctx)
         chat-id (u/chat-id update)
         phone (get-phone update)
-        code (generate-confirmation-code 4)
+        code (generate-confirmation-code 5)
         bot-name (:name (:bot ctx))]
     (if phone
       {:run       [{:function sms/create!

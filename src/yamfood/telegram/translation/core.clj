@@ -8,7 +8,7 @@
   {:ru {; Registration
         :send-contact-button             "Отправить контакт"
         :change-phone-button             "Изменить номер"
-        :request-code-message            "Отправьте 4х значный код отправленный на номер _+{1}_"
+        :request-code-message            "Отправьте код отправленный на номер _+{1}_"
         :invalid-phone-message           "Неверный номер телефона, попробуйте еще раз"
         :phone-confirmed-message         "Номер успешно подтвержден!"
         :incorrect-code-message          "Неверный код, попробуйте еще раз"
