@@ -1,12 +1,14 @@
 (ns yamfood.core.db.core
   (:require
+    [jdbc.pool.c3p0 :as pool]
     [environ.core :refer [env]]
     [clj-postgresql.core :as pg]
     [clj-postgresql.types :as pgt]))
 
 
-(def db {:classname      "org.postgresql.Driver"
-         :connection-uri (env :jdbc-database-url)})
+(def db (pool/make-datasource-spec
+          {:classname      "org.postgresql.Driver"
+           :connection-uri (env :jdbc-database-url)}))
 
 
 (defn point->clj

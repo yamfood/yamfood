@@ -21,6 +21,7 @@
                  [migratus "1.2.8"]
                  [clj-postgresql "0.7.0"]
                  [org.clojure/java.jdbc "0.7.10"]
+                 [clojure.jdbc/clojure.jdbc-c3p0 "0.3.3"]
                  [honeysql "0.9.6"]]
   :plugins [[lein-cloverage "1.0.10"]]
   :aot :all
