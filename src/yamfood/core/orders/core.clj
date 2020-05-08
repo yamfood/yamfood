@@ -203,8 +203,7 @@
   []
   (->> active-orders-query
        (hs/format)
-       (jdbc/query db/db)
-       (map fmt-order-location)))
+       (jdbc/query db/db)))
 
 
 (defn ended-orders-query
@@ -244,26 +243,6 @@
         (jdbc/query db/db)
         (first)
         (:count))))
-
-
-(defn active-order-by-rider-id-query
-  [rider-id]
-  (hs/format
-    {:with   [[:cte_orders (hh/merge-where
-                             order-detail-query
-                             [:= :orders.rider_id rider-id])]]
-     :select [:*]
-     :from   [:cte_orders]
-     :where  [:= :cte_orders.status " on-way "]}))
-
-
-(defn active-order-by-rider-id!
-  [rider-id]
-  (let [order (->> (active-order-by-rider-id-query rider-id)
-                   (jdbc/query db/db)
-                   (first))]
-    (when order
-      (fmt-order-location order))))
 
 
 (defn order-by-id-query
