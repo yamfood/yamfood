@@ -210,16 +210,17 @@
 
 (defn active-order
   [ctx order]
-  (if (int? order)
-    {:run {:function   o/order-by-id!
-           :args       [order]
-           :next-event :c/active-order}}
-    (let [update (:update ctx)
-          lang (:lang ctx)
-          chat-id (u/chat-id update)]
-      {:send-text {:chat-id chat-id
-                   :text    (active-order-text lang order)
-                   :options {:parse_mode "markdown"}}})))
+  (cond
+    (nil? order) {}
+    (int? order) {:run {:function   o/order-by-id!
+                        :args       [order]
+                        :next-event :c/active-order}}
+    (map? order) (let [update (:update ctx)
+                       lang (:lang ctx)
+                       chat-id (u/chat-id update)]
+                   {:send-text {:chat-id chat-id
+                                :text    (active-order-text lang order)
+                                :options {:parse_mode "markdown"}}})))
 
 
 (defn invoice-description
@@ -237,23 +238,24 @@
 
 (defn send-invoice
   [ctx order]
-  (if (int? order)
-    {:run {:function   o/order-by-id!
-           :args       [order]
-           :next-event :c/send-invoice}}
-    (let [update (:update ctx)
-          lang (:lang ctx)
-          chat-id (u/chat-id update)
-          message-id (:message_id (:message (:callback_query update)))]
-      {:send-invoice   {:chat-id     chat-id
-                        :title       (translate lang :invoice-title (:id order))
-                        :description (invoice-description lang order)
-                        :payload     {:order_id (:id order)}
-                        :currency    "UZS"
-                        :prices      (order-prices lang (:params ctx) order)
-                        :options     {:reply_markup (invoice-reply-markup lang)}}
-       :delete-message {:chat-id    chat-id
-                        :message-id message-id}})))
+  (cond
+    (nil? order) {}
+    (int? order) {:run {:function   o/order-by-id!
+                        :args       [order]
+                        :next-event :c/send-invoice}}
+    (map? order) (let [update (:update ctx)
+                       lang (:lang ctx)
+                       chat-id (u/chat-id update)
+                       message-id (:message_id (:message (:callback_query update)))]
+                   {:send-invoice   {:chat-id     chat-id
+                                     :title       (translate lang :invoice-title (:id order))
+                                     :description (invoice-description lang order)
+                                     :payload     {:order_id (:id order)}
+                                     :currency    "UZS"
+                                     :prices      (order-prices lang (:params ctx) order)
+                                     :options     {:reply_markup (invoice-reply-markup lang)}}
+                    :delete-message {:chat-id    chat-id
+                                     :message-id message-id}})))
 
 
 (defn cancel-invoice-handler
