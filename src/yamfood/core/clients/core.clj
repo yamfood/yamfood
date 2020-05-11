@@ -28,7 +28,6 @@
                :clients.is_blocked
                [:bots.id :bot_id]
                [:bots.name :bot]
-               [(clients-active-order-query :clients.id) :active_order_id]
                [:baskets.id :basket_id]]
    :from      [:clients]
    :left-join [:baskets [:= :baskets.client_id :clients.id]

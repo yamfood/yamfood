@@ -102,13 +102,9 @@
 
 (defn rider-by-tid!
   [tid]
-  (let [rider (->> (rider-by-tid-query tid)
-                   (jdbc/query db/db)
-                   (first))]
-    (when rider
-      (assoc rider
-        :active-order
-        (o/active-order-by-rider-id! (:id rider))))))
+  (->> (rider-by-tid-query tid)
+       (jdbc/query db/db)
+       (first)))
 
 
 (defn rider-by-id!
