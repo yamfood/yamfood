@@ -144,8 +144,9 @@
   [address]
   (let [address (:address address)
         road (:road address)
+        county (:county address)
         house (:house_number address)]
-    (str road ", " house)))
+    (str county ", " road ", " house)))
 
 
 (defn utm
