@@ -27,3 +27,6 @@
       chat-id
       {:reply_markup (feedback-request-markup order-id)}
       (translate lang :request-feedback-message))))
+
+
+(send-feedback-request! 125)
