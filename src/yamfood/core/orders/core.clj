@@ -81,13 +81,10 @@
                [:= :products.category_id :categories.id]]})
 
 
-(defn order-current-status-query
-  [order-id]
-  {:select   [:order_logs.status]
+(def last-order-log-query
+  {:select   [(hs/raw "DISTINCT ON (order_logs.order_id) *")]
    :from     [:order_logs]
-   :where    [:= :order_logs.order_id order-id]
-   :order-by [[:order_logs.created_at :desc]]
-   :limit    1})
+   :order-by [:order_logs.order_id [:order_logs.id :desc]]})
 
 
 (def order-detail-query
@@ -108,14 +105,15 @@
                [:riders.name :rider_name]
                [:riders.phone :rider_phone]
                [(order-total-sum-query :orders.id) :total_sum]
-               [(order-current-status-query :orders.id) :status]
+               [:last_log.status :status]
                :orders.comment
                :orders.notes
                :orders.delivery_cost
                :orders.rate
                :orders.address]
    :from      [:orders]
-   :left-join [:riders [:= :orders.rider_id :riders.id]
+   :left-join [[last-order-log-query :last_log] [:= :last_log.order_id :orders.id]
+               :riders [:= :orders.rider_id :riders.id]
                :clients [:= :orders.client_id :clients.id]
                :kitchens [:= :orders.kitchen_id :kitchens.id]
                :bots [:= :clients.bot_id :bots.id]]
