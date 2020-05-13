@@ -6,7 +6,8 @@
     [yamfood.core.clients.core :as clients]
     [yamfood.telegram.handlers.utils :as u]
     [yamfood.telegram.handlers.client.core :as c]
-    [yamfood.telegram.translation.core :refer [translate]]))
+    [yamfood.telegram.translation.core :refer [translate]]
+    [clojure.string :as str]))
 
 
 (defn start-handler
@@ -81,6 +82,12 @@
          {:delete-message {:chat-id    chat-id
                            :message-id (:message_id (:message query))}})))))
 
+
+(defn clear-name
+  [name]
+  (str/replace name #"_" " "))
+
+
 ;{:update_id 220545420, :message {:message_id 11446, :from {:id 79225668, :is_bot false, :first_name "Рустам", :last_name "Бабаджанов", :username "kensay", :language_code "en"}, :chat {:id 79225668, :first_name "Рустам", :last_name "Бабаджанов", :username "kensay", :type "private"}, :date 1588228029, :text "/start", :entities [{:offset 0, :length 6, :type "bot_command"}]}}
 (defn registration-handler
   [ctx]
@@ -95,8 +102,8 @@
       {:dispatch {:args [:c/request-phone]}}
 
       {:run      {:function clients/create-client!
-                  :args     [tid bot-id name (if utm {:utm utm :lang lang}
-                                                     {:lang lang})]}
+                  :args     [tid bot-id (clear-name name) (if utm {:utm utm :lang lang}
+                                                                  {:lang lang})]}
        :dispatch {:args        [:c/request-phone]
                   :rebuild-ctx {:function c/build-ctx!
                                 :update   (:update ctx)
