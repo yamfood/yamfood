@@ -90,6 +90,14 @@
 
         ; Feedback
         :request-feedback-message        "Оцените, пожалуйста, заказ!"
+        :request-text-feedback           "Напишите комментарий или выберите из предложенных"
+
+        :feedback-ok                     "Спасибо, все хорошо"
+        :feedback-long-delivery          "Долгая доставка"
+        :feedback-cold-food              "Остывшая еда"
+        :feedback-incomplete-order       "Неполный заказ"
+        :feedback-no-cutlery             "Нет приборов"
+        :feedback-bad-courier            "Жалоба на курьера"
 
         ; Other
         :inline-back-title               "Назад"
@@ -184,6 +192,14 @@
 
         ; Feedback
         :request-feedback-message        "Please rate the order!"
+        :request-text-feedback           "Write a comment or choose from proposed\n"
+
+        :feedback-ok                     "Thank you, everything is good"
+        :feedback-long-delivery          "Late delivery"
+        :feedback-cold-food              "Cooled food"
+        :feedback-incomplete-order       "Incomplete order"
+        :feedback-no-cutlery             "No appliances"
+        :feedback-bad-courier            "Courier complaint"
 
         ; Other
         :inline-back-title               "Back"
@@ -279,6 +295,14 @@
 
         ; Feedback
         :request-feedback-message        "Iltimos, buyurtmani baholang!"
+        :request-text-feedback           "Sharh yozing yoki taklif qilinganlardan birini tanlang"
+
+        :feedback-ok                     "Rahmat, hammasi yaxshi"
+        :feedback-long-delivery          "Kech yetkazma"
+        :feedback-cold-food              "Sovib ketdgan taom"
+        :feedback-incomplete-order       "Buyurtma to'liq emas"
+        :feedback-no-cutlery             "Oshxona anjomlari yo'q"
+        :feedback-bad-courier            "Kuryerga shikoyat"
 
         ; Other
         :inline-back-title               "Orqaga"

@@ -3,7 +3,8 @@
     [yamfood.core.orders.core :as o]
     [yamfood.core.clients.core :as c]
     [yamfood.telegram.dispatcher :as d]
-    [yamfood.telegram.handlers.utils :as u]))
+    [yamfood.telegram.handlers.utils :as u]
+    [yamfood.telegram.translation.core :refer [translate]]))
 
 
 (defn feedback-handler
@@ -17,9 +18,15 @@
      :dispatch {:args [:c/request-text-feedback order-id]}}))
 
 
-(def text-feedback-markup
+(defn text-feedback-markup
+  [lang]
   {:resize_keyboard true
-   :keyboard        [[{:text "Не хочу"}]]})
+   :keyboard        [[{:text (translate lang :feedback-ok)}]
+                     [{:text (translate lang :feedback-long-delivery)}]
+                     [{:text (translate lang :feedback-cold-food)}]
+                     [{:text (translate lang :feedback-incomplete-order)}]
+                     [{:text (translate lang :feedback-no-cutlery)}]
+                     [{:text (translate lang :feedback-bad-courier)}]]})
 
 
 (defn request-text-feedback
@@ -27,6 +34,7 @@
   (let [update (:update ctx)
         query (:callback_query update)
         client (:client ctx)
+        lang (:lang ctx)
         payload (:payload client)
         chat-id (u/chat-id update)]
     {:delete-message {:chat-id    chat-id
@@ -36,14 +44,15 @@
                                                   (assoc :step u/feedback-step)
                                                   (assoc :last-order-id order-id))]}
      :send-text      {:chat-id chat-id
-                      :text    "Оставьте отзыв к заказу!"
-                      :options {:reply_markup text-feedback-markup}}}))
+                      :text    (translate lang :request-text-feedback)
+                      :options {:reply_markup (text-feedback-markup lang)}}}))
 
 
 (defn text-feedback-handler
   [ctx]
   (let [update (:update ctx)
         chat-id (u/chat-id update)
+        lang (:lang ctx)
         client (:client ctx)
         payload (:payload client)
         last-order-id (:last-order-id payload)
@@ -52,7 +61,7 @@
                  :args     [(:id order)
                             {:rate (str (:rate order) " " (:text (:message update)))}]}
      :send-text {:chat-id chat-id
-                 :text    "Принято!"
+                 :text    (translate lang :accepted)
                  :options {:reply_markup {:remove_keyboard true}}}
      :dispatch  {:args [:c/menu]}}))
 
