@@ -15,6 +15,7 @@
         text (:text message)]
     (cond
       (= (:step (:payload client)) u/phone-step) {:dispatch {:args [:c/phone]}}
+      (= (:step (:payload client)) u/feedback-step) {:dispatch {:args [:c/text-feedback]}}
       (= (:step (:payload client)) u/phone-confirmation-step) {:dispatch {:args [:c/confirm-phone]}}
       (= text update-location-text) {:dispatch {:args [:c/request-location]}}
       :else {:dispatch {:args [:c/start]}})))
