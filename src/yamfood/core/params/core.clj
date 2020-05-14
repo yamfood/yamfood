@@ -57,7 +57,15 @@
    :playmobile-password {:name    "PlayMobile Пароль"
                          :docs    "Пароль от системы SMS информирования"
                          :default ""
-                         :adapter nil}})
+                         :adapter nil}
+   :notifier-bot-token  {:name    "Токен бота для оповещений"
+                         :docs    "Токен бота для оповещений"
+                         :default ""
+                         :adapter nil}
+   :feedback-chat-id    {:name    "ID чата отзывов"
+                         :docs    "ID чата в который бот будет слать отзывы клиентов"
+                         :default ""
+                         :adapter read-string}})
 
 
 (defn params-detail-list!
