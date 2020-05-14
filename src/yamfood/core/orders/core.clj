@@ -81,13 +81,10 @@
                [:= :products.category_id :categories.id]]})
 
 
-(defn order-current-status-query
-  [order-id]
-  {:select   [:order_logs.status]
+(def last-order-log-query
+  {:select   [(hs/raw "DISTINCT ON (order_logs.order_id) *")]
    :from     [:order_logs]
-   :where    [:= :order_logs.order_id order-id]
-   :order-by [[:order_logs.created_at :desc]]
-   :limit    1})
+   :order-by [:order_logs.order_id [:order_logs.id :desc]]})
 
 
 ;JOIN (select DISTINCT ON (logs.order_id) *

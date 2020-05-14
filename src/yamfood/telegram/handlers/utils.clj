@@ -13,6 +13,7 @@
 (def browse-step "browse")
 (def basket-step "basket")
 (def order-confirmation-step "order-confirmation")
+(def feedback-step "feedback")
 
 (def cash-payment "cash")
 (def card-payment "card")
@@ -142,11 +143,8 @@
 
 (defn text-from-address
   [address]
-  (let [address (:address address)
-        road (:road address)
-        county (:county address)
-        house (:house_number address)]
-    (str county ", " road ", " house)))
+  (let [display-name (:display_name address)]
+    (str/join ", " (drop-last 3 (str/split display-name #", ")))))
 
 
 (defn utm
