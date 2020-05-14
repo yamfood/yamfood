@@ -64,7 +64,7 @@
                          :adapter nil}
    :feedback-chat-id    {:name    "ID чата отзывов"
                          :docs    "ID чата в который бот будет слать отзывы клиентов"
-                         :default ""
+                         :default -1
                          :adapter read-string}})
 
 
