@@ -1,12 +1,12 @@
 (ns yamfood.telegram.handlers.client.feedback
   (:require
+    [yamfood.core.params.core :as p]
     [yamfood.core.orders.core :as o]
     [yamfood.core.clients.core :as c]
     [yamfood.telegram.dispatcher :as d]
     [yamfood.telegram.handlers.utils :as u]
     [yamfood.telegram.helpers.notifier :as n]
-    [yamfood.telegram.translation.core :refer [translate]]
-    [yamfood.core.params.core :as p]))
+    [yamfood.telegram.translation.core :refer [translate]]))
 
 
 (defn feedback-handler
