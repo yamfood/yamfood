@@ -1,9 +1,11 @@
 (ns yamfood.telegram.handlers.client.feedback
   (:require
     [yamfood.core.orders.core :as o]
+    [yamfood.core.params.core :as p]
     [yamfood.core.clients.core :as c]
     [yamfood.telegram.dispatcher :as d]
     [yamfood.telegram.handlers.utils :as u]
+    [yamfood.telegram.helpers.notifier :as n]
     [yamfood.telegram.translation.core :refer [translate]]))
 
 
@@ -52,14 +54,20 @@
   [ctx]
   (let [update (:update ctx)
         chat-id (u/chat-id update)
+        params (p/params!)
+        forward-feedback? (seq (:notifier-bot-token params))
         lang (:lang ctx)
         client (:client ctx)
         payload (:payload client)
         last-order-id (:last-order-id payload)
-        order (o/order-by-id! last-order-id)]
-    {:run       {:function o/update!
-                 :args     [(:id order)
-                            {:rate (str (:rate order) " " (:text (:message update)))}]}
+        order (o/order-by-id! last-order-id)
+        rate (str (:rate order) " " (:text (:message update)))]
+    {:run       (into [{:function o/update!
+                        :args     [(:id order) {:rate rate}]}]
+                      (if forward-feedback?
+                        [{:function n/forward-feedback!
+                          :args     [(assoc order :rate rate)]}]
+                        nil))
      :send-text {:chat-id chat-id
                  :text    (translate lang :accepted)
                  :options {:reply_markup {:remove_keyboard true}}}
