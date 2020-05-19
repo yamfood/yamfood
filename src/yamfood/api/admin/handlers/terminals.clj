@@ -7,7 +7,7 @@
 (defn terminals-list
   [_]
   {:body
-   (map #(select-keys % [:name :deliveryTerminalId :deliveryRestaurantName])
+   (map #(select-keys % [:deliveryTerminalId :deliveryRestaurantName])
         (iiko/delivery-terminals!))})
 
 
