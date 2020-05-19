@@ -55,9 +55,16 @@
       (api/nomenclature! access-token organization-id)))
 
 
-  (utils/categories nomenclature "40745ab8-634c-4891-9da7-50d980176946")
+  (let [params (p/params!)
+        access-token (api/get-access-token! (:iiko-user-id params)
+                                            (:iiko-user-secret params))
+        organization-id (-> (api/organizations! access-token)
+                            (first)
+                            :id)]
+    (api/delivery-terminals! access-token organization-id))
 
-  (products/multiple-create-products!
-    (map
-      utils/iiko->product
-      (utils/products nomenclature "04fca6aa-7a17-4440-99cf-9cdb641a66f2"))))
+
+  (map utils/iiko->product (utils/products nomenclature "16c0bb0c-ad96-41ee-84f4-2f5ddcdea86c"))
+
+  (map utils/iiko->modifier (utils/modifiers nomenclature)))
+

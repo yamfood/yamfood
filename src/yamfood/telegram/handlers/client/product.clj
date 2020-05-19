@@ -112,6 +112,52 @@
        {:dispatch {:args [:c/no-product-text]}}))))
 
 
+(defn modifiers-reducer
+  [lang]
+  (fn [r modifier]
+    (let [current (last r)
+          c (count current)
+          text (u/translated lang (:name modifier))
+          next {:text text :callback_data "nothing"}]
+      (cond
+        (= c 1) (conj (pop r) [(first current) next])
+        :else (conj r [next])))))
+
+
+(defn modifiers-markup
+  [lang product-id state step]
+  (let [fn (if (= step 1) first second)
+        group (fn (:modifiers state))
+        modifiers (:modifiers group)]
+    {:inline_keyboard
+     (into
+       (reduce (modifiers-reducer lang) [] modifiers)
+       [[{:text "Дальше" :callback_data (str "construct/" product-id "/" (inc step))}]])}))
+
+
+(defn construct-product-handler
+  ([ctx]
+   (let [update (:update ctx)
+         query (:callback_query update)
+         product-id (u/parse-int (first (u/callback-params (:data query))))]
+     {:run {:function   products/state-for-product-detail!
+            :args       [(:basket_id (:client ctx))
+                         product-id]
+            :next-event :c/construct}}))
+  ([ctx state]
+   (let [update (:update ctx)
+         query (:callback_query update)
+         product-id (u/parse-int (first (u/callback-params (:data query))))
+         step (u/parse-int (second (u/callback-params (:data query))))]
+     {:edit-reply-markup {:chat_id      (u/chat-id update)
+                          :message_id   (:message_id (:message query))
+                          :reply_markup (modifiers-markup
+                                          :ru
+                                          product-id
+                                          state
+                                          step)}})))
+
+
 (d/register-event-handler!
   :c/text
   product-detail-handler)
@@ -120,6 +166,11 @@
 (d/register-event-handler!
   :c/detail-want
   want-handler)
+
+
+(d/register-event-handler!
+  :c/construct
+  construct-product-handler)
 
 
 (d/register-event-handler!
