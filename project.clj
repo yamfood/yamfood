@@ -17,7 +17,8 @@
                  [clj-http "3.10.0"]
                  [morse "0.4.3"]
                  [tongue "0.2.9"]
-
+                 [mount "0.1.16"]
+                 [nrepl "0.6.0"]
                  [migratus "1.2.8"]
                  [clj-postgresql "0.7.0"]
                  [org.clojure/java.jdbc "0.7.10"]
@@ -28,4 +29,8 @@
   :uberjar-name "yamfood.jar"
   :profiles
   {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]
-                        [ring/ring-mock "0.3.2"]]}})
+                        [ring/ring-mock "0.3.2"]]
+         ;; Initial namespace
+         :repl-options   {:init-ns user}
+         ;; Additional environment dependent source code
+         :source-paths   ["env/dev/clj"]}})
