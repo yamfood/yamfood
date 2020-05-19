@@ -45,11 +45,11 @@
   [lang order-state]
   (let [payment (get-in order-state [:client :payload :payment])]
     {:inline_keyboard
-     [[{:text e/location-emoji :callback_data "request-location"}
-       (cond
-         (= payment u/card-payment) {:text e/card-emoji :callback_data "switch-payment-type"}
-         :else {:text e/cash-emoji :callback_data "switch-payment-type"})
-       {:text e/comment-emoji :callback_data "change-comment"}]
+     [[{:text (translate lang :oc-location-button) :callback_data "request-location"}]
+      [{:text (if (= payment u/card-payment)
+                (str e/card-emoji " " (translate lang :card))
+                (str e/cash-emoji " " (translate lang :cash))) :callback_data "switch-payment-type"}]
+      [{:text (translate lang :oc-comment-button) :callback_data "change-comment"}]
       [{:text (translate lang :oc-basket-button) :callback_data "basket"}]
       [{:text (translate lang :oc-create-order-button) :callback_data "create-order"}]]}))
 
