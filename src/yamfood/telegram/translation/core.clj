@@ -71,7 +71,7 @@
                                               e/money-emoji " {total} сум ({payment})\n\n"
                                               e/comment-emoji " `{comment}` \n\n"
                                               e/location-emoji " *{address}* \n\n"
-                                              " _❗️Вы заказываете на указанный выше адрес, при необходимости измените его ❗️_")
+                                              " _❗️Вы заказываете на указанный выше адрес, при необходимости измените его_")
 
         ; Active Order
         :active-order-message            (str "*Заказ №{1}:*\n\n"
@@ -176,7 +176,7 @@
                                               e/money-emoji " {total} sum ({payment})\n"
                                               e/comment-emoji " `{comment}` \n\n"
                                               e/location-emoji " *{address}* \n\n"
-                                              " _❗️You order to the above address, change it if necessary❗️_")
+                                              " _❗️You order to the above address, change it if necessary_")
 
         ; Active Order
         :active-order-message            (str "*Order №{1}:*\n\n"
@@ -282,7 +282,7 @@
                                               e/money-emoji " {total} so'm ({payment})\n"
                                               e/comment-emoji " `{comment}` \n\n"
                                               e/location-emoji " *{address}* \n\n"
-                                              " _❗️Yuqoridagi manzilga buyurtma beryapsiz, agar kerak bo'lsa, uni o'zgartiring❗️_")
+                                              " _❗️Yuqoridagi manzilga buyurtma beryapsiz, agar kerak bo'lsa, uni o'zgartiring_")
 
         ; Active Order
         :active-order-message            (str "*Buyurtma №{1}:*\n\n"
