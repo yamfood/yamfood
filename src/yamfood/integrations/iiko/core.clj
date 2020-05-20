@@ -44,6 +44,16 @@
     (api/check-order! access-token order)))
 
 
+(defn delivery-terminals! []
+  (let [params (p/params!)
+        access-token (api/get-access-token! (:iiko-user-id params)
+                                            (:iiko-user-secret params))
+        organization-id (-> (api/organizations! access-token)
+                            (first)
+                            :id)]
+    (:deliveryTerminals (api/delivery-terminals! access-token organization-id))))
+
+
 (comment
   (def nomenclature
     (let [params (p/params!)

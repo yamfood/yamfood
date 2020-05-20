@@ -87,20 +87,16 @@
   (products/state-for-product-detail! basket-id product-id))
 
 
-(defn- insert-product-to-basket!
-  [basket-id product-id]
-  (first
-    (jdbc/insert! db/db "basket_products"
-                  {:product_id product-id
-                   :basket_id  basket-id})))
-
-
 (defn add-product-to-basket!
-  [basket-id product-id]
-  (let [product-id (:product_id (insert-product-to-basket!
-                                  basket-id
-                                  product-id))]
-    (products/state-for-product-detail! basket-id product-id)))
+  ([basket-id product-id]
+   (add-product-to-basket! basket-id product-id []))
+  ([basket-id product-id modifiers]
+   (let [basket-product (-> (jdbc/insert! db/db "basket_products"
+                                          {:product_id product-id
+                                           :basket_id  basket-id
+                                           :payload    {:modifiers modifiers}})
+                            (first))]
+     (products/state-for-product-detail! basket-id (:product_id basket-product)))))
 
 
 (defn order-confirmation-state!

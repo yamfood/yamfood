@@ -1,5 +1,6 @@
 (ns yamfood.telegram.handlers.client.product
   (:require
+    [yamfood.utils :as utils]
     [clojure.data.json :as json]
     [yamfood.telegram.dispatcher :as d]
     [yamfood.core.baskets.core :as baskets]
@@ -113,12 +114,17 @@
 
 
 (defn modifiers-reducer
-  [lang]
+  [lang product-id step selected-modifiers]
   (fn [r modifier]
     (let [current (last r)
           c (count current)
+          selected? (utils/in? selected-modifiers (:id modifier))
           text (u/translated lang (:name modifier))
-          next {:text text :callback_data "nothing"}]
+          text (if selected? (str "✔️ " text) text)
+          next {:text text :callback_data (format "construct/%s/%s/%s"
+                                                  product-id
+                                                  step
+                                                  (:id modifier))}]
       (cond
         (= c 1) (conj (pop r) [(first current) next])
         :else (conj r [next])))))
@@ -126,13 +132,25 @@
 
 (defn modifiers-markup
   [lang product-id state step]
-  (let [fn (if (= step 1) first second)
-        group (fn (:modifiers state))
-        modifiers (:modifiers group)]
+  (let [groups (:modifiers state)
+        current-group (nth groups (dec step))
+        modifiers (:modifiers current-group)
+        callback-data (if (= step (count groups))
+                        (str "construct-finish/" product-id)
+                        (str "construct/" product-id "/" (inc step)))]
     {:inline_keyboard
-     (into
-       (reduce (modifiers-reducer lang) [] modifiers)
-       [[{:text "Дальше" :callback_data (str "construct/" product-id "/" (inc step))}]])}))
+     (into (reduce
+             (modifiers-reducer lang product-id step (:selected-modifiers state))
+             []
+             modifiers)
+           [[{:text "Дальше" :callback_data callback-data}]])}))
+
+
+(defn new-modifiers
+  [selected-modifiers modifier]
+  (if (utils/in? selected-modifiers modifier)
+    (filter #(not (= % modifier)) selected-modifiers)
+    (conj selected-modifiers modifier)))
 
 
 (defn construct-product-handler
@@ -145,17 +163,47 @@
                          product-id]
             :next-event :c/construct}}))
   ([ctx state]
-   (let [update (:update ctx)
+   (let [client (:client ctx)
+         update (:update ctx)
          query (:callback_query update)
          product-id (u/parse-int (first (u/callback-params (:data query))))
-         step (u/parse-int (second (u/callback-params (:data query))))]
-     {:edit-reply-markup {:chat_id      (u/chat-id update)
-                          :message_id   (:message_id (:message query))
-                          :reply_markup (modifiers-markup
-                                          :ru
-                                          product-id
-                                          state
-                                          step)}})))
+         step (u/parse-int (second (u/callback-params (:data query))))
+         modifier-id (nth (u/callback-params (:data query)) 2 nil)
+         current-modifiers (get-in client [:payload :modifiers (keyword (str product-id))] [])
+         new-modifiers (new-modifiers current-modifiers modifier-id)
+         state (assoc state :selected-modifiers new-modifiers)]
+     (merge
+       {:edit-reply-markup {:chat_id      (u/chat-id update)
+                            :message_id   (:message_id (:message query))
+                            :reply_markup (modifiers-markup
+                                            :ru
+                                            product-id
+                                            state
+                                            step)}
+        :answer-callback   {:callback_query_id (:id query)
+                            :text              " "}}
+       (when modifier-id
+         {:run {:function clients/update-payload!
+                :args     [(:id client)
+                           (-> (:payload client)
+                               (assoc-in [:modifiers (keyword (str product-id))]
+                                         new-modifiers))]}})))))
+
+
+(defn construct-finish-handler
+  [ctx]
+  (let [
+        client (:client ctx)
+        update (:update ctx)
+        query (:callback_query update)
+        product-id (u/parse-int (first (u/callback-params (:data query))))
+        modifiers (get-in client [:payload :modifiers (keyword (str product-id))])]
+    {:run             {:function baskets/add-product-to-basket!
+                       :args     [(:basket_id client) product-id modifiers]}
+     :answer-callback {:callback_query_id (:id query)
+                       :show_alert        true
+                       :text              "Блюдо успешно собрано и добавлено в корзину!"}
+     :dispatch        {:args [:c/menu]}}))
 
 
 (d/register-event-handler!
@@ -171,6 +219,11 @@
 (d/register-event-handler!
   :c/construct
   construct-product-handler)
+
+
+(d/register-event-handler!
+  :c/construct-finish
+  construct-finish-handler)
 
 
 (d/register-event-handler!

@@ -16,6 +16,7 @@
     [yamfood.api.admin.middleware :refer [wrap-auth]]
     [yamfood.api.admin.handlers.kitchens :as kitchens]
     [yamfood.api.admin.handlers.products :as products]
+    [yamfood.api.admin.handlers.terminals :as terminals]
     [yamfood.api.admin.handlers.announcements :as announcements]))
 
 
@@ -43,6 +44,7 @@
       (c/GET "/sign-s3" [] sign-s3)
       (c/context "/data" [] data/routes)
       (c/context "/bots" [] bots/routes)
+      (c/context "/terminals" [] terminals/routes)
       (c/context "/admins" [] admins/routes)
       (c/context "/riders" [] riders/routes)
       (c/context "/orders" [] orders/routes)

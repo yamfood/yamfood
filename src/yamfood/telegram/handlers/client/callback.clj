@@ -15,6 +15,7 @@
       "language" {:dispatch {:args [:c/change-language]}}
       "want" {:dispatch {:args [:c/detail-want]}}
       "construct" {:dispatch {:args [:c/construct]}}
+      "construct-finish" {:dispatch {:args [:c/construct-finish]}}
       "detail+" {:dispatch {:args [:c/detail-inc]}}
       "detail-" {:dispatch {:args [:c/detail-dec]}}
       "basket" {:dispatch {:args [:c/basket]}}

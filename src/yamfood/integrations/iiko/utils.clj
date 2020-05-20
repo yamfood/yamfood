@@ -57,8 +57,8 @@
 (defn iiko->product
   [iiko-product]
   {:name     {:ru (:name iiko-product)}
-   :payload  {:iiko_id   (:id iiko-product)
-              :modifiers (map iiko->modifier-group (:groupModifiers iiko-product))}
+   :payload  {:iiko_id        (:id iiko-product)
+              :groupModifiers (map iiko->modifier-group (:groupModifiers iiko-product))}
    :price    (:price iiko-product)
    :position (:order iiko-product)})
 

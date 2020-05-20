@@ -62,6 +62,8 @@
 
         ; Order Confirmation
         :oc-basket-button                (str e/back-emoji " Корзина")
+        :oc-location-button              (str e/location-emoji " Изменить локацию")
+        :oc-comment-button               (str e/comment-emoji " Комментарий")
         :oc-create-order-button          "✅ Подтвердить"
         :oc-empty-comment-text           "Укажите комментарий к адресу или к заказу"
         :oc-message                      (str "*Детали вашего заказа:* \n\n"
@@ -69,7 +71,8 @@
                                               e/delivery-emoji " {delivery} сум\n"
                                               e/money-emoji " {total} сум ({payment})\n\n"
                                               e/comment-emoji " `{comment}` \n\n"
-                                              e/location-emoji " {address}")
+                                              e/location-emoji " *{address}* \n\n"
+                                              " _❗️Вы заказываете на указанный выше адрес, при необходимости измените его_")
 
         ; Active Order
         :active-order-message            (str "*Заказ №{1}:*\n\n"
@@ -165,6 +168,8 @@
 
         ; Order Confirmation
         :oc-basket-button                (str e/back-emoji " Cart")
+        :oc-location-button              (str e/location-emoji " Change location")
+        :oc-comment-button               (str e/comment-emoji " Comment")
         :oc-create-order-button          "✅ Confirm"
         :oc-empty-comment-text           "Enter a comment to the address or order"
         :oc-message                      (str "*Details of your order:* \n\n"
@@ -172,7 +177,8 @@
                                               e/delivery-emoji " {delivery} sum\n"
                                               e/money-emoji " {total} sum ({payment})\n"
                                               e/comment-emoji " `{comment}` \n\n"
-                                              e/location-emoji " {address}")
+                                              e/location-emoji " *{address}* \n\n"
+                                              " _❗️You order to the above address, change it if necessary_")
 
         ; Active Order
         :active-order-message            (str "*Order №{1}:*\n\n"
@@ -269,6 +275,8 @@
 
         ; Order Confirmation
         :oc-basket-button                (str e/back-emoji " Savat")
+        :oc-location-button              (str e/location-emoji " Manzilni o'zgartirish")
+        :oc-comment-button               (str e/comment-emoji " Izoh")
         :oc-create-order-button          "✅ Tasdiqlash"
         :oc-empty-comment-text           "Manzilga yoki buyurtmaga izoh kiriting"
         :oc-message                      (str "*Buyurtmaning tafsilotlari:* \n\n"
@@ -276,7 +284,8 @@
                                               e/delivery-emoji " {delivery} so'm\n"
                                               e/money-emoji " {total} so'm ({payment})\n"
                                               e/comment-emoji " `{comment}` \n\n"
-                                              e/location-emoji " {address}")
+                                              e/location-emoji " *{address}* \n\n"
+                                              " _❗️Yuqoridagi manzilga buyurtma beryapsiz, agar kerak bo'lsa, uni o'zgartiring_")
 
         ; Active Order
         :active-order-message            (str "*Buyurtma №{1}:*\n\n"
