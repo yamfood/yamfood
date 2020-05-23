@@ -1,11 +1,11 @@
 (ns yamfood.core.baskets.core
   (:require
     [honeysql.core :as hs]
+    [yamfood.core.utils :as cu]
     [clojure.java.jdbc :as jdbc]
     [yamfood.core.db.core :as db]
     [yamfood.core.clients.core :as clients]
-    [yamfood.core.products.core :as products]
-    [yamfood.core.utils :as cu]))
+    [yamfood.core.products.core :as products]))
 
 
 (defn- basket-products-query
@@ -24,15 +24,25 @@
               :order-by  [:id]}))
 
 
-(defn- basket-totals-query
+(defn basket-products-totals-query
   [basket-id]
-  (format "
-    select
-      coalesce(sum(basket_products.count * products.price), 0) as total_cost,
-      coalesce(sum(basket_products.count * products.energy), 0) as total_energy
-    from basket_products, products
-    where basket_products.basket_id = %d and
-          products.id = basket_products.product_id", basket-id))
+  {:select    [[(hs/raw "sum(distinct products.price)") :products_cost]
+               [(hs/raw "coalesce(sum(modifiers.price), 0)") :modifiers_cost]
+               [:basket_products.count :count]]
+   :from      [:basket_products]
+   :left-join [:products [:= :basket_products.product_id :products.id]
+               :modifiers [:in
+                           (hs/raw "modifiers.id::text")
+                           (hs/raw "(select jsonb_array_elements_text(basket_products.payload -> 'modifiers'))")]]
+   :where     [:= :basket_products.basket_id basket-id]
+   :group-by  [:basket_products.id]})
+
+
+(defn basket-totals-query
+  [basket-id]
+  {:with   [[:basket_products_totals (basket-products-totals-query basket-id)]]
+   :select [[(hs/raw "sum((totals.products_cost + totals.modifiers_cost) * totals.count)::int") :total_cost]]
+   :from   [[:basket_products_totals :totals]]})
 
 
 (defn- basket-products!
@@ -44,8 +54,10 @@
 
 (defn basket-totals!
   [basket-id]
-  (->> (basket-totals-query basket-id)
+  (->> (-> (basket-totals-query basket-id)
+           (hs/format))
        (jdbc/query db/db)
+       (map #(assoc % :total_energy 0))
        (first)))
 
 
