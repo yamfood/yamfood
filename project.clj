@@ -2,6 +2,7 @@
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
   :min-lein-version "2.0.0"
+  :main ^:skip-aot yamfood.core
   :dependencies [[org.clojure/clojure "1.10.0"]
                  [org.clojure/data.json "0.2.6"]
 
@@ -10,7 +11,6 @@
                  [ring-cors "0.1.13"]
                  [compojure "1.6.1"]
                  [aleph "0.4.6"]
-
                  [overtone/at-at "1.2.0"]
                  [amazonica "0.3.152"]
                  [environ "1.1.0"]
@@ -32,5 +32,6 @@
                         [ring/ring-mock "0.3.2"]]
          ;; Initial namespace
          :repl-options   {:init-ns user}
+         :jvm-opts     ["-Dio.netty.tryReflectionSetAccessible=true"]
          ;; Additional environment dependent source code
          :source-paths   ["env/dev/clj"]}})

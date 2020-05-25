@@ -1,5 +1,6 @@
 (ns yamfood.telegram.handlers.client.order
   (:require
+    [clojure.string :as str]
     [yamfood.core.orders.core :as o]
     [yamfood.core.orders.core :as ord]
     [yamfood.core.kitchens.core :as k]
@@ -131,12 +132,17 @@
   ([ctx]
    (let [payload (:payload (:client ctx))
          location (:location payload)]
-     {:run {:function   k/nearest-kitchen!
+     {:run {:function   (fn [bot-id lng lat]
+                          (let [kitchen (k/nearest-kitchen! bot-id lng lat)]
+                            [kitchen (when kitchen
+                                       (bsk/disabled-basket-products!
+                                         (:basket_id (:client ctx))
+                                         (:id kitchen)))]))
             :args       [(:id (:bot ctx))
                          (:longitude location)
                          (:latitude location)]
             :next-event :c/create-order}}))
-  ([ctx kitchen]
+  ([ctx [kitchen disabled-products]]
    (let [update (:update ctx)
          lang (:lang ctx)
          query (:callback_query update)
@@ -154,7 +160,7 @@
          card? (= payment u/card-payment)
          delivery-cost (get-in ctx [:params :delivery-cost])]
      (if kitchen
-       (merge
+       (if (empty? disabled-products)
          {:run            [(merge {:function ord/create-order!
                                    :args     [basket-id (:id kitchen) location
                                               (u/text-from-address address)
@@ -166,7 +172,19 @@
                              {:function bsk/clear-basket!
                               :args     [basket-id]})]
           :delete-message {:chat-id    chat-id
-                           :message-id message-id}})
+                           :message-id message-id}}
+         {:run             {:function bsk/remove-basket-products!
+                            :args     [(map :id disabled-products)]}
+          :answer-callback {:callback_query_id (:id query)
+                            :show_alert        true
+                            :text              (->> disabled-products
+                                                    (map #(format
+                                                            (str (:emoji %) " %d x %s")
+                                                            (:count %)
+                                                            (u/translated lang (:name %))))
+                                                    (str/join "\n")
+                                                    (str (translate lang :disabled-products-removed)))}
+          :dispatch        {:args [:c/basket]}})
        {:answer-callback {:callback_query_id (:id query)
                           :show_alert        true
                           :text              (translate lang :all-kitchens-closed)}}))))
