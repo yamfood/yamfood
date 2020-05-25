@@ -8,7 +8,7 @@
     [yamfood.core.products.core :as products]))
 
 
-(defn- basket-products-query
+(defn basket-products-query
   [basket-id]
   (hs/format {:select    [:products.id
                           :basket_products.count
@@ -24,27 +24,6 @@
               :order-by  [:id]}))
 
 
-(defn basket-products-totals-query
-  [basket-id]
-  {:select    [[(hs/raw "sum(distinct products.price)") :products_cost]
-               [(hs/raw "coalesce(sum(modifiers.price), 0)") :modifiers_cost]
-               [:basket_products.count :count]]
-   :from      [:basket_products]
-   :left-join [:products [:= :basket_products.product_id :products.id]
-               :modifiers [:in
-                           (hs/raw "modifiers.id::text")
-                           (hs/raw "(select jsonb_array_elements_text(basket_products.payload -> 'modifiers'))")]]
-   :where     [:= :basket_products.basket_id basket-id]
-   :group-by  [:basket_products.id]})
-
-
-(defn basket-totals-query
-  [basket-id]
-  {:with   [[:basket_products_totals (basket-products-totals-query basket-id)]]
-   :select [[(hs/raw "sum((totals.products_cost + totals.modifiers_cost) * totals.count)::int") :total_cost]]
-   :from   [[:basket_products_totals :totals]]})
-
-
 (defn- basket-products!
   [basket-id]
   (->> (basket-products-query basket-id)
@@ -54,7 +33,7 @@
 
 (defn basket-totals!
   [basket-id]
-  (->> (-> (basket-totals-query basket-id)
+  (->> (-> (products/basket-totals-query basket-id)
            (hs/format))
        (jdbc/query db/db)
        (map #(assoc % :total_energy 0))

@@ -27,6 +27,27 @@
    :order-by  [:categories.position :products.position]})
 
 
+(defn basket-products-totals-query
+  [basket-id]
+  {:select    [[(hs/raw "sum(distinct products.price)") :products_cost]
+               [(hs/raw "coalesce(sum(modifiers.price), 0)") :modifiers_cost]
+               [:basket_products.count :count]]
+   :from      [:basket_products]
+   :left-join [:products [:= :basket_products.product_id :products.id]
+               :modifiers [:in
+                           (hs/raw "modifiers.id::text")
+                           (hs/raw "(select jsonb_array_elements_text(basket_products.payload -> 'modifiers'))")]]
+   :where     [:= :basket_products.basket_id basket-id]
+   :group-by  [:basket_products.id]})
+
+
+(defn basket-totals-query
+  [basket-id]
+  {:with   [[:basket_products_totals (basket-products-totals-query basket-id)]]
+   :select [[(hs/raw "coalesce(sum((totals.products_cost + totals.modifiers_cost) * totals.count)::int, 0)") :total_cost]]
+   :from   [[:basket_products_totals :totals]]})
+
+
 (defn disabled-products-query
   [kitchen-id]
   {:select [:disabled_products.product_id]
@@ -98,15 +119,6 @@
         (map keywordize-json-fields))))
 
 
-(defn basket-cost-query
-  [basket-id]
-  {:select [[(hs/raw "coalesce(sum(products.price * basket_products.count), 0)") :cost]]
-   :from   [:basket_products :products]
-   :where  [:and
-            [:= :basket_products.basket_id basket-id]
-            [:= :products.id :basket_products.product_id]]})
-
-
 (defn product-detail-state-query
   [basket-id]
   {:select    [:products.id
@@ -119,7 +131,7 @@
                :products.energy
                :categories.emoji
                [:categories.name :category]
-               [(basket-cost-query basket-id) :basket_cost]
+               [(basket-totals-query basket-id) :basket_cost]
                [(hs/raw "coalesce(basket_products.count, 0)") :count_in_basket]]
    :from      [:products]
    :where     [:= :products.is_active true]
@@ -314,11 +326,11 @@
 
 (defn basket-cost!
   [basket-id]
-  (->> (basket-cost-query basket-id)
+  (->> (basket-totals-query basket-id)
        (hs/format)
        (jdbc/query db/db)
        (first)
-       (:cost)))
+       (:total_cost)))
 
 
 (defn menu-state!
