@@ -67,22 +67,25 @@
 
 (defn product-caption
   [lang product]
-  (let [description (u/translated lang (:description product))]
+  (let [constructable? (some true? (map :required (:modifiers product)))
+        description (u/translated lang (:description product))
+        price (u/fmt-values (:price product))
+        price (if constructable? (str "от " price) price)]
     (translate lang
                :product-caption
                {:name        (u/translated lang (:name product))
                 :description (if (empty? description)
                                nil
                                (str description "\n\n"))
-                :price       (u/fmt-values (:price product))
+                :price       price
                 :energy      (u/fmt-values (:energy product))})))
 
 
 (defn product-detail-options
-  [lang product]
-  {:caption      (product-caption lang product)
+  [lang product-state]
+  {:caption      (product-caption lang product-state)
    :parse_mode   "markdown"
-   :reply_markup (json/write-str (u/product-detail-markup lang product))})
+   :reply_markup (json/write-str (u/product-detail-markup lang product-state))})
 
 
 (defn product-detail-handler

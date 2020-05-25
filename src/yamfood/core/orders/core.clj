@@ -6,7 +6,8 @@
     [clojure.java.jdbc :as jdbc]
     [yamfood.core.db.core :as db]
     [yamfood.core.clients.core :as clients]
-    [yamfood.telegram.handlers.utils :as u]))
+    [yamfood.telegram.handlers.utils :as u]
+    [yamfood.core.products.core :as products]))
 
 
 (def order-statuses
@@ -127,7 +128,7 @@
   {:select    [:products.id
                :products.name
                :products.price
-               :products.payload
+               [(hs/raw "products.payload || order_products.payload") :payload]
                :order_products.comment
                :order_products.count
                :categories.is_delivery_free
@@ -155,9 +156,21 @@
          (map keywordize-fn))))
 
 
+(defn add-modifiers
+  [all-modifiers]
+  (fn [product]
+    (assoc
+      product
+      :modifiers
+      (map (products/get-modifier all-modifiers) (:modifiers (:payload product))))))
+
+
 (defn add-products!
   [order]
-  (assoc order :products (products-by-order-id! (:id order))))
+  (let [all-modifiers (products/modifiers!)
+        products (products-by-order-id! (:id order))
+        products (map (add-modifiers all-modifiers) products)]
+    (assoc order :products products)))
 
 
 (defn orders-by-client-id-query
