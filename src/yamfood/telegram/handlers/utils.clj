@@ -1,6 +1,5 @@
 (ns yamfood.telegram.handlers.utils
   (:require
-    [clojure.edn :as edn]
     [clojure.string :as str]
     [environ.core :refer [env]]
     [yamfood.telegram.handlers.emojies :as e]
@@ -145,13 +144,27 @@
       nil)))
 
 
+(defn product-modifiers-text
+  [modifiers]
+  (str/join ", " (doall (map #(translated :ru (:name %)) modifiers))))
+
+
+(defn order-one-product-text
+  [lang]
+  (fn [product]
+    (let [count (:count product)
+          name (translated lang (:name product))
+          modifiers-text (product-modifiers-text (:modifiers product))
+          modifiers-text (if (seq modifiers-text) (format "(%s)" modifiers-text) modifiers-text)]
+      (format (str e/food-emoji " %d x %s %s\n") count name
+              (apply str modifiers-text)))))
+
+
 (defn order-products-text
   ([lang products]
    (doall
      (map
-       #(format (str e/food-emoji " %d x %s\n")
-                (:count %)
-                (translated lang (:name %)))
+       (order-one-product-text lang)
        products))))
 
 
