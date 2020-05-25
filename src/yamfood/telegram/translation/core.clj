@@ -60,6 +60,7 @@
         :to-order-button                 "✅ Далее"
 
         ; Order Confirmation
+        :oc-rm-disabled-products-button  (str e/cancel-emoji " Удалить недействительные")
         :oc-basket-button                (str e/back-emoji " Корзина")
         :oc-location-button              (str e/location-emoji " Изменить локацию")
         :oc-comment-button               (str e/comment-emoji " Комментарий")
@@ -105,7 +106,8 @@
         ; Other
         :inline-back-title               "Назад"
         :inline-back-description         "Коснитесь чтобы вернуться в меню"
-        :all-kitchens-closed             "К сожалению, на данный момент все кухни закрыты :("
+        :all-kitchens-closed             "❗️К сожалению, на данный момент все кухни закрыты :("
+        :disabled-products-removed       "Указанные ниже блюда временно недоступны в ближайшем филиале, они будут удалены из корзины\n\n"
         :blocked-message                 "Вы заблокированы, обратитесь в службу поддержки"
         :accepted                        "Принято"
         :card                            "Картой"
@@ -165,6 +167,7 @@
         :to-order-button                 "✅ Further"
 
         ; Order Confirmation
+        :oc-rm-disabled-products-button  (str e/cancel-emoji " Remove unavailable")
         :oc-basket-button                (str e/back-emoji " Cart")
         :oc-location-button              (str e/location-emoji " Change location")
         :oc-comment-button               (str e/comment-emoji " Comment")
@@ -210,7 +213,8 @@
         ; Other
         :inline-back-title               "Back"
         :inline-back-description         "Tap to return to the menu"
-        :all-kitchens-closed             "Unfortunately, all branches are currently closed :("
+        :all-kitchens-closed             "❗️Unfortunately, all branches are currently closed :("
+        :disabled-products-removed       "The dishes listed below are temporarily unavailable at the nearest branch, they will be removed from the basket\n\n"
         :blocked-message                 "You are blocked, please contact the support service"
         :accepted                        "Accepted"
         :card                            "By card"
@@ -271,6 +275,7 @@
         :to-order-button                 "✅ Keyingi"
 
         ; Order Confirmation
+        :oc-rm-disabled-products-button  (str e/cancel-emoji " Удалить недействительные") ;; TODO
         :oc-basket-button                (str e/back-emoji " Savat")
         :oc-location-button              (str e/location-emoji " Manzilni o'zgartirish")
         :oc-comment-button               (str e/comment-emoji " Izoh")
@@ -316,7 +321,9 @@
         ; Other
         :inline-back-title               "Orqaga"
         :inline-back-description         "Menyuga qaytish uchun bosing"
-        :all-kitchens-closed             "Afsuski, hozirgi vaqtda barcha filiallar yopiq :(\n"
+        :all-kitchens-closed             "❗️Afsuski, hozirgi vaqtda barcha filiallar yopiq :("
+        ;; TODO translate properly
+        :disabled-products-removed       "Quyidagi taomlar yaqin atrofdagi filialda vaqtincha mavjud emas, ular savatdan olib tashlanadi\n\n"
         :blocked-message                 "Siz bloklangindiz, qo'llab-quvvatlash xizmatiga murojaat qiling"
         :accepted                        "Qabul qilindi"
         :card                            "Karta bilan"

@@ -19,6 +19,7 @@
       "basket" {:dispatch {:args [:c/basket]}}
       "basket+" {:dispatch {:args [:c/inc-basket-product]}}
       "basket-" {:dispatch {:args [:c/dec-basket-product]}}
+      "rm-disabled" {:dispatch {:args [:c/remove-disabled-products]}}
       "to-order" {:dispatch {:args [:c/to-order]}}
       "request-location" {:dispatch {:args [:c/request-location]}}
       "request-phone" {:dispatch {:args [:c/request-phone]}}

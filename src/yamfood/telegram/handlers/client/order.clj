@@ -1,5 +1,6 @@
 (ns yamfood.telegram.handlers.client.order
   (:require
+    [clojure.string :as str]
     [yamfood.core.orders.core :as o]
     [yamfood.core.orders.core :as ord]
     [yamfood.core.kitchens.core :as k]
@@ -16,7 +17,7 @@
   [ctx]
   (let [client (:client ctx)]
     {:run {:function   bsk/order-confirmation-state!
-           :args       [(:basket_id client)]
+           :args       [client]
            :next-event :c/send-order-detail}}))
 
 
@@ -43,7 +44,9 @@
 
 (defn order-confirmation-markup
   [lang order-state]
-  (let [payment (get-in order-state [:client :payload :payment])]
+  (let [payment (get-in order-state [:client :payload :payment])
+        kitchen (:kitchen order-state)
+        disabled-products (:disabled_products order-state)]
     {:inline_keyboard
      [[{:text (translate lang :oc-location-button) :callback_data "request-location"}]
       [{:text (if (= payment u/card-payment)
@@ -51,26 +54,44 @@
                 (str e/cash-emoji " " (translate lang :cash))) :callback_data "switch-payment-type"}]
       [{:text (translate lang :oc-comment-button) :callback_data "change-comment"}]
       [{:text (translate lang :oc-basket-button) :callback_data "basket"}]
-      [{:text (translate lang :oc-create-order-button) :callback_data "create-order"}]]}))
+      (if (nil? kitchen)
+        ;; TODO add text for kitchens-unavailable-button
+        []
+        (if (seq disabled-products)
+          [{:text (translate lang :oc-rm-disabled-products-button) :callback_data "rm-disabled"}]
+          [{:text (translate lang :oc-create-order-button) :callback_data "create-order"}]))]}))
 
 
 (defn pre-order-text
   [lang params order-state]
   (let [price (:total_cost (:basket order-state))
         products (:products (:basket order-state))
+        kitchen (:kitchen order-state)
+        disabled-products (:disabled_products order-state)
         delivery (if (every? false? (map :is_delivery_free products))
                    (:delivery-cost params)
                    0)]
-    (translate lang :oc-message
-               {:price    (u/fmt-values price)
-                :payment  (translate lang (keyword (or (get-in order-state [:client :payload :payment])
-                                                       "cash")))
-                :comment  (or (:comment (:payload (:client order-state)))
-                              (translate lang :oc-empty-comment-text))
-                :delivery (u/fmt-values delivery)
-                :total    (u/fmt-values (+ delivery price))
-                :address  (u/text-from-address
-                            (get-in order-state [:client :payload :location :address]))})))
+    (str (translate lang :oc-message
+                    {:price    (u/fmt-values price)
+                     :payment  (translate lang (keyword (or (get-in order-state [:client :payload :payment])
+                                                            "cash")))
+                     :comment  (or (:comment (:payload (:client order-state)))
+                                   (translate lang :oc-empty-comment-text))
+                     :delivery (u/fmt-values delivery)
+                     :total    (u/fmt-values (+ delivery price))
+                     :address  (u/text-from-address
+                                 (get-in order-state [:client :payload :location :address]))})
+         (if-not (some? kitchen)
+           (str "\n\n*" (translate lang :all-kitchens-closed) \*)
+           (when (seq disabled-products)
+             (str "\n\n*" (->> disabled-products
+                               (map #(format
+                                       (str e/cancel-emoji (:emoji %) " %d x %s ")
+                                       (:count %)
+                                       (u/translated lang (:name %))))
+                               (str/join "\n")
+                               (translate lang :disabled-products-removed)) \*))))))
+
 
 
 (defn order-detail-handler
@@ -89,7 +110,7 @@
   ([ctx]
    (let [client (:client ctx)]
      {:run {:function   bsk/order-confirmation-state!
-            :args       [(:basket_id client)]
+            :args       [client]
             :next-event :c/update-order-confirmation}}))
   ([ctx order-state]
    (let [query (:callback_query (:update ctx))
@@ -126,14 +147,10 @@
 
 (defn create-order-handler
   ([ctx]
-   (let [payload (:payload (:client ctx))
-         location (:location payload)]
-     {:run {:function   k/nearest-kitchen!
-            :args       [(:id (:bot ctx))
-                         (:longitude location)
-                         (:latitude location)]
-            :next-event :c/create-order}}))
-  ([ctx kitchen]
+   {:run {:function   bsk/order-confirmation-state!
+          :args       [(:client ctx)]
+          :next-event :c/create-order}})
+  ([ctx {:keys [kitchen disabled-products]}]
    (let [update (:update ctx)
          lang (:lang ctx)
          query (:callback_query update)
@@ -150,17 +167,19 @@
          delivery-cost (get-in ctx [:params :delivery-cost])]
      (if kitchen
        (merge
-         {:run            [(merge {:function ord/create-order!
-                                   :args     [basket-id (:id kitchen) location
-                                              (u/text-from-address address)
-                                              comment payment delivery-cost]}
-                                  (if card?
-                                    {:next-event :c/send-invoice}
-                                    {:next-event :c/active-order}))
-                           (when (not card?)
-                             {:function bsk/clear-basket!
-                              :args     [basket-id]})]
-          :delete-message {:chat-id    chat-id
+         (if (empty? disabled-products)
+           {:run [(merge {:function ord/create-order!
+                          :args     [basket-id (:id kitchen) location
+                                     (u/text-from-address address)
+                                     comment payment delivery-cost]}
+                         (if card?
+                           {:next-event :c/send-invoice}
+                           {:next-event :c/active-order}))
+                  (when (not card?)
+                    {:function bsk/clear-basket!
+                     :args     [basket-id]})]}
+           {:dispatch {:args [:c/remove-disabled-products]}})
+         {:delete-message {:chat-id    chat-id
                            :message-id message-id}})
        {:answer-callback {:callback_query_id (:id query)
                           :show_alert        true

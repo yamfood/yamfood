@@ -1,6 +1,8 @@
 (ns yamfood.telegram.handlers.client.basket
   (:require
+    [clojure.string :as str]
     [yamfood.telegram.dispatcher :as d]
+    [yamfood.core.baskets.core :as bsk]
     [yamfood.core.clients.core :as clients]
     [yamfood.core.baskets.core :as baskets]
     [yamfood.telegram.handlers.utils :as u]
@@ -114,6 +116,31 @@
                          :reply_markup (basket-detail-markup lang basket-state)}}))
 
 
+(defn basket-remove-disabled
+  ([ctx]
+   {:run {:function   bsk/order-confirmation-state!
+          :args       [(:client ctx)]
+          :next-event :c/remove-disabled-products}})
+  ([ctx state]
+   (let [update (:update ctx)
+         lang (:lang ctx)
+         query (:callback_query update)
+         disabled-products (:disabled_products state)]
+     {:run             {:function bsk/remove-basket-products!
+                        :args     [(map :id disabled-products)]}
+      :answer-callback {:callback_query_id (:id query)
+                        :show_alert        true
+                        :text              (->> disabled-products
+                                                (map #(format
+                                                        (str (:emoji %) " %d x %s")
+                                                        (:count %)
+                                                        (u/translated lang (:name %))))
+                                                (str/join "\n")
+                                                (str (translate lang :disabled-products-removed)))}
+      :dispatch        {:args [:c/basket]}})))
+
+
+
 (d/register-event-handler!
   :c/basket
   basket-handler)
@@ -127,6 +154,11 @@
 (d/register-event-handler!
   :c/dec-basket-product
   basket-dec-handler)
+
+
+(d/register-event-handler!
+  :c/remove-disabled-products
+  basket-remove-disabled)
 
 
 (d/register-event-handler!

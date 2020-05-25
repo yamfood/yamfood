@@ -10,7 +10,7 @@
                  [ring-cors "0.1.13"]
                  [compojure "1.6.1"]
                  [aleph "0.4.6"]
-
+                 [nilenso/honeysql-postgres "0.2.6"]
                  [overtone/at-at "1.2.0"]
                  [amazonica "0.3.152"]
                  [environ "1.1.0"]

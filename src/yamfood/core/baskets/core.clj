@@ -1,11 +1,12 @@
 (ns yamfood.core.baskets.core
   (:require
     [honeysql.core :as hs]
+    [yamfood.core.utils :as cu]
     [clojure.java.jdbc :as jdbc]
     [yamfood.core.db.core :as db]
-    [yamfood.core.clients.core :as clients]
-    [yamfood.core.products.core :as products]
-    [yamfood.core.utils :as cu]))
+    [honeysql-postgres.format :refer :all]
+    [yamfood.core.kitchens.core :as kitchens]
+    [yamfood.core.products.core :as products]))
 
 
 (defn- basket-products-query
@@ -22,6 +23,34 @@
                           [:= :products.id :basket_products.product_id]]
               :left-join [:categories [:= :products.category_id :categories.id]]
               :order-by  [:id]}))
+
+
+(defn- disabled-products [basket-id kitchen-id]
+  {:select    [:products.*, :categories.emoji, :basket_products.count]
+   :from      [:baskets]
+   :join      [:basket_products [:= :baskets.id :basket_products.basket_id]
+               :products [:= :basket_products.product_id :products.id]]
+   :left-join [:categories [:= :products.category_id :categories.id]
+               :disabled_products [:= :basket_products.product_id :disabled_products.product_id]]
+   :where     [:and
+               [:= :baskets.id basket-id]
+               [:= :disabled_products.kitchen_id kitchen-id]
+               [:or
+                [:!= :disabled_products nil]
+                [:not :products.is_active]]]})
+
+
+(defn- disabled-products-query [basket-id kitchen-id]
+  (hs/format (disabled-products basket-id kitchen-id)))
+
+
+(defn- remove-basket-products-query
+  [product-ids]
+  (hs/format
+    (-> {:delete-from :basket_products
+         :where       [:in :product_id product-ids]
+         :returning   [:*]})
+    :parameterizer :none))
 
 
 (defn- basket-totals-query
@@ -103,12 +132,31 @@
     (products/state-for-product-detail! basket-id product-id)))
 
 
-(defn order-confirmation-state!
-  [basket-id]
-  {:basket (basket-state! basket-id)
-   :client (clients/client-with-basket-id! basket-id)})
-
-
 (defn clear-basket!
   [basket-id]
   (jdbc/delete! db/db "basket_products" ["basket_id = ?" basket-id]))
+
+
+(defn remove-basket-products! [product-ids]
+  (jdbc/query db/db (remove-basket-products-query product-ids)))
+
+;; TODO remove unused
+(defn remove-disabled-basket-products! [basket-id kitchen-id]
+  (jdbc/query db/db (remove-basket-products-query (-> (disabled-products basket-id kitchen-id)
+                                                      (assoc :select [:products.id])))))
+
+
+(defn disabled-basket-products!
+  [basket-id kitchen-id]
+  (->> (disabled-products-query basket-id kitchen-id)
+       (jdbc/query db/db)
+       (map #(cu/keywordize-field % :name))))
+
+
+(defn order-confirmation-state!
+  [client]
+  (merge (when-let [kitchen (kitchens/nearest-kitchen! (:bot_id client) (:longitude client) (:latitude client))]
+           {:kitchen           kitchen
+            :disabled_products (disabled-basket-products! (:basket_id client) (:id kitchen))})
+         {:basket (basket-state! (:basket_id client))
+          :client client}))

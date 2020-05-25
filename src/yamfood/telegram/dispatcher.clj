@@ -7,7 +7,7 @@
 
 (defn apply-effect
   [ctx name effect]
-  (let [handler (name @effect-handlers)]
+  (let [handler (get @effect-handlers name)]
     (cond
       (sequential? effect) (doall (map #(handler ctx %) effect))
       :else (handler ctx effect))))
