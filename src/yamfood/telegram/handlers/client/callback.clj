@@ -19,6 +19,7 @@
       "detail+" {:dispatch {:args [:c/detail-inc]}}
       "detail-" {:dispatch {:args [:c/detail-dec]}}
       "basket" {:dispatch {:args [:c/basket]}}
+      "basket-product-info" {:dispatch {:args [:c/basket-product-info]}}
       "basket+" {:dispatch {:args [:c/inc-basket-product]}}
       "basket-" {:dispatch {:args [:c/dec-basket-product]}}
       "to-order" {:dispatch {:args [:c/to-order]}}

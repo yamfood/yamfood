@@ -1,6 +1,7 @@
 (ns yamfood.core.baskets.core
   (:require
     [honeysql.core :as hs]
+    [honeysql.helpers :as hh]
     [yamfood.core.utils :as cu]
     [clojure.java.jdbc :as jdbc]
     [yamfood.core.db.core :as db]
@@ -8,27 +9,51 @@
     [yamfood.core.products.core :as products]))
 
 
-(defn basket-products-query
-  [basket-id]
-  (hs/format {:select    [:products.id
-                          :basket_products.count
-                          :products.name
-                          :products.price
-                          :categories.is_delivery_free
-                          :products.energy]
-              :from      [:basket_products :products]
-              :where     [:and
-                          [:= :basket_products.basket_id basket-id]
-                          [:= :products.id :basket_products.product_id]]
-              :left-join [:categories [:= :products.category_id :categories.id]]
-              :order-by  [:id]}))
+(def basket-products-query
+  {:select    [:products.id
+               :basket_products.count
+               [:basket_products.id :bp_id]
+               :basket_products.payload
+               :products.name
+               :products.price
+               :categories.is_delivery_free
+               :products.energy]
+   :from      [:basket_products :products]
+   :where     [:and
+               [:= :products.id :basket_products.product_id]]
+   :left-join [:categories [:= :products.category_id :categories.id]]
+   :order-by  [:id]})
+
+
+(defn add-modifiers!
+  [all-modifiers]
+  (fn [product]
+    (assoc product
+      :modifiers
+      (map (products/get-modifier all-modifiers)
+           (:modifiers (:payload product))))))
+
+
+(defn calculate-total-cost
+  [product]
+  (let [modifiers (:modifiers product)
+        modifiers-cost (reduce + (map :price modifiers))
+        price (:price product)]
+    (assoc product :total_cost (+ price modifiers-cost))))
 
 
 (defn- basket-products!
   [basket-id]
-  (->> (basket-products-query basket-id)
-       (jdbc/query db/db)
-       (map #(cu/keywordize-field % :name))))
+  (let [all-modifiers (products/modifiers!)]
+    (->> (-> basket-products-query
+             (hh/merge-where [:= :basket_products.basket_id basket-id])
+             (hs/format))
+         (jdbc/query db/db)
+         (map #(-> %
+                   (cu/keywordize-field :name)
+                   (cu/keywordize-field :payload)
+                   ((add-modifiers! all-modifiers))
+                   (calculate-total-cost))))))
 
 
 (defn basket-totals!
@@ -99,3 +124,17 @@
 (defn clear-basket!
   [basket-id]
   (jdbc/delete! db/db "basket_products" ["basket_id = ?" basket-id]))
+
+
+(defn basket-product-detail!
+  [basket-product-id]
+  (let [all-modifiers (products/modifiers!)]
+    (->> (-> basket-products-query
+             (hh/merge-where [:= :basket_products.id basket-product-id])
+             (hs/format))
+         (jdbc/query db/db)
+         (map #(-> %
+                   (cu/keywordize-field :name)
+                   (cu/keywordize-field :payload)
+                   ((add-modifiers! all-modifiers))))
+         (first))))
