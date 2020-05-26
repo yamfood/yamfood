@@ -20,6 +20,19 @@
      (-> resp :body))))
 
 
+(defn edit-caption
+  "Use this method to edit captions of messages
+  (https://core.telegram.org/bots/api#editmessagecaption)"
+  ([token chat-id message-id caption] (edit-caption token chat-id message-id {} caption))
+  ([token chat-id message-id options caption]
+   (let [url (str base-url token "/editMessageCaption")
+         query (into {:chat_id chat-id :caption caption :message_id message-id} options)
+         resp (http/post url {:content-type :json
+                              :as           :json
+                              :form-params  query})]
+     (-> resp :body))))
+
+
 (defn send-location
   "Sends location to the chat
   (https://core.telegram.org/bots/api#sendlocation)"
