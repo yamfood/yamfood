@@ -131,8 +131,7 @@
                [(hs/raw "products.payload || order_products.payload") :payload]
                :order_products.comment
                :order_products.count
-               :categories.is_delivery_free
-               [(hs/call :* :order_products.count :products.price) :total]]
+               :categories.is_delivery_free]
    :from      [:order_products :products]
    :left-join [:categories [:= :categories.id :products.category_id]]
    :where     [:= :order_products.product_id :products.id]})
@@ -159,17 +158,30 @@
 (defn add-modifiers
   [all-modifiers]
   (fn [product]
-    (assoc
-      product
-      :modifiers
-      (map (products/get-modifier all-modifiers) (:modifiers (:payload product))))))
+    (-> product
+        (assoc :modifiers
+               (map (products/get-modifier all-modifiers) (:modifiers (:payload product)))))))
+
+
+(defn calculate-price
+  [product]
+  (let [modifiers (:modifiers product)
+        modifiers-cost (reduce + (map :price modifiers))
+        price (+ (:price product) modifiers-cost)
+        total (* price (:count product))]
+    (-> product
+        (assoc :price price)
+        (assoc :total total))))
 
 
 (defn add-products!
   [order]
   (let [all-modifiers (products/modifiers!)
         products (products-by-order-id! (:id order))
-        products (map (add-modifiers all-modifiers) products)]
+        products (map #(-> %
+                           ((add-modifiers all-modifiers))
+                           (calculate-price))
+                      products)]
     (assoc order :products products)))
 
 
