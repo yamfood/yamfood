@@ -7,7 +7,8 @@
     [yamfood.telegram.handlers.utils :as u]
     [yamfood.core.clients.core :as clients]
     [yamfood.core.products.core :as products]
-    [yamfood.telegram.translation.core :refer [translate]]))
+    [yamfood.telegram.translation.core :refer [translate]]
+    [yamfood.core.products.core :as p]))
 
 
 (defn want-handler
@@ -67,10 +68,8 @@
 
 (defn product-caption
   [lang product]
-  (let [constructable? (some true? (map :required (:modifiers product)))
-        description (u/translated lang (:description product))
-        price (u/fmt-values (:price product))
-        price (if constructable? (str "от " price) price)]
+  (let [description (u/translated lang (:description product))
+        price (u/fmt-values (:price product))]
     (translate lang
                :product-caption
                {:name        (u/translated lang (:name product))
@@ -149,6 +148,15 @@
            [[{:text "Дальше" :callback_data callback-data}]])}))
 
 
+(defn constructed-product-caption!
+  [lang product]
+  (let [all-modifiers (p/modifiers!)
+        modifiers (map (p/get-modifier all-modifiers) (remove nil? (:selected-modifiers product)))
+        total-cost (+ (reduce + (map :price modifiers)) (:price product))
+        product (assoc product :price total-cost)]
+    (product-caption lang product)))
+
+
 (defn new-modifiers
   [selected-modifiers modifier]
   (if (utils/in? selected-modifiers modifier)
@@ -166,7 +174,8 @@
                          product-id]
             :next-event :c/construct}}))
   ([ctx state]
-   (let [client (:client ctx)
+   (let [lang (:lang ctx)
+         client (:client ctx)
          update (:update ctx)
          query (:callback_query update)
          product-id (u/parse-int (first (u/callback-params (:data query))))
@@ -176,15 +185,17 @@
          new-modifiers (new-modifiers current-modifiers modifier-id)
          state (assoc state :selected-modifiers new-modifiers)]
      (merge
-       {:edit-reply-markup {:chat_id      (u/chat-id update)
-                            :message_id   (:message_id (:message query))
-                            :reply_markup (modifiers-markup
-                                            :ru
-                                            product-id
-                                            state
-                                            step)}
-        :answer-callback   {:callback_query_id (:id query)
-                            :text              " "}}
+       {:edit-photo      {:chat-id    (u/chat-id update)
+                          :message-id (:message_id (:message query))
+                          :caption    (constructed-product-caption! lang state)
+                          :options    {:parse_mode   "markdown"
+                                       :reply_markup (modifiers-markup
+                                                       :ru
+                                                       product-id
+                                                       state
+                                                       step)}}
+        :answer-callback {:callback_query_id (:id query)
+                          :text              " "}}
        (when modifier-id
          {:run {:function clients/update-payload!
                 :args     [(:id client)
