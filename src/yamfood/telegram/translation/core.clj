@@ -157,10 +157,10 @@
         :added-to-basket-message         "Added to cart"
         :more-button                     "\uD83C\uDF7D More?"
         :add-product-button              "Want"
-        :construct-product-button        "Собрать"
-        :construct-product-next-button   "Дальше"
-        :construct-product-back-button   "Назад"
-        :construct-product-success-text  "Блюдо успешно собрано и добавлено в корзину!"
+        :construct-product-button        "Construct"
+        :construct-product-next-button   "Next"
+        :construct-product-back-button   "Back"
+        :construct-product-success-text  "The dish was successfully constructed and added to the basket!"
         :product-basket-button           (str e/basket-emoji " Cart ({1} sum)")
         :product-menu-button             (str e/back-emoji " Back")
         :product-caption                 (str e/food-emoji " *{name}* \n\n"
@@ -266,12 +266,12 @@
         :added-to-basket-message         "Savatga qo'shilgan"
         :more-button                     "\uD83C\uDF7D Yana?"
         :add-product-button              "Istayman"
-        :construct-product-button        "Собрать"
-        :construct-product-next-button   "Дальше"
-        :construct-product-back-button   "Назад"
-        :construct-product-success-text  "Блюдо успешно собрано и добавлено в корзину!"
+        :construct-product-button        "Yig'ish"
+        :construct-product-next-button   "Keyingi"
+        :construct-product-back-button   "Orqaga"
+        :construct-product-success-text  "Ovqat muvaffaqiyatli qurildi va Savatga qo'shildi!"
         :product-basket-button           (str e/basket-emoji " Savat ({1} so'm)")
-        :product-menu-button             (str e/back-emoji " Назад")
+        :product-menu-button             (str e/back-emoji " Orqaga")
         :product-caption                 (str e/food-emoji " *{name}* \n\n"
                                               "{description}"
                                               e/money-emoji "{price} so'm")
