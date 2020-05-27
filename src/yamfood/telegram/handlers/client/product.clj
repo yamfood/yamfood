@@ -2,13 +2,13 @@
   (:require
     [yamfood.utils :as utils]
     [clojure.data.json :as json]
+    [yamfood.core.products.core :as p]
     [yamfood.telegram.dispatcher :as d]
     [yamfood.core.baskets.core :as baskets]
     [yamfood.telegram.handlers.utils :as u]
     [yamfood.core.clients.core :as clients]
     [yamfood.core.products.core :as products]
-    [yamfood.telegram.translation.core :refer [translate]]
-    [yamfood.core.products.core :as p]))
+    [yamfood.telegram.translation.core :refer [translate]]))
 
 
 (defn want-handler
@@ -145,7 +145,8 @@
              (modifiers-reducer lang product-id step (:selected-modifiers state))
              []
              modifiers)
-           [[{:text "Дальше" :callback_data callback-data}]])}))
+           [[{:text "Дальше" :callback_data callback-data}]
+            [{:text "Назад" :callback_data (str "construct/" product-id "/" (dec step))}]])}))
 
 
 (defn constructed-product-caption!
@@ -183,17 +184,23 @@
          modifier-id (nth (u/callback-params (:data query)) 2 nil)
          current-modifiers (get-in client [:payload :modifiers (keyword (str product-id))] [])
          new-modifiers (new-modifiers current-modifiers modifier-id)
-         state (assoc state :selected-modifiers new-modifiers)]
+         state (assoc state :selected-modifiers new-modifiers)
+         caption (if (= 0 step)
+                   (product-caption lang state)
+                   (constructed-product-caption! lang state))
+         markup (if (= 0 step)
+                  (json/write-str (u/product-detail-markup lang state))
+                  (modifiers-markup
+                    :ru
+                    product-id
+                    state
+                    step))]
      (merge
        {:edit-photo      {:chat-id    (u/chat-id update)
                           :message-id (:message_id (:message query))
-                          :caption    (constructed-product-caption! lang state)
+                          :caption    caption
                           :options    {:parse_mode   "markdown"
-                                       :reply_markup (modifiers-markup
-                                                       :ru
-                                                       product-id
-                                                       state
-                                                       step)}}
+                                       :reply_markup markup}}
         :answer-callback {:callback_query_id (:id query)
                           :text              " "}}
        (when modifier-id
