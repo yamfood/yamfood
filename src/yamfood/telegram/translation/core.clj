@@ -48,6 +48,9 @@
         :more-button                     "\uD83C\uDF7D Еще?"
         :add-product-button              "Хочу"
         :construct-product-button        "Собрать"
+        :construct-product-next-button   "Дальше"
+        :construct-product-back-button   "Назад"
+        :construct-product-success-text  "Блюдо успешно собрано и добавлено в корзину!"
         :product-basket-button           (str e/basket-emoji " Корзина ({1} сум)")
         :product-menu-button             (str e/back-emoji " Назад")
         :product-caption                 (str e/food-emoji " *{name}* \n\n"
@@ -155,6 +158,9 @@
         :more-button                     "\uD83C\uDF7D More?"
         :add-product-button              "Want"
         :construct-product-button        "Собрать"
+        :construct-product-next-button   "Дальше"
+        :construct-product-back-button   "Назад"
+        :construct-product-success-text  "Блюдо успешно собрано и добавлено в корзину!"
         :product-basket-button           (str e/basket-emoji " Cart ({1} sum)")
         :product-menu-button             (str e/back-emoji " Back")
         :product-caption                 (str e/food-emoji " *{name}* \n\n"
@@ -261,6 +267,9 @@
         :more-button                     "\uD83C\uDF7D Yana?"
         :add-product-button              "Istayman"
         :construct-product-button        "Собрать"
+        :construct-product-next-button   "Дальше"
+        :construct-product-back-button   "Назад"
+        :construct-product-success-text  "Блюдо успешно собрано и добавлено в корзину!"
         :product-basket-button           (str e/basket-emoji " Savat ({1} so'm)")
         :product-menu-button             (str e/back-emoji " Назад")
         :product-caption                 (str e/food-emoji " *{name}* \n\n"

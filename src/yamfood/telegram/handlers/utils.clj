@@ -145,8 +145,8 @@
 
 
 (defn product-modifiers-text
-  [modifiers]
-  (str/join ", " (doall (map #(translated :ru (:name %)) modifiers))))
+  [lang modifiers]
+  (str/join ", " (doall (map #(translated lang (:name %)) modifiers))))
 
 
 (defn order-one-product-text
@@ -154,7 +154,7 @@
   (fn [product]
     (let [count (:count product)
           name (translated lang (:name product))
-          modifiers-text (product-modifiers-text (:modifiers product))
+          modifiers-text (product-modifiers-text lang (:modifiers product))
           modifiers-text (if (seq modifiers-text) (format "(%s)" modifiers-text) modifiers-text)]
       (format (str e/food-emoji " %d x %s %s\n") count name
               (apply str modifiers-text)))))

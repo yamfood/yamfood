@@ -116,13 +116,13 @@
 
 
 (defn product-modifiers-text
-  [modifiers]
-  (str/join ", " (doall (map #(u/translated :ru (:name %)) modifiers))))
+  [lang modifiers]
+  (str/join ", " (doall (map #(u/translated lang (:name %)) modifiers))))
 
 
 (defn product-info-text
   [lang product]
-  (let [modifiers-text (product-modifiers-text (:modifiers product))
+  (let [modifiers-text (product-modifiers-text lang (:modifiers product))
         modifiers-text (if (seq modifiers-text) (format "(%s)" modifiers-text) modifiers-text)]
     (format (str e/food-emoji " %s %s")
             (u/translated lang (:name product))

@@ -145,8 +145,8 @@
              (modifiers-reducer lang product-id step (:selected-modifiers state))
              []
              modifiers)
-           [[{:text "Дальше" :callback_data callback-data}]
-            [{:text "Назад" :callback_data (str "construct/" product-id "/" (dec step))}]])}))
+           [[{:text (translate lang :construct-product-next-button) :callback_data callback-data}]
+            [{:text (translate lang :construct-product-back-button) :callback_data (str "construct/" product-id "/" (dec step))}]])}))
 
 
 (defn constructed-product-caption!
@@ -191,7 +191,7 @@
          markup (if (= 0 step)
                   (json/write-str (u/product-detail-markup lang state))
                   (modifiers-markup
-                    :ru
+                    lang
                     product-id
                     state
                     step))]
@@ -213,7 +213,7 @@
 
 (defn construct-finish-handler
   [ctx]
-  (let [
+  (let [lang (:lang ctx)
         client (:client ctx)
         update (:update ctx)
         query (:callback_query update)
@@ -223,7 +223,7 @@
                        :args     [(:basket_id client) product-id modifiers]}
      :answer-callback {:callback_query_id (:id query)
                        :show_alert        true
-                       :text              "Блюдо успешно собрано и добавлено в корзину!"}
+                       :text              (translate lang :construct-product-success-text)}
      :dispatch        {:args [:c/menu]}}))
 
 
