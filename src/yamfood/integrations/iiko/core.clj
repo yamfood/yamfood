@@ -40,7 +40,12 @@
   [order]
   (let [params (p/params!)
         access-token (api/get-access-token! (:iiko-user-id params)
-                                            (:iiko-user-secret params))]
+                                            (:iiko-user-secret params))
+        organization-id (-> (api/organizations! access-token)
+                            (first)
+                            :id)
+        context (iiko-context! params access-token organization-id)
+        order (utils/order->iiko context order)]
     (api/check-order! access-token order)))
 
 
@@ -71,10 +76,5 @@
         organization-id (-> (api/organizations! access-token)
                             (first)
                             :id)]
-    (api/delivery-terminals! access-token organization-id))
-
-
-  (map utils/iiko->product (utils/products nomenclature "16c0bb0c-ad96-41ee-84f4-2f5ddcdea86c"))
-
-  (map utils/iiko->modifier (utils/modifiers nomenclature)))
+    (api/delivery-terminals! access-token organization-id)))
 

@@ -1,7 +1,6 @@
 (ns yamfood.integrations.iiko.utils
   (:require
-    [yamfood.utils :as u]
-    [yamfood.integrations.iiko.api :as api]))
+    [yamfood.utils :as u]))
 
 
 (defn restaurants
@@ -63,11 +62,18 @@
    :position (:order iiko-product)})
 
 
+(defn modifier->item-modifier
+  [modifier]
+  {:id     (:id modifier)
+   :amount 1})
+
+
 (defn product->item
   [product]
-  {:id      (:iiko_id (:payload product))
-   :amount  (:count product)
-   :comment (:comment product)})
+  {:id        (:iiko_id (:payload product))
+   :amount    (:count product)
+   :comment   (:comment product)
+   :modifiers (map modifier->item-modifier (:modifiers product))})
 
 
 (defn get-iiko-payment-type
