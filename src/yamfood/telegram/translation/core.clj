@@ -58,7 +58,8 @@
                                               e/money-emoji "{price} сум")
 
         ; Basket
-        :basket-message                  "Ваша корзина:"
+        :basket-message                  (str "Ваша корзина:\n\n"
+                                              "_Коснитесь блюда чтобы посмотреть детали_")
         :empty-basket-text               "К сожалению, ваша корзина пока пуста :("
         :basket-menu-button              (str e/back-emoji " В меню")
         :to-order-button                 "✅ Далее"
@@ -167,7 +168,8 @@
                                               e/money-emoji "{price} sum")
 
         ; Basket
-        :basket-message                  "Your Cart:"
+        :basket-message                  (str "Your Cart:\n\n"
+                                              "_Tap a dish to view details_")
         :empty-basket-text               "Unfortunately, your Cart is still empty :("
         :basket-menu-button              (str e/back-emoji " Into menu")
         :to-order-button                 "✅ Further"
@@ -269,7 +271,7 @@
         :construct-product-button        "Yig'ish"
         :construct-product-next-button   "Keyingi"
         :construct-product-back-button   "Orqaga"
-        :construct-product-success-text  "Ovqat muvaffaqiyatli qurildi va Savatga qo'shildi!"
+        :construct-product-success-text  "Ovqat yig'ildi va savatga qo'shildi"
         :product-basket-button           (str e/basket-emoji " Savat ({1} so'm)")
         :product-menu-button             (str e/back-emoji " Orqaga")
         :product-caption                 (str e/food-emoji " *{name}* \n\n"
@@ -277,7 +279,8 @@
                                               e/money-emoji "{price} so'm")
 
         ; Basket
-        :basket-message                  "Sizning savatingiz:"
+        :basket-message                  (str "Sizning savatingiz:\n\n"
+                                              "_Tafsilotlarini ko'rish uchun taomni bosing_")
         :empty-basket-text               "Afsuski, sizning savatingiz hali bo'sh :("
         :basket-menu-button              (str e/back-emoji " Menyuga")
         :to-order-button                 "✅ Keyingi"

@@ -64,8 +64,9 @@
 
 (defn modifier->item-modifier
   [modifier]
-  {:id     (:id modifier)
-   :amount 1})
+  {:id      (:id modifier)
+   :groupId (:group_id modifier)
+   :amount  1})
 
 
 (defn product->item

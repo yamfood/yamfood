@@ -59,13 +59,15 @@
   []
   (->> (-> {:select [:modifiers.id
                      :modifiers.name
+                     :modifiers.group_id
                      :modifiers.price]
             :from   [:modifiers]}
            (hs/format))
        (jdbc/query db/db)
        (map #(-> %
                  (cu/keywordize-field :name)
-                 (update :id str)))))
+                 (update :id str)
+                 (update :group_id str)))))
 
 
 (defn get-modifier
