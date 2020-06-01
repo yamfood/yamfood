@@ -1,6 +1,5 @@
 (ns yamfood.telegram.handlers.utils
   (:require
-    [clojure.edn :as edn]
     [clojure.string :as str]
     [environ.core :refer [env]]
     [yamfood.telegram.handlers.emojies :as e]
@@ -48,14 +47,19 @@
       [{:text (translate lang :more-button) :switch_inline_query_current_chat ""}])))
 
 
+(defn navigation-buttons
+  [lang state]
+  [(more-button lang state)
+   [{:text (translate lang :product-basket-button (fmt-values (:basket_cost state))) :callback_data "basket"}]
+   [{:text (translate lang :product-menu-button) :callback_data "menu"}]])
+
+
 (defn product-not-in-basket-markup
   [lang state]
-  (let [basket-cost (:basket_cost state)]
-    {:inline_keyboard
-     [[{:text (translate lang :add-product-button) :callback_data (str "want/" (:id state))}]
-      (more-button lang state)
-      [{:text (translate lang :product-basket-button (fmt-values basket-cost)) :callback_data "basket"}]
-      [{:text (translate lang :product-menu-button) :callback_data "menu"}]]}))
+  {:inline_keyboard
+   (into
+     [[{:text (translate lang :add-product-button) :callback_data (str "want/" (:id state))}]]
+     (navigation-buttons lang state))})
 
 
 (defn basket-product-controls
@@ -67,20 +71,29 @@
 
 (defn product-in-basket-markup
   [lang state]
-  (let [basket-cost (:basket_cost state)]
-    {:inline_keyboard
-     [(basket-product-controls "detail" (:id state) (:count_in_basket state))
-      (more-button lang state)
-      [{:text (translate lang :product-basket-button (fmt-values basket-cost)) :callback_data "basket"}]
-      [{:text (translate lang :product-menu-button) :callback_data "menu"}]]}))
+  {:inline_keyboard
+   (into
+     [(basket-product-controls "detail" (:id state) (:count_in_basket state))]
+     (navigation-buttons lang state))})
+
+
+(defn constructable-product-markup
+  [lang state]
+  {:inline_keyboard
+   (into
+     [[{:text (translate lang :construct-product-button) :callback_data (str "construct/" (:id state) "/1")}]]
+     (navigation-buttons lang state))})
 
 
 (defn product-detail-markup
-  [lang state-for-detail]
-  (let [count-in-basket (:count_in_basket state-for-detail)]
-    (if (= count-in-basket 0)
-      (product-not-in-basket-markup lang state-for-detail)
-      (product-in-basket-markup lang state-for-detail))))
+  [lang state]
+  (let [constructable? (some true? (map :required (:modifiers state)))
+        count-in-basket (:count_in_basket state)]
+    (if constructable?
+      (constructable-product-markup lang state)
+      (if (= count-in-basket 0)
+        (product-not-in-basket-markup lang state)
+        (product-in-basket-markup lang state)))))
 
 
 (defn callback-action
@@ -131,13 +144,27 @@
       nil)))
 
 
+(defn product-modifiers-text
+  [lang modifiers]
+  (str/join ", " (doall (map #(translated lang (:name %)) modifiers))))
+
+
+(defn order-one-product-text
+  [lang]
+  (fn [product]
+    (let [count (:count product)
+          name (translated lang (:name product))
+          modifiers-text (product-modifiers-text lang (:modifiers product))
+          modifiers-text (if (seq modifiers-text) (format "(%s)" modifiers-text) modifiers-text)]
+      (format (str e/food-emoji " %d x %s %s\n") count name
+              (apply str modifiers-text)))))
+
+
 (defn order-products-text
   ([lang products]
    (doall
      (map
-       #(format (str e/food-emoji " %d x %s\n")
-                (:count %)
-                (translated lang (:name %)))
+       (order-one-product-text lang)
        products))))
 
 

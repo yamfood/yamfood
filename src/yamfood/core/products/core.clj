@@ -27,6 +27,27 @@
    :order-by  [:categories.position :products.position]})
 
 
+(defn basket-products-totals-query
+  [basket-id]
+  {:select    [[(hs/raw "sum(distinct products.price)") :products_cost]
+               [(hs/raw "coalesce(sum(modifiers.price), 0)") :modifiers_cost]
+               [:basket_products.count :count]]
+   :from      [:basket_products]
+   :left-join [:products [:= :basket_products.product_id :products.id]
+               :modifiers [:in
+                           (hs/raw "modifiers.id::text")
+                           (hs/raw "(select jsonb_array_elements_text(basket_products.payload -> 'modifiers'))")]]
+   :where     [:= :basket_products.basket_id basket-id]
+   :group-by  [:basket_products.id]})
+
+
+(defn basket-totals-query
+  [basket-id]
+  {:with   [[:basket_products_totals (basket-products-totals-query basket-id)]]
+   :select [[(hs/raw "coalesce(sum((totals.products_cost + totals.modifiers_cost) * totals.count)::int, 0)") :total_cost]]
+   :from   [[:basket_products_totals :totals]]})
+
+
 (defn disabled-products-query
   [kitchen-id]
   {:select [:disabled_products.product_id]
@@ -34,10 +55,32 @@
    :where  [:= :disabled_products.kitchen_id kitchen-id]})
 
 
+(defn modifiers!
+  []
+  (->> (-> {:select [:modifiers.id
+                     :modifiers.name
+                     :modifiers.group_id
+                     :modifiers.price]
+            :from   [:modifiers]}
+           (hs/format))
+       (jdbc/query db/db)
+       (map #(-> %
+                 (cu/keywordize-field :name)
+                 (update :id str)
+                 (update :group_id str)))))
+
+
+(defn get-modifier
+  [all-modifiers]
+  (fn [id]
+    (first (filter #(= id (:id %)) all-modifiers))))
+
+
 (defn keywordize-json-fields
   [product]
   (-> product
       (cu/keywordize-field :category)
+      (cu/keywordize-field :payload)
       (cu/keywordize-field :description)
       (cu/keywordize-field :name)))
 
@@ -78,27 +121,19 @@
         (map keywordize-json-fields))))
 
 
-(defn basket-cost-query
-  [basket-id]
-  {:select [[(hs/raw "coalesce(sum(products.price * basket_products.count), 0)") :cost]]
-   :from   [:basket_products :products]
-   :where  [:and
-            [:= :basket_products.basket_id basket-id]
-            [:= :products.id :basket_products.product_id]]})
-
-
 (defn product-detail-state-query
   [basket-id]
   {:select    [:products.id
                :products.name
                :products.description
+               :products.payload
                :products.price
                :products.photo
                :products.thumbnail
                :products.energy
                :categories.emoji
                [:categories.name :category]
-               [(basket-cost-query basket-id) :basket_cost]
+               [(basket-totals-query basket-id) :basket_cost]
                [(hs/raw "coalesce(basket_products.count, 0)") :count_in_basket]]
    :from      [:products]
    :where     [:= :products.is_active true]
@@ -117,11 +152,23 @@
       (hs/format)))
 
 
+(defn attach-modifiers!
+  [product]
+  (let [modifier-groups (get-in product [:payload :groupModifiers])]
+    (assoc product :modifiers (map (fn [mg]
+                                     (assoc
+                                       mg
+                                       :modifiers
+                                       (map (get-modifier (modifiers!)) (:modifiers mg))))
+                                   modifier-groups))))
+
+
 (defn state-for-product-detail!
   [basket-id id]
   (->> (product-detail-state-by-id-query basket-id id)
        (jdbc/query db/db)
        (map keywordize-json-fields)
+       (map attach-modifiers!)
        (first)))
 
 
@@ -281,11 +328,11 @@
 
 (defn basket-cost!
   [basket-id]
-  (->> (basket-cost-query basket-id)
+  (->> (basket-totals-query basket-id)
        (hs/format)
        (jdbc/query db/db)
        (first)
-       (:cost)))
+       (:total_cost)))
 
 
 (defn menu-state!

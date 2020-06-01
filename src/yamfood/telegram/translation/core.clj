@@ -47,6 +47,10 @@
         :added-to-basket-message         "Добавлено в корзину"
         :more-button                     "\uD83C\uDF7D Еще?"
         :add-product-button              "Хочу"
+        :construct-product-button        "Собрать"
+        :construct-product-next-button   "Дальше"
+        :construct-product-back-button   "Назад"
+        :construct-product-success-text  "Блюдо успешно собрано и добавлено в корзину!"
         :product-basket-button           (str e/basket-emoji " Корзина ({1} сум)")
         :product-menu-button             (str e/back-emoji " Назад")
         :product-caption                 (str e/food-emoji " *{name}* \n\n"
@@ -54,7 +58,8 @@
                                               e/money-emoji "{price} сум")
 
         ; Basket
-        :basket-message                  "Ваша корзина:"
+        :basket-message                  (str "Ваша корзина:\n\n"
+                                              "_Коснитесь блюда чтобы посмотреть детали_")
         :empty-basket-text               "К сожалению, ваша корзина пока пуста :("
         :basket-menu-button              (str e/back-emoji " В меню")
         :to-order-button                 "✅ Далее"
@@ -153,13 +158,18 @@
         :added-to-basket-message         "Added to cart"
         :more-button                     "\uD83C\uDF7D More?"
         :add-product-button              "Want"
+        :construct-product-button        "Construct"
+        :construct-product-next-button   "Next"
+        :construct-product-back-button   "Back"
+        :construct-product-success-text  "The dish was successfully constructed and added to the basket!"
         :product-basket-button           (str e/basket-emoji " Cart ({1} sum)")
         :product-menu-button             (str e/back-emoji " Back")
         :product-caption                 (str e/food-emoji " *{name}* \n\n"
                                               e/money-emoji "{price} sum")
 
         ; Basket
-        :basket-message                  "Your Cart:"
+        :basket-message                  (str "Your Cart:\n\n"
+                                              "_Tap a dish to view details_")
         :empty-basket-text               "Unfortunately, your Cart is still empty :("
         :basket-menu-button              (str e/back-emoji " Into menu")
         :to-order-button                 "✅ Further"
@@ -258,14 +268,19 @@
         :added-to-basket-message         "Savatga qo'shilgan"
         :more-button                     "\uD83C\uDF7D Yana?"
         :add-product-button              "Istayman"
+        :construct-product-button        "Yig'ish"
+        :construct-product-next-button   "Keyingi"
+        :construct-product-back-button   "Orqaga"
+        :construct-product-success-text  "Ovqat yig'ildi va savatga qo'shildi"
         :product-basket-button           (str e/basket-emoji " Savat ({1} so'm)")
-        :product-menu-button             (str e/back-emoji " Назад")
+        :product-menu-button             (str e/back-emoji " Orqaga")
         :product-caption                 (str e/food-emoji " *{name}* \n\n"
                                               "{description}"
                                               e/money-emoji "{price} so'm")
 
         ; Basket
-        :basket-message                  "Sizning savatingiz:"
+        :basket-message                  (str "Sizning savatingiz:\n\n"
+                                              "_Tafsilotlarini ko'rish uchun taomni bosing_")
         :empty-basket-text               "Afsuski, sizning savatingiz hali bo'sh :("
         :basket-menu-button              (str e/back-emoji " Menyuga")
         :to-order-button                 "✅ Keyingi"

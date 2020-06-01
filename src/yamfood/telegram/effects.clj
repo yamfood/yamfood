@@ -125,6 +125,17 @@
 
 
 (d/register-effect-handler!
+  :edit-photo
+  (fn [ctx effect]
+    (-t/edit-caption
+      (:token ctx)
+      (:chat-id effect)
+      (:message-id effect)
+      (:options effect)
+      (:caption effect))))
+
+
+(d/register-effect-handler!
   :send-invoice
   (fn [ctx effect]
     (-t/send-invoice

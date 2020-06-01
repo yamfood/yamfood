@@ -1,5 +1,6 @@
 (ns yamfood.telegram.handlers.client.basket
   (:require
+    [clojure.string :as str]
     [yamfood.telegram.dispatcher :as d]
     [yamfood.core.clients.core :as clients]
     [yamfood.core.baskets.core :as baskets]
@@ -50,7 +51,7 @@
 (defn basket-product-markup
   [lang]
   (fn [val product]
-    (apply conj val [[{:callback_data "nothing"
+    (apply conj val [[{:callback_data (str "basket-product-info/" (:bp_id product))
                        :text          (format (str e/food-emoji " %d x %s")
                                               (:count product)
                                               (u/translated lang (:name product)))}]
@@ -59,7 +60,7 @@
                        "basket"
                        (:id product)
                        (format "%s сум"
-                               (u/fmt-values (* (:price product) (:count product)))))])))
+                               (u/fmt-values (* (:total_cost product) (:count product)))))])))
 
 
 (defn basket-detail-products-markup
@@ -114,9 +115,46 @@
                          :reply_markup (basket-detail-markup lang basket-state)}}))
 
 
+(defn product-modifiers-text
+  [lang modifiers]
+  (str/join ", " (doall (map #(u/translated lang (:name %)) modifiers))))
+
+
+(defn product-info-text
+  [lang product]
+  (let [modifiers-text (product-modifiers-text lang (:modifiers product))
+        modifiers-text (if (seq modifiers-text) (format "(%s)" modifiers-text) modifiers-text)]
+    (format (str e/food-emoji " %s %s")
+            (u/translated lang (:name product))
+            modifiers-text)))
+
+
+(defn product-info-handler
+  ([ctx]
+   (let [update (:update ctx)
+         query (:callback_query update)
+         params (u/callback-params (:data query))
+         basket-product-id (u/parse-int (first params))]
+     {:run {:function   baskets/basket-product-detail!
+            :args       [basket-product-id]
+            :next-event :c/basket-product-info}}))
+  ([ctx product]
+   (let [update (:update ctx)
+         lang (:lang ctx)
+         query (:callback_query update)]
+     {:answer-callback {:callback_query_id (:id query)
+                        :text              (product-info-text lang product)
+                        :show_alert        true}})))
+
+
 (d/register-event-handler!
   :c/basket
   basket-handler)
+
+
+(d/register-event-handler!
+  :c/basket-product-info
+  product-info-handler)
 
 
 (d/register-event-handler!

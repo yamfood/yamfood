@@ -29,23 +29,52 @@
          #(and (= (:parentGroup %) category-id)
                (:isIncludedInMenu %))
          (:products nomenclature))
-       (sort-by :order)
-       (map #(select-keys % [:id :name :price :order]))))
+       (sort-by :order)))
+
+
+(defn modifiers
+  [nomenclature]
+  (->> (filter
+         #(= "modifier" (:type %))
+         (:products nomenclature))))
+
+
+(defn iiko->modifier
+  [modifier]
+  {:id    (:id modifier)
+   :price (:price modifier)
+   :name  {:ru (:name modifier)}})
+
+
+(defn iiko->modifier-group
+  [modifier-group]
+  {:required  (:required modifier-group)
+   :modifiers (map :modifierId (:childModifiers modifier-group))})
+
 
 
 (defn iiko->product
   [iiko-product]
   {:name     {:ru (:name iiko-product)}
-   :payload  {:iiko_id (:id iiko-product)}
+   :payload  {:iiko_id        (:id iiko-product)
+              :groupModifiers (map iiko->modifier-group (:groupModifiers iiko-product))}
    :price    (:price iiko-product)
    :position (:order iiko-product)})
 
 
+(defn modifier->item-modifier
+  [modifier]
+  {:id      (:id modifier)
+   :groupId (:group_id modifier)
+   :amount  1})
+
+
 (defn product->item
   [product]
-  {:id      (:iiko_id (:payload product))
-   :amount  (:count product)
-   :comment (:comment product)})
+  {:id        (:iiko_id (:payload product))
+   :amount    (:count product)
+   :comment   (:comment product)
+   :modifiers (map modifier->item-modifier (:modifiers product))})
 
 
 (defn get-iiko-payment-type

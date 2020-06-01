@@ -3,10 +3,14 @@
 
 (defn- keywordize
   [data]
-  (into
-    {}
-    (for [[k v] data]
-      [(keyword k) (if (map? v) (keywordize v) v)])))
+  (if (map? data)
+    (into {}
+          (for [[key val] data]
+            [(keyword key) (cond
+                             (map? val) (keywordize val)
+                             (vector? val) (map keywordize val)
+                             :else val)]))
+    data))
 
 
 (defn keywordize-field

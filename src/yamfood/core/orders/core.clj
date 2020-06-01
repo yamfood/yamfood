@@ -6,7 +6,8 @@
     [clojure.java.jdbc :as jdbc]
     [yamfood.core.db.core :as db]
     [yamfood.core.clients.core :as clients]
-    [yamfood.telegram.handlers.utils :as u]))
+    [yamfood.telegram.handlers.utils :as u]
+    [yamfood.core.products.core :as products]))
 
 
 (def order-statuses
@@ -41,23 +42,25 @@
     (db/point->clj (:location order))))
 
 
-(defn- order-totals-query
+(defn order-products-totals-query
   [order-id]
-  {:select [(hs/raw "coalesce(sum(order_products.count * products.price), 0) as total_cost")
-            (hs/raw "coalesce(sum(order_products.count * products.energy), 0) as total_energy")]
-   :from   [:order_products :products]
-   :where  [:and
-            [:= :order_products.order_id order-id]
-            [:= :products.id :order_products.product_id]]})
+  {:select    [[(hs/raw "sum(distinct products.price)") :products_cost]
+               [(hs/raw "coalesce(sum(modifiers.price), 0)") :modifiers_cost]
+               [:order_products.count :count]]
+   :from      [:order_products]
+   :left-join [:products [:= :order_products.product_id :products.id]
+               :modifiers [:in
+                           (hs/raw "modifiers.id::text")
+                           (hs/raw "(select jsonb_array_elements_text(order_products.payload -> 'modifiers'))")]]
+   :where     [:= :order_products.order_id order-id]
+   :group-by  [:order_products.id]})
 
 
-(defn order-total-sum-query
+(defn order-totals-query
   [order-id]
-  {:select [(hs/raw "coalesce(sum(order_products.count * products.price), 0) as total_cost")]
-   :from   [:order_products :products]
-   :where  [:and
-            [:= :order_products.order_id order-id]
-            [:= :products.id :order_products.product_id]]})
+  {:with   [[:order_products_totals (order-products-totals-query order-id)]]
+   :select [[(hs/raw "sum((totals.products_cost + totals.modifiers_cost) * totals.count)::int") :total_cost]]
+   :from   [[:order_products_totals :totals]]})
 
 
 (defn order-totals!
@@ -72,6 +75,7 @@
   [basket-id]
   {:select    [:basket_products.product_id
                :basket_products.count
+               :basket_products.payload
                :categories.is_delivery_free]
    :from      [:basket_products :products]
    :where     [:and
@@ -79,18 +83,6 @@
                [:= :basket_products.product_id :products.id]]
    :left-join [:categories
                [:= :products.category_id :categories.id]]})
-
-
-(def last-order-log-query
-  {:select   [(hs/raw "DISTINCT ON (order_logs.order_id) *")]
-   :from     [:order_logs]
-   :order-by [:order_logs.order_id [:order_logs.id :desc]]})
-
-
-;JOIN (select DISTINCT ON (logs.order_id) *
-;             from order_logs as logs
-;             ORDER BY logs.order_id, logs.id desc) last_log on (last_log.order_id = orders.id)
-
 
 
 (def last-order-log-query
@@ -116,7 +108,7 @@
                [(hs/raw "clients.payload->'lang'") :lang]
                [:riders.name :rider_name]
                [:riders.phone :rider_phone]
-               [(order-total-sum-query :orders.id) :total_sum]
+               [(order-totals-query :orders.id) :total_sum]
                [:last_log.status :status]
                :orders.comment
                :orders.notes
@@ -136,11 +128,10 @@
   {:select    [:products.id
                :products.name
                :products.price
-               :products.payload
+               [(hs/raw "products.payload || order_products.payload") :payload]
                :order_products.comment
                :order_products.count
-               :categories.is_delivery_free
-               [(hs/call :* :order_products.count :products.price) :total]]
+               :categories.is_delivery_free]
    :from      [:order_products :products]
    :left-join [:categories [:= :categories.id :products.category_id]]
    :where     [:= :order_products.product_id :products.id]})
@@ -164,9 +155,34 @@
          (map keywordize-fn))))
 
 
+(defn add-modifiers
+  [all-modifiers]
+  (fn [product]
+    (-> product
+        (assoc :modifiers
+               (map (products/get-modifier all-modifiers) (:modifiers (:payload product)))))))
+
+
+(defn calculate-price
+  [product]
+  (let [modifiers (:modifiers product)
+        modifiers-cost (reduce + (map :price modifiers))
+        price (+ (:price product) modifiers-cost)
+        total (* price (:count product))]
+    (-> product
+        (assoc :price price)
+        (assoc :total total))))
+
+
 (defn add-products!
   [order]
-  (assoc order :products (products-by-order-id! (:id order))))
+  (let [all-modifiers (products/modifiers!)
+        products (products-by-order-id! (:id order))
+        products (map #(-> %
+                           ((add-modifiers all-modifiers))
+                           (calculate-price))
+                      products)]
+    (assoc order :products products)))
 
 
 (defn orders-by-client-id-query
@@ -368,7 +384,7 @@
                                          payment
                                          delivery-cost))]
         (->> products
-             (map #(select-keys % [:product_id :count]))
+             (map #(select-keys % [:product_id :payload :count]))
              (map #(assoc % :order_id order-id))
              (jdbc/insert-multi! db/db "order_products"))
         (when (= payment u/cash-payment)
