@@ -1,5 +1,6 @@
 (ns yamfood.tasks.announcements
   (:require
+    [clojure.tools.logging :as log]
     [yamfood.core.clients.core :as c]
     [yamfood.core.bots.core :as bots]
     [yamfood.core.announcements.core :as a]
@@ -35,7 +36,7 @@
 (defn announcements-daemon!
   []
   (try
-    (println "Looking for new announcements...")
+    (log/info "Looking for new announcements...")
     (doall
       (->> (a/announcements-to-send!)
            (map send-announcement!)))
