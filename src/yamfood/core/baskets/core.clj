@@ -42,6 +42,29 @@
     (assoc product :total_cost (+ price modifiers-cost))))
 
 
+(defn- disabled-products-query [basket-id kitchen-id]
+  (hs/format
+    {:select    [:products.*, :categories.emoji, :basket_products.count]
+     :from      [:baskets]
+     :join      [:basket_products [:= :baskets.id :basket_products.basket_id]
+                 :products [:= :basket_products.product_id :products.id]]
+     :left-join [:categories [:= :products.category_id :categories.id]
+                 :disabled_products [:= :basket_products.product_id :disabled_products.product_id]]
+     :where     [:and
+                 [:= :baskets.id basket-id]
+                 [:= :disabled_products.kitchen_id kitchen-id]
+                 [:or
+                  [:!= :disabled_products nil]
+                  [:not :products.is_active]]]}))
+
+
+(defn- remove-basket-products-query
+  [product-ids]
+  (hs/format
+    {:delete-from :basket_products
+     :where       [:in :product_id product-ids]}))
+
+
 (defn- basket-products!
   [basket-id]
   (let [all-modifiers (products/modifiers!)]
@@ -138,3 +161,14 @@
                    (cu/keywordize-field :payload)
                    ((add-modifiers! all-modifiers))))
          (first))))
+
+
+(defn remove-basket-products! [product-ids]
+  (jdbc/execute! db/db (remove-basket-products-query product-ids)))
+
+
+(defn disabled-basket-products!
+  [basket-id kitchen-id]
+  (->> (disabled-products-query basket-id kitchen-id)
+       (jdbc/query db/db)
+       (map #(cu/keywordize-field % :name))))

@@ -19,11 +19,11 @@
 
 
 (mount/defstate ^{:on-reload :noop} server
-                :start
-                (when (env :nrepl-port)
-                  (do
-                    (log/info "Starting REPL server on port" (env :nrepl-port))
-                    (nrepl/start-server :port (env :nrepl-port) :bind (env :nrepl-bind))))
-                :stop
-                (when (env :nrepl-port)
-                  (nrepl/stop-server server)))
+  :start
+  (when (env :nrepl-port)
+    (do
+      (log/info "Starting REPL server on port" (env :nrepl-port))
+      (nrepl/start-server :port (Integer. (env :nrepl-port)) :bind (env :nrepl-bind))))
+  :stop
+  (when (env :nrepl-port)
+    (nrepl/stop-server server)))
