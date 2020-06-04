@@ -1,7 +1,9 @@
 (ns user
   (:require
-    [yamfood.core]
     [yamfood.nrepl]
+    [yamfood.core.db.core]
+    [yamfood.core]
+    [yamfood.tasks.core]
     [mount.core :as mount]
     [environ.core :refer [env]]
     [migratus.core :as migratus]

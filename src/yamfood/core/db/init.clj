@@ -1,11 +1,14 @@
 (ns yamfood.core.db.init
   (:require
     [migratus.core :as migratus]
-    [yamfood.core.db.migrations :as m]))
+    [yamfood.core.db.migrations :as m]
+    [yamfood.core.db.core :refer [db]]
+    [mount.core :as mount]))
 
 
 (defn init []
-  (migratus/migrate m/config))
+  (mount/start #'db)
+  (migratus/migrate (m/config)))
 
 
 ;(init)
