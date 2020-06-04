@@ -47,10 +47,9 @@
   (let [payment (get-in order-state [:client :payload :payment])]
     {:inline_keyboard
      [[{:text (translate lang :oc-location-button) :callback_data "request-location"}]
-      ; !!! Commented because of payme temporary disabling bot payments API
-      ;[{:text (if (= payment u/card-payment)
-      ;          (str e/card-emoji " " (translate lang :card))
-      ;          (str e/cash-emoji " " (translate lang :cash))) :callback_data "switch-payment-type"}]
+      [{:text (if (= payment u/card-payment)
+                (str e/card-emoji " " (translate lang :card))
+                (str e/cash-emoji " " (translate lang :cash))) :callback_data "switch-payment-type"}]
       [{:text (translate lang :oc-comment-button) :callback_data "change-comment"}]
       [{:text (translate lang :oc-basket-button) :callback_data "basket"}]
       [{:text (translate lang :oc-create-order-button) :callback_data "create-order"}]]}))
@@ -65,10 +64,8 @@
                    0)]
     (translate lang :oc-message
                {:price    (u/fmt-values price)
-                ; !!! Commented because of payme temporary disabling bot payments API
-                ;:payment  (translate lang (keyword (or (get-in order-state [:client :payload :payment])
-                ;                                       "cash")))
-                :payment  (translate lang :cash)
+                :payment  (translate lang (keyword (or (get-in order-state [:client :payload :payment])
+                                                       "cash")))
                 :comment  (or (:comment (:payload (:client order-state)))
                               (translate lang :oc-empty-comment-text))
                 :delivery (u/fmt-values delivery)
@@ -151,10 +148,8 @@
          basket-id (:basket_id (:client ctx))
          payload (:payload (:client ctx))
          location (:location payload)
-         ; !!! Commented because of payme temporary disabling bot payments API
-         ;payment (or (:payment payload)
-         ;            u/cash-payment)
-         payment u/cash-payment
+         payment (or (:payment payload)
+                     u/cash-payment)
          comment (:comment payload)
          address (:address location)
          card? (= payment u/card-payment)
