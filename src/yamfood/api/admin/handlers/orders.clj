@@ -239,7 +239,7 @@
     (assoc log :info (cond
                        rider-id (str "Курьер: " (:phone (r/rider-by-id! rider-id)))
                        admin-id (str "Администратор: " (:name (a/admin-by-id! admin-id)))
-                       payment-id (str "Click ID: " payment-id)))))
+                       payment-id (str "Payme ID: " payment-id)))))
 
 
 (defn order-logs
