@@ -20,7 +20,7 @@
      :home            (:iiko-home params)
      :street          (:iiko-street params)
      :payments        {:cash (:id (first (filter #(= (:code %) "CASH") iiko-payment-types)))
-                       :card (:id (first (filter #(= (:code %) "PAYME") iiko-payment-types)))}}))
+                       :card (:id (first (filter #(= (:code %) "CLICK") iiko-payment-types)))}}))
 
 
 (defn create-order!
