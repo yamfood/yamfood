@@ -234,7 +234,8 @@
 
 (defn ended-orders-query
   [offset limit]
-  {:with   [[:cte_orders order-detail-query]]
+  {:with   [[:cte_orders (-> order-detail-query
+                             (assoc :order-by [[:orders.id :desc]]))]]
    :select [:*]
    :from   [:cte_orders]
    :where  [:in :cte_orders.status ended-order-statuses]
@@ -249,7 +250,6 @@
    (ended-orders! offset limit nil))
   ([offset limit where]
    (->> (-> (ended-orders-query offset limit)
-            (assoc :order-by [[:cte_orders.id :desc]])
             (hh/merge-where where))
         (hs/format)
         (jdbc/query db/db)
