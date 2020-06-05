@@ -24,4 +24,6 @@
     (println "Looking for new sms...")
     (doall
       (->> (sms-core/sms-to-send! 50)
-           (pmap send-sms!)))))
+           (pmap send-sms!)))
+    (catch Exception e
+      (println e))))
