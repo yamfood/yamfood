@@ -22,7 +22,7 @@
   :start
   (when (env :nrepl-port)
     (do
-      (log/info "Starting REPL server on port" (env :nrepl-port))
+      (log/info "Starting REPL server on port" (env :nrepl-bind) ":" (Integer. (env :nrepl-port)))
       (nrepl/start-server :port (Integer. (env :nrepl-port)) :bind (env :nrepl-bind))))
   :stop
   (when (env :nrepl-port)

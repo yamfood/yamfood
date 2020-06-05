@@ -1,5 +1,6 @@
 (ns yamfood.tasks.sms
   (:require
+    [clojure.tools.logging :as log]
     [yamfood.core.params.core :as p]
     [yamfood.core.sms.core :as sms-core]
     [yamfood.integrations.sms.core :as sms-api]))
@@ -21,7 +22,7 @@
 (defn sms-daemon!
   []
   (try
-    (println "Looking for new sms...")
+    (log/info "Looking for new sms...")
     (doall
       (->> (sms-core/sms-to-send! 50)
            (pmap send-sms!)))

@@ -1,0 +1,18 @@
+version: '3.4'
+services:
+  bot:
+    image: clojure:openjdk-8-lein-slim-buster
+    working_dir: /app
+    command: lein trampoline run
+    ports:
+      - 7777:3000
+      - 7001:7000
+    volumes:
+      - ./:/app
+      - ~/.m2:/root/.m2
+    environment:
+      - PORT=3000
+      - LIQ_TOKEN="c081648b5122e8"
+      - NREPL_PORT=7000
+      - NREPL_BIND=0.0.0.0
+      - DATABASE_URL=""
