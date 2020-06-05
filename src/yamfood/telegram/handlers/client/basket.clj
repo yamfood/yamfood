@@ -97,7 +97,8 @@
         message-id (:message_id (:message query))]
     {:send-text      {:chat-id chat-id
                       :text    (translate lang :basket-message)
-                      :options {:reply_markup (basket-detail-markup lang basket-state)}}
+                      :options {:parse_mode "markdown"
+                                :reply_markup (basket-detail-markup lang basket-state)}}
      :delete-message {:chat-id    chat-id
                       :message-id message-id}
      :run            {:function clients/update-payload!
