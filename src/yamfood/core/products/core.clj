@@ -215,6 +215,28 @@
        (keywordize-json-fields)))
 
 
+(defn update-product-by-iiko-id!
+  ([iiko-id product]
+   (update-product-by-iiko-id! iiko-id product db/db))
+  ([iiko-id product db]
+   (->> {:update :products
+         :set    product
+         :where  [:= (hs/raw "products.payload->>'iiko_id'") iiko-id]}
+        (hs/format)
+        (jdbc/execute! db))))
+
+
+(defn update-modifier!
+  ([id modifier]
+   (update-modifier! id modifier db/db))
+  ([id modifier db]
+   (->> {:update :modifiers
+         :set    modifier
+         :where  [:= :id id]}
+        (hs/format)
+        (jdbc/execute! db))))
+
+
 (defn all-categories!
   []
   (->> all-categories-query
