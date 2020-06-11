@@ -9,7 +9,7 @@
 (defn uuid [] (str (UUID/randomUUID)))
 
 
-(defn str-uuid [s] (UUID/fromString s))
+(defn str->uuid [s] (UUID/fromString s))
 
 
 (defn str->int [s]

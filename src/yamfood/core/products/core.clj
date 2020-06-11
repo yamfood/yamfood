@@ -4,7 +4,9 @@
     [honeysql.helpers :as hh]
     [yamfood.core.utils :as cu]
     [clojure.java.jdbc :as jdbc]
-    [yamfood.core.db.core :as db]))
+    [yamfood.core.db.core :as db]
+    [yamfood.integrations.iiko.utils :as utils]
+    [yamfood.utils :as u]))
 
 
 (def all-products-query
@@ -215,26 +217,22 @@
        (keywordize-json-fields)))
 
 
-(defn update-product-by-iiko-id!
-  ([iiko-id product]
-   (update-product-by-iiko-id! iiko-id product db/db))
-  ([iiko-id product db]
-   (->> {:update :products
-         :set    product
-         :where  [:= (hs/raw "products.payload->>'iiko_id'") iiko-id]}
-        (hs/format)
-        (jdbc/execute! db))))
-
-
-(defn update-modifier!
-  ([id modifier]
-   (update-modifier! id modifier db/db))
-  ([id modifier db]
-   (->> {:update :modifiers
-         :set    modifier
-         :where  [:= :id id]}
-        (hs/format)
-        (jdbc/execute! db))))
+(defn update-iiko-products [iiko-products]
+  (let [grouped-by-type (group-by :type iiko-products)]
+    (jdbc/with-db-transaction
+      [t-con db/db]
+      (doseq [dish (get grouped-by-type "dish")]
+        (jdbc/update!
+          t-con
+          "products"
+          (update (utils/iiko->product dish) :payload db/map->jsonb)
+          ["products.payload->>'iiko_id' = ?" (:id dish)]))
+      (doseq [modifier (get grouped-by-type "modifier")]
+        (jdbc/update!
+          t-con
+          "modifiers"
+          (utils/iiko->modifier modifier)
+          ["modifiers.id = ?" (u/str->uuid (:id modifier))])))))
 
 
 (defn all-categories!

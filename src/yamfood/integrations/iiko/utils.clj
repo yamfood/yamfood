@@ -39,13 +39,6 @@
          (:products nomenclature))))
 
 
-(defn iiko->modifier
-  [modifier]
-  {:id    (:id modifier)
-   :price (:price modifier)
-   :name  {:ru (:name modifier)}})
-
-
 (defn iiko->modifier-group
   [modifier-group]
   {:required  (:required modifier-group)
@@ -63,7 +56,6 @@
 (defn iiko->modifier
   [iiko-modifier]
   {:price (:price iiko-modifier)})
-
 
 
 (defn modifier->item-modifier
