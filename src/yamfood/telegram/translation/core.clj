@@ -47,9 +47,9 @@
         :added-to-basket-message         "Добавлено в корзину"
         :more-button                     "\uD83C\uDF7D Еще?"
         :add-product-button              "Хочу"
-        :construct-product-button        "Собрать"
-        :construct-product-next-button   "Дальше"
-        :construct-product-back-button   "Назад"
+        :construct-product-button        "Хочу"
+        :construct-product-next-button   "✅ Дальше"
+        :construct-product-back-button   (str e/back-emoji " Назад")
         :construct-product-success-text  "Блюдо успешно собрано и добавлено в корзину!"
         :product-basket-button           (str e/basket-emoji " Корзина ({1} сум)")
         :product-menu-button             (str e/back-emoji " Назад")
@@ -159,9 +159,9 @@
         :added-to-basket-message         "Added to cart"
         :more-button                     "\uD83C\uDF7D More?"
         :add-product-button              "Want"
-        :construct-product-button        "Construct"
-        :construct-product-next-button   "Next"
-        :construct-product-back-button   "Back"
+        :construct-product-button        "Want"
+        :construct-product-next-button   "✅ Next"
+        :construct-product-back-button   (str e/back-emoji " Back")
         :construct-product-success-text  "The dish was successfully constructed and added to the basket!"
         :product-basket-button           (str e/basket-emoji " Cart ({1} sum)")
         :product-menu-button             (str e/back-emoji " Back")
@@ -270,9 +270,9 @@
         :added-to-basket-message         "Savatga qo'shilgan"
         :more-button                     "\uD83C\uDF7D Yana?"
         :add-product-button              "Istayman"
-        :construct-product-button        "Yig'ish"
-        :construct-product-next-button   "Keyingi"
-        :construct-product-back-button   "Orqaga"
+        :construct-product-button        "Istayman"
+        :construct-product-next-button   "✅ Keyingi"
+        :construct-product-back-button   (str e/back-emoji " Orqaga")
         :construct-product-success-text  "Ovqat yig'ildi va savatga qo'shildi"
         :product-basket-button           (str e/basket-emoji " Savat ({1} so'm)")
         :product-menu-button             (str e/back-emoji " Orqaga")

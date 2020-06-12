@@ -197,9 +197,6 @@
    :where  [:in :cte_orders.status active-order-statuses]})
 
 
-(hs/format active-orders-query)
-
-
 (defn client-finished-orders!
   [client-id]
   (->> (-> {:with   [[:cte_orders order-detail-query]]

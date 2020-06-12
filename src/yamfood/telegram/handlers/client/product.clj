@@ -137,16 +137,25 @@
   (let [groups (:modifiers state)
         current-group (nth groups (dec step))
         modifiers (:modifiers current-group)
+        required? (:required current-group)
+        selected-modifiers (:selected-modifiers state)
+        selected-in-group (filter #(utils/in? (:selected-modifiers state) (:id %))
+                                  modifiers)
         callback-data (if (= step (count groups))
                         (str "construct-finish/" product-id)
                         (str "construct/" product-id "/" (inc step)))]
     {:inline_keyboard
      (into (reduce
-             (modifiers-reducer lang product-id step (:selected-modifiers state))
+             (modifiers-reducer lang product-id step selected-modifiers)
              []
              modifiers)
-           [[{:text (translate lang :construct-product-next-button) :callback_data callback-data}]
-            [{:text (translate lang :construct-product-back-button) :callback_data (str "construct/" product-id "/" (dec step))}]])}))
+           (remove
+             nil?
+             [(cond
+                (not required?) [{:text (translate lang :construct-product-next-button) :callback_data callback-data}]
+                (seq selected-in-group) [{:text (translate lang :construct-product-next-button) :callback_data callback-data}]
+                :else nil)
+              [{:text (translate lang :construct-product-back-button) :callback_data (str "construct/" product-id "/" (dec step))}]]))}))
 
 
 (defn constructed-product-caption!
