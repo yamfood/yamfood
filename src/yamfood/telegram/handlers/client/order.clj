@@ -42,14 +42,27 @@
                                         :token    (:token ctx)}}}))))
 
 
+(defn payment-buttons
+  [lang current-payment]
+  (let [emoji "☑️ "]
+    [{:text          (str (when (= current-payment u/cash-payment) emoji)
+                          (translate lang :cash))
+      :callback_data (if (= current-payment u/cash-payment)
+                       "nothing"
+                       "switch-payment-type")}
+     {:text          (str (when (= current-payment u/card-payment) emoji)
+                          (translate lang :card))
+      :callback_data (if (= current-payment u/card-payment)
+                       "nothing"
+                       "switch-payment-type")}]))
+
+
 (defn order-confirmation-markup
   [lang order-state]
   (let [payment (get-in order-state [:client :payload :payment])]
     {:inline_keyboard
-     [[{:text (translate lang :oc-location-button) :callback_data "request-location"}]
-      [{:text (if (= payment u/card-payment)
-                (str e/card-emoji " " (translate lang :card))
-                (str e/cash-emoji " " (translate lang :cash))) :callback_data "switch-payment-type"}]
+     [(payment-buttons lang payment)
+      [{:text (translate lang :oc-location-button) :callback_data "request-location"}]
       [{:text (translate lang :oc-comment-button) :callback_data "change-comment"}]
       [{:text (translate lang :oc-basket-button) :callback_data "basket"}]
       [{:text (translate lang :oc-create-order-button) :callback_data "create-order"}]]}))
