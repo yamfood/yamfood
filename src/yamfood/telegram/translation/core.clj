@@ -76,7 +76,8 @@
                                               e/money-emoji " {total} сум ({payment})\n\n"
                                               e/comment-emoji " `{comment}` \n\n"
                                               e/location-emoji " *{address}* \n\n"
-                                              " _❗️Вы заказываете на указанный выше адрес, при необходимости измените его_")
+                                              " _❗️Вы заказываете на указанный выше адрес, при необходимости измените его_\n\n"
+                                              "\uD83D\uDD15 Мы больше не звоним для подтверждения заказа, пожалуйста, убедитесь что вы верно оформили заказ")
 
         ; Active Order
         :active-order-message            (str "*Заказ №{1}:*\n\n"
@@ -187,7 +188,8 @@
                                               e/money-emoji " {total} sum ({payment})\n"
                                               e/comment-emoji " `{comment}` \n\n"
                                               e/location-emoji " *{address}* \n\n"
-                                              " _❗️You order to the above address, change it if necessary_")
+                                              " _❗️You order to the above address, change it if necessary_ \n\n"
+                                              "\uD83D\uDD15 We are not calling to confirm the order anymore, please make sure that you correctly placed the order")
 
         ; Active Order
         :active-order-message            (str "*Order №{1}:*\n\n"
@@ -299,7 +301,8 @@
                                               e/money-emoji " {total} so'm ({payment})\n"
                                               e/comment-emoji " `{comment}` \n\n"
                                               e/location-emoji " *{address}* \n\n"
-                                              " _❗️Yuqoridagi manzilga buyurtma beryapsiz, agar kerak bo'lsa, uni o'zgartiring_")
+                                              " _❗️Yuqoridagi manzilga buyurtma beryapsiz, agar kerak bo'lsa, uni o'zgartiring_\n\n"
+                                              "\uD83D\uDD15 Buyurtmani tasdiqlash uchun endi qo'ng'iroq qilmaymiz, iltimos, to'g'ri buyurtma berganingizga ishonch hosil qiling")
 
         ; Active Order
         :active-order-message            (str "*Buyurtma №{1}:*\n\n"
