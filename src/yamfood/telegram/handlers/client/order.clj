@@ -77,8 +77,6 @@
                    0)]
     (translate lang :oc-message
                {:price    (u/fmt-values price)
-                :payment  (translate lang (keyword (or (get-in order-state [:client :payload :payment])
-                                                       "cash")))
                 :comment  (or (:comment (:payload (:client order-state)))
                               (translate lang :oc-empty-comment-text))
                 :delivery (u/fmt-values delivery)

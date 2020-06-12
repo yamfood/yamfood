@@ -6,7 +6,7 @@
 (def cash-emoji "\uD83D\uDCB5")
 (def card-emoji "\uD83D\uDCB3")
 (def comment-emoji "\uD83D\uDCAC")
-(def basket-emoji "\uD83E\uDDFA")
+(def basket-emoji "\uD83D\uDED2")
 (def food-emoji "\uD83E\uDD57")
 (def delivery-emoji "🛵")
 (def energy-emoji "\uD83D\uDD0B")

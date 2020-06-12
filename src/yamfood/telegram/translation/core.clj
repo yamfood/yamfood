@@ -62,22 +62,22 @@
                                               "_Коснитесь блюда чтобы посмотреть детали_")
         :empty-basket-text               "К сожалению, ваша корзина пока пуста :("
         :basket-menu-button              (str e/back-emoji " В меню")
-        :to-order-button                 "✅ Далее"
+        :to-order-button                 "Далее ➡️"
 
         ; Order Confirmation
         :oc-basket-button                (str e/back-emoji " Корзина")
         :oc-location-button              (str e/location-emoji " Изменить локацию")
         :oc-comment-button               (str e/comment-emoji " Комментарий")
-        :oc-create-order-button          "✅ Подтвердить"
+        :oc-create-order-button          "✅ Все проверил, заказываю"
         :oc-empty-comment-text           "Укажите комментарий к адресу или к заказу"
         :oc-message                      (str "*Детали вашего заказа:* \n\n"
                                               e/food-emoji " {price} сум\n"
                                               e/delivery-emoji " {delivery} сум\n"
-                                              e/money-emoji " {total} сум ({payment})\n\n"
+                                              e/money-emoji " {total} сум\n\n"
                                               e/comment-emoji " `{comment}` \n\n"
                                               e/location-emoji " *{address}* \n\n"
-                                              " _❗️Вы заказываете на указанный выше адрес, при необходимости измените его_\n\n"
-                                              "\uD83D\uDD15 Мы больше не звоним для подтверждения заказа, пожалуйста, убедитесь что вы верно оформили заказ")
+                                              " _❗️Пожалуйста, проверьте адрес_\n\n"
+                                              "_\uD83D\uDD15 Больше не звоним для подтверждения заказа_")
 
         ; Active Order
         :active-order-message            (str "*Заказ №{1}:*\n\n"
@@ -174,22 +174,22 @@
                                               "_Tap a dish to view details_")
         :empty-basket-text               "Unfortunately, your Cart is still empty :("
         :basket-menu-button              (str e/back-emoji " Into menu")
-        :to-order-button                 "✅ Further"
+        :to-order-button                 "Further ➡️"
 
         ; Order Confirmation
         :oc-basket-button                (str e/back-emoji " Cart")
         :oc-location-button              (str e/location-emoji " Change location")
         :oc-comment-button               (str e/comment-emoji " Comment")
-        :oc-create-order-button          "✅ Confirm"
+        :oc-create-order-button          "✅ All checked, order"
         :oc-empty-comment-text           "Enter a comment to the address or order"
         :oc-message                      (str "*Details of your order:* \n\n"
                                               e/food-emoji " {price} sum\n"
                                               e/delivery-emoji " {delivery} sum\n"
-                                              e/money-emoji " {total} sum ({payment})\n"
+                                              e/money-emoji " {total} sum\n"
                                               e/comment-emoji " `{comment}` \n\n"
                                               e/location-emoji " *{address}* \n\n"
-                                              " _❗️You order to the above address, change it if necessary_ \n\n"
-                                              "\uD83D\uDD15 We are not calling to confirm the order anymore, please make sure that you correctly placed the order")
+                                              " _❗️Please check the address_ \n\n"
+                                              "_\uD83D\uDD15 We no longer call to confirm the order_")
 
         ; Active Order
         :active-order-message            (str "*Order №{1}:*\n\n"
@@ -287,22 +287,22 @@
                                               "_Tafsilotlarini ko'rish uchun taomni bosing_")
         :empty-basket-text               "Afsuski, sizning savatingiz hali bo'sh :("
         :basket-menu-button              (str e/back-emoji " Menyuga")
-        :to-order-button                 "✅ Keyingi"
+        :to-order-button                 "Keyingi ➡️"
 
         ; Order Confirmation
         :oc-basket-button                (str e/back-emoji " Savat")
         :oc-location-button              (str e/location-emoji " Manzilni o'zgartirish")
         :oc-comment-button               (str e/comment-emoji " Izoh")
-        :oc-create-order-button          "✅ Tasdiqlash"
+        :oc-create-order-button          "✅ Tekshirdim, tasdiqlayman"
         :oc-empty-comment-text           "Manzilga yoki buyurtmaga izoh kiriting"
         :oc-message                      (str "*Buyurtmaning tafsilotlari:* \n\n"
                                               e/food-emoji " {price} so'm\n"
                                               e/delivery-emoji " {delivery} so'm\n"
-                                              e/money-emoji " {total} so'm ({payment})\n"
+                                              e/money-emoji " {total} so'm\n"
                                               e/comment-emoji " `{comment}` \n\n"
                                               e/location-emoji " *{address}* \n\n"
-                                              " _❗️Yuqoridagi manzilga buyurtma beryapsiz, agar kerak bo'lsa, uni o'zgartiring_\n\n"
-                                              "\uD83D\uDD15 Buyurtmani tasdiqlash uchun endi qo'ng'iroq qilmaymiz, iltimos, to'g'ri buyurtma berganingizga ishonch hosil qiling")
+                                              " _❗️Iltimos, manzilni tekshiring_\n\n"
+                                              "_\uD83D\uDD15 Buyurtmani tasdiqlash uchun endi qo'ng'iroq qilmaymiz_")
 
         ; Active Order
         :active-order-message            (str "*Buyurtma №{1}:*\n\n"
