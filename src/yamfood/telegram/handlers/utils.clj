@@ -87,7 +87,7 @@
 
 (defn product-detail-markup
   [lang state]
-  (let [constructable? (some true? (map :required (:modifiers state)))
+  (let [constructable? (seq (:modifiers state))
         count-in-basket (:count_in_basket state)]
     (if constructable?
       (constructable-product-markup lang state)
