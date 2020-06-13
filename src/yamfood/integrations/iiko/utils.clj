@@ -48,14 +48,21 @@
 
 (defn iiko->product
   [iiko-product]
-  {:payload {:iiko_id        (:id iiko-product)
-             :groupModifiers (map iiko->modifier-group (:groupModifiers iiko-product))}
-   :price   (:price iiko-product)})
+  {:payload     {:iiko_id        (:id iiko-product)
+                 :groupModifiers (map iiko->modifier-group (:groupModifiers iiko-product))}
+   :price       (:price iiko-product)
+   :name        {:ru (:name iiko-product)}
+   :description {:ru (:description iiko-product)}
+   :energy      (:energyAmount iiko-product)
+   :is_active   (not (:isDeleted iiko-product))})
 
 
 (defn iiko->modifier
   [iiko-modifier]
-  {:price (:price iiko-modifier)})
+  {:id       (u/str->uuid (:id iiko-modifier))
+   :group_id (u/str->uuid (:groupId iiko-modifier))
+   :price    (:price iiko-modifier)
+   :name     {:ru (:name iiko-modifier)}})
 
 
 (defn modifier->item-modifier

@@ -5,7 +5,8 @@
     [clojure.spec.alpha :as s]
     [yamfood.integrations.iiko.core :as i]
     [yamfood.core.products.core :as p]
-    [clojure.tools.logging :as log]))
+    [clojure.tools.logging :as log]
+    [yamfood.integrations.iiko.utils :as utils]))
 
 
 (s/def ::photo string?)
@@ -211,13 +212,17 @@
   [_]
   (try
     (log/info "Starting to sync iiko products")
-    (-> (:products (i/nomenclature!))
-        (p/update-iiko-products))
+    (let [{products "dish" modifiers "modifier"}
+          (->
+            (group-by :type (:products (i/nomenclature!)))
+            (update "dish" (partial map utils/iiko->product))
+            (update "modifier" (partial map utils/iiko->modifier)))]
+      (p/upsert-products-and-modifiers products modifiers))
     (log/info "Successfully synchronized iiko products")
     {:status 200}
     (catch Exception e
       (log/warn "Error occurred during iiko sync!" (.getMessage e))
-      {:status 503})))
+      {:status 500})))
 
 
 

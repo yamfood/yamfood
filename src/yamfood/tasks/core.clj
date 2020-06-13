@@ -19,3 +19,5 @@
 (mount/defstate sms
   :start (at/every 5000 #(sms/sms-daemon!) pool)
   :stop (at/stop sms))
+
+#_(mount/stop #'sms #'anouncements)

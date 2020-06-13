@@ -217,22 +217,42 @@
        (keywordize-json-fields)))
 
 
-(defn update-iiko-products [iiko-products]
-  (let [grouped-by-type (group-by :type iiko-products)]
-    (jdbc/with-db-transaction
-      [t-con db/db]
-      (doseq [dish (get grouped-by-type "dish")]
-        (jdbc/update!
-          t-con
-          "products"
-          (update (utils/iiko->product dish) :payload db/map->jsonb)
-          ["products.payload->>'iiko_id' = ?" (:id dish)]))
-      (doseq [modifier (get grouped-by-type "modifier")]
-        (jdbc/update!
-          t-con
-          "modifiers"
-          (utils/iiko->modifier modifier)
-          ["modifiers.id = ?" (u/str->uuid (:id modifier))])))))
+(defn update-or-create-iiko-product!
+  ([product]
+   (update-or-create-iiko-product! product db/db))
+  ([product db]
+   (let [product* (-> product
+                      (update :name db/map->jsonb)
+                      (update :payload db/map->jsonb)
+                      (update :description db/map->jsonb))]
+     (when (-> (jdbc/update! db "products"
+                 ;; only price and payload get updated
+                 (select-keys product* [:price :payload])
+                 ["products.payload->>'iiko_id' = ?" (get-in product [:payload :iiko_id])])
+               (first)
+               (zero?))
+       (first (jdbc/insert! db "products" product*))))))
+
+
+(defn update-or-create-modifier!
+  ([modifier]
+   (update-or-create-modifier! modifier db/db))
+  ([modifier db]
+   (when (-> (jdbc/update! db "modifiers"
+               (select-keys modifier [:price :group_id])
+               ["modifiers.id = ?" (:id modifier)])
+             (first)
+             (zero?))
+     (first (jdbc/insert! db "modifiers" modifier)))))
+
+
+(defn upsert-products-and-modifiers [products modifiers]
+  (jdbc/with-db-transaction
+    [t-con db/db]
+    (doseq [product products]
+      (update-or-create-iiko-product! product t-con))
+    (doseq [modifier modifiers]
+      (update-or-create-modifier! modifier t-con))))
 
 
 (defn all-categories!
