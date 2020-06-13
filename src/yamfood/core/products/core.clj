@@ -4,7 +4,9 @@
     [honeysql.helpers :as hh]
     [yamfood.core.utils :as cu]
     [clojure.java.jdbc :as jdbc]
-    [yamfood.core.db.core :as db]))
+    [yamfood.core.db.core :as db]
+    [yamfood.integrations.iiko.utils :as utils]
+    [yamfood.utils :as u]))
 
 
 (def all-products-query
@@ -213,6 +215,44 @@
        (jdbc/query db/db)
        (first)
        (keywordize-json-fields)))
+
+
+(defn update-or-create-iiko-product!
+  ([product]
+   (update-or-create-iiko-product! product db/db))
+  ([product db]
+   (let [product* (-> product
+                      (update :name db/map->jsonb)
+                      (update :payload db/map->jsonb)
+                      (update :description db/map->jsonb))]
+     (when (-> (jdbc/update! db "products"
+                 ;; only price and payload get updated
+                 (select-keys product* [:price :payload])
+                 ["products.payload->>'iiko_id' = ?" (get-in product [:payload :iiko_id])])
+               (first)
+               (zero?))
+       (first (jdbc/insert! db "products" product*))))))
+
+
+(defn update-or-create-modifier!
+  ([modifier]
+   (update-or-create-modifier! modifier db/db))
+  ([modifier db]
+   (when (-> (jdbc/update! db "modifiers"
+               (select-keys modifier [:price :group_id])
+               ["modifiers.id = ?" (:id modifier)])
+             (first)
+             (zero?))
+     (first (jdbc/insert! db "modifiers" modifier)))))
+
+
+(defn upsert-products-and-modifiers [products modifiers]
+  (jdbc/with-db-transaction
+    [t-con db/db]
+    (doseq [product products]
+      (update-or-create-iiko-product! product t-con))
+    (doseq [modifier modifiers]
+      (update-or-create-modifier! modifier t-con))))
 
 
 (defn all-categories!

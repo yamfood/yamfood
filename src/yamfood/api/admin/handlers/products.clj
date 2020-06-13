@@ -3,7 +3,10 @@
     [yamfood.utils :as u]
     [compojure.core :as c]
     [clojure.spec.alpha :as s]
-    [yamfood.core.products.core :as p]))
+    [yamfood.integrations.iiko.core :as i]
+    [yamfood.core.products.core :as p]
+    [clojure.tools.logging :as log]
+    [yamfood.integrations.iiko.utils :as utils]))
 
 
 (s/def ::photo string?)
@@ -205,9 +208,28 @@
        :status 404})))
 
 
+(defn sync-products
+  [_]
+  (try
+    (log/info "Starting to sync iiko products")
+    (let [{products "dish" modifiers "modifier"}
+          (->
+            (group-by :type (:products (i/nomenclature!)))
+            (update "dish" (partial map utils/iiko->product))
+            (update "modifier" (partial map utils/iiko->modifier)))]
+      (p/upsert-products-and-modifiers products modifiers))
+    (log/info "Successfully synchronized iiko products")
+    {:status 200}
+    (catch Exception e
+      (log/warn "Error occurred during iiko sync!" (.getMessage e))
+      {:status 500})))
+
+
+
 (c/defroutes
   routes
   (c/GET "/" [] products-list)
+  (c/GET "/sync" [] sync-products)
   (c/POST "/" [] create-product)
 
   (c/GET "/:id{[0-9]+}/" [] product-detail)
