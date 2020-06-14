@@ -227,7 +227,7 @@
         update (:update ctx)
         query (:callback_query update)
         product-id (u/parse-int (first (u/callback-params (:data query))))
-        modifiers (get-in client [:payload :modifiers (keyword (str product-id))])]
+        modifiers (get-in client [:payload :modifiers (keyword (str product-id))] [])]
     {:run             {:function baskets/add-product-to-basket!
                        :args     [(:basket_id client) product-id modifiers]}
      :answer-callback {:callback_query_id (:id query)
