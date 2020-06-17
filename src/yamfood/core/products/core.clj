@@ -72,12 +72,6 @@
                  (update :group_id str)))))
 
 
-(defn get-modifier
-  [all-modifiers]
-  (fn [id]
-    (first (filter #(= id (:id %)) all-modifiers))))
-
-
 (defn keywordize-json-fields
   [product]
   (-> product
@@ -85,6 +79,61 @@
       (cu/keywordize-field :payload)
       (cu/keywordize-field :description)
       (cu/keywordize-field :name)))
+
+
+(defn product-modifiers!
+  ([]
+   (product-modifiers! nil))
+  ([filter]
+   (->> (when (seq filter) {:where filter})
+        (merge
+          {:select [:*]
+           :from   [:product_modifiers]})
+        (hs/format)
+        (jdbc/query db/db)
+        (map #(-> %
+                  (cu/keywordize-field :name)
+                  (update :id str)
+                  (update :group_id str)
+                  (assoc :product
+                         {:id          (:products_id %)
+                          :name        (:products_name %)
+                          :photo       (:products_photo %)
+                          :energy      (:products_energy %)
+                          :price       (:products_price %)
+                          :thumbnail   (:products_thumbnail %)
+                          :is_active   (:products_is_active %)
+                          :category_id (:products_category_id %)
+                          :payload     (:products_payload %)
+                          :position    (:products_position %)
+                          :description (:products_description %)})
+                  (select-keys [:id :name :price :group_id :product])))
+        (group-by (juxt :id :name :price :group_id))
+        (map (fn [[[id name price group_id] modifiers]]
+               {:id       id
+                :name     name
+                :price    price
+                :group_id group_id
+                :products (->> (reduce (fn [acc v] (conj acc (:product v)))
+                                       []
+                                       modifiers)
+                               (map keywordize-json-fields))})))))
+
+
+(defn get-modifier
+  [all-modifiers]
+  (fn [id]
+    (first (filter #(= id (:id %)) all-modifiers))))
+
+
+(defn update-modifier!
+  [modifier-id modifier]
+  (jdbc/update!
+    db/db
+    "modifiers"
+    modifier
+    ["modifiers.id = ?" modifier-id]
+    {:return-keys  true}))
 
 
 (defn all-products!
