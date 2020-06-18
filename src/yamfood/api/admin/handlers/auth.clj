@@ -13,7 +13,8 @@
     (if admin
       (try
         (a/update-admin-token! (:id admin))
-        {:body (a/admin-by-credentials! login password)}
+        {:body (-> (a/admin-by-credentials! login password)
+                   (dissoc :password))}
         (catch Exception e
           (println e)
           {:body   {:error "Unexpected error"}
