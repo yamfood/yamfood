@@ -192,7 +192,28 @@
 
 (def active-orders-query
   {:with   [[:cte_orders order-detail-query]]
-   :select [:*]
+   :select [:cte_orders.id
+            :cte_orders.location
+            :cte_orders.payment
+            :cte_orders.bot_id
+            :cte_orders.bot_name
+            :cte_orders.kitchen_id
+            :cte_orders.kitchen
+            :cte_orders.kitchen_payload
+            :cte_orders.created_at
+            :cte_orders.client_id
+            :cte_orders.tid
+            :cte_orders.name
+            :cte_orders.phone
+            :cte_orders.lang
+            :cte_orders.rider_name
+            :cte_orders.rider_phone
+            :cte_orders.status
+            :cte_orders.comment
+            :cte_orders.notes
+            :cte_orders.delivery_cost
+            :cte_orders.rate
+            :cte_orders.address]
    :from   [:cte_orders]
    :where  [:in :cte_orders.status active-order-statuses]})
 
