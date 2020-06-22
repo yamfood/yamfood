@@ -6,7 +6,8 @@
     [yamfood.integrations.iiko.core :as i]
     [yamfood.core.products.core :as p]
     [clojure.tools.logging :as log]
-    [yamfood.integrations.iiko.utils :as utils]))
+    [yamfood.integrations.iiko.utils :as utils]
+    [clojure.set :as set]))
 
 
 (s/def ::photo string?)
@@ -34,20 +35,18 @@
   [product]
   (-> product
       (update :category :ru)
-      (update :name :ru)))
-
-
-(defn set-modifier-translations
-  [product]
-  (-> product
       (update :name :ru)
-      (update :products (partial map set-translations))))
+      (update :groupModifiers
+              (fn [groupModifiers]
+                (map (fn [group]
+                       (update group :modifiers
+                               (partial map #(update % :name :ru)))) groupModifiers)))))
 
 
 (defn products-list
   [_]
   {:body
-   (->> (p/all-products!)
+   (->> (p/product-modifiers!)
         (map set-translations))})
 
 
@@ -57,17 +56,10 @@
       (update :name :ru)))
 
 
-(defn modifiers-list
-  [_]
-  {:body
-   (->> (p/product-modifiers!)
-        (map set-modifier-translations))})
-
-
 (defn modifier-details
   [request]
   (let [modifier-id (u/str->uuid (:id (:params request)))
-        modifier (first (p/product-modifiers! [:= :id modifier-id]))]
+        modifier (first (p/modifiers! [:= :id modifier-id]))]
     (if modifier
       {:body modifier}
       {:body   {:error "Not found"}
@@ -77,7 +69,10 @@
 (defn patch-modifier
   [request]
   (let [modifier-id (u/str->uuid (:id (:params request)))
-        modifier (first (p/product-modifiers! [:= :id modifier-id]))
+        modifier (set/rename-keys (first (p/modifiers! [:= :id modifier-id]))
+                                  {:name     :modifier_name
+                                   :price    :modifier_price
+                                   :group_id :modifier_group_id})
         body (select-keys (:body request) [:name :group_id :price])
         valid? (and modifier (s/valid? ::patch-modifier body))]
     (if valid?
@@ -293,7 +288,6 @@
   (c/PATCH "/:id{[0-9]+}/" [] patch-product)
   (c/DELETE "/:id{[0-9]+}/" [] delete-product)
 
-  (c/GET "/modifiers/" [] modifiers-list)
   (c/GET "/modifiers/:id/" [] modifier-details)
   (c/PATCH "/modifiers/:id/" [] patch-modifier)
 
