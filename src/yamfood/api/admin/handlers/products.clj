@@ -6,8 +6,7 @@
     [yamfood.integrations.iiko.core :as i]
     [yamfood.core.products.core :as p]
     [clojure.tools.logging :as log]
-    [yamfood.integrations.iiko.utils :as utils]
-    [clojure.set :as set]))
+    [yamfood.integrations.iiko.utils :as utils]))
 
 
 (s/def ::photo string?)
@@ -34,7 +33,7 @@
 (defn set-translations
   [product]
   (-> product
-      (update :category :ru)
+      (update-in [:category :name] :ru)
       (update :name :ru)
       (update :groupModifiers
               (fn [groupModifiers]
@@ -69,10 +68,7 @@
 (defn patch-modifier
   [request]
   (let [modifier-id (u/str->uuid (:id (:params request)))
-        modifier (set/rename-keys (first (p/modifiers! [:= :id modifier-id]))
-                                  {:name     :modifier_name
-                                   :price    :modifier_price
-                                   :group_id :modifier_group_id})
+        modifier (first (p/modifiers! [:= :id modifier-id]))
         body (select-keys (:body request) [:name :group_id :price])
         valid? (and modifier (s/valid? ::patch-modifier body))]
     (if valid?
@@ -210,6 +206,7 @@
 
 (defn product-detail
   [request]
+  (prn (:id (:params request)))
   (let [product-id (u/str->int (:id (:params request)))
         product (p/product-by-id! product-id)]
     (if product

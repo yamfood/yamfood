@@ -32,7 +32,7 @@
 
 
 (defn create-migration [name]
-  (migratus/create m/config name))
+  (migratus/create (m/config) name))
 
 
 #_(start)

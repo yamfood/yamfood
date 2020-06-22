@@ -104,16 +104,21 @@
                        [:modifiers.price :modifier_price]
                        [:modifiers.group_id :modifier_group_id]
                        [:product_modifiers.group_id :group_id]
-                       [:product_modifiers.group_required :group_required]]
+                       [:product_modifiers.group_required :group_required]
+                       [:categories.emoji :product_category_emoji]
+                       [:categories.bot_id :product_category_bot_id]
+                       [:categories.name :product_category_name]]
            :from      [:products]
            :left-join [:product_modifiers [:= :product_modifiers.product_id :products.id]
-                       :modifiers [:= :product_modifiers.modifier_id :modifiers.id]]})
+                       :modifiers [:= :product_modifiers.modifier_id :modifiers.id]
+                       :categories [:= :categories.id :products.category_id]]})
         (hs/format)
         (jdbc/query db/db)
         (map (fn [row]
                (-> row
                    (cu/keywordize-field :product_name)
                    (cu/keywordize-field :modifier_name)
+                   (cu/keywordize-field :product_category_name)
                    (update :product_id #(some-> % str))
                    (update :modifier_id #(some-> % str))
                    (update :modifier_group_id #(some-> % str))
@@ -123,14 +128,12 @@
         ;; [{:product {:id ...}, :modifier {:id ...}]
         (group-by :product)
         (map (fn [[product product_modifiers]]
-               (assoc product :groupModifiers
-                              (->> product_modifiers
-                                   (group-by :group)
-                                   (map (fn [[group product_modifiers]]
-                                          (assoc group :modifiers (map :modifier product_modifiers))))
-                                   (filter #(some? (:id %))))))))))
-
-
+               (->> product_modifiers
+                    (group-by :group)
+                    (map (fn [[group product_modifiers]]
+                           (assoc group :modifiers (map :modifier product_modifiers))))
+                    (filter #(some? (:id %)))
+                    (assoc (cu/group-by-prefix product :category) :groupModifiers)))))))
 
 
 (defn get-modifier
@@ -272,7 +275,7 @@
 (defn product-by-id!
   [id]
   (->> (-> all-products-query
-           (hh/merge-where [:= :products.id id]))
+           (assoc :where [:= :products.id id]))
        (hs/format)
        (jdbc/query db/db)
        (first)
