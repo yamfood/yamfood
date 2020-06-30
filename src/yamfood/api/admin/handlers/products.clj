@@ -27,20 +27,68 @@
 (s/def ::position int?)
 (s/def ::is_free_delivery boolean?)
 (s/def ::category_id (s/nilable int?))
+(s/def ::group_id (s/nilable uuid?))
 
 
 (defn set-translations
   [product]
   (-> product
-      (update :category :ru)
-      (update :name :ru)))
+      (update-in [:category :name] :ru)
+      (update :name :ru)
+      (update :groupModifiers
+              (fn [groupModifiers]
+                (map (fn [group]
+                       (update group :modifiers
+                               (partial map #(update % :name :ru)))) groupModifiers)))))
 
 
 (defn products-list
   [_]
   {:body
-   (->> (p/all-products!)
+   (->> (p/product-modifiers!)
         (map set-translations))})
+
+
+(defn fmt-modifier
+  [modifier]
+  (-> modifier
+      (update :name :ru)))
+
+
+(defn modifier-details
+  [request]
+  (let [modifier-id (u/str->uuid (:id (:params request)))
+        modifier (first (p/modifiers! [:= :id modifier-id]))]
+    (if modifier
+      {:body modifier}
+      {:body   {:error "Not found"}
+       :status 404})))
+
+
+(defn patch-modifier
+  [request]
+  (let [modifier-id (u/str->uuid (:id (:params request)))
+        modifier (first (p/modifiers! [:= :id modifier-id]))
+        body (select-keys (:body request) [:name :group_id :price])
+        valid? (and modifier (s/valid? ::patch-modifier body))]
+    (if valid?
+      (try
+        {:body (-> (p/update-modifier! modifier-id body)
+                   (fmt-modifier))}
+        (catch Exception e
+          (println e)
+          {:body   {:error "Unexpected error"}
+           :status 500}))
+      {:body   {:error "Invalid input or category"}
+       :status 400})))
+
+
+(s/def ::patch-modifier
+  (s/keys
+    :opt-un
+    [::name
+     ::price
+     ::group_id]))
 
 
 (defn fmt-category
@@ -158,6 +206,7 @@
 
 (defn product-detail
   [request]
+  (prn (:id (:params request)))
   (let [product-id (u/str->int (:id (:params request)))
         product (p/product-by-id! product-id)]
     (if product
@@ -235,6 +284,10 @@
   (c/GET "/:id{[0-9]+}/" [] product-detail)
   (c/PATCH "/:id{[0-9]+}/" [] patch-product)
   (c/DELETE "/:id{[0-9]+}/" [] delete-product)
+
+  (c/GET "/modifiers/:id/" [] modifier-details)
+  (c/PATCH "/modifiers/:id/" [] patch-modifier)
+
 
   (c/GET "/categories/" [] categories-list)
   (c/POST "/categories/" [] create-category)

@@ -24,15 +24,15 @@
 
 
 (defn migrate []
-  (migratus/migrate m/config))
+  (migratus/migrate (m/config)))
 
 
 (defn rollback []
-  (migratus/rollback m/config))
+  (migratus/rollback (m/config)))
 
 
 (defn create-migration [name]
-  (migratus/create m/config name))
+  (migratus/create (m/config) name))
 
 
 #_(start)

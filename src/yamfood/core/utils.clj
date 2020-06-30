@@ -1,4 +1,5 @@
-(ns yamfood.core.utils)
+(ns yamfood.core.utils
+  (:require [clojure.string :as str]))
 
 
 (defn- keywordize
@@ -20,3 +21,12 @@
    (let [payload (get map field)]
      (assoc map field (keywordize payload)))))
 
+
+(defn group-by-prefix [m prefix]
+  (->> m
+       (map (fn [[k v]]
+              (let [k-split (str/split (name k) #"_")]
+                (if (= (first k-split) (name prefix))
+                  {(keyword (first k-split)) {(keyword (str/join "_" (rest k-split))) v}}
+                  {k v}))))
+       (apply merge-with merge)))

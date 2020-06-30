@@ -12,4 +12,4 @@
 
 
 ;(init)
-;(migratus/create m/config "rider_deposits_timestamps")
+;(migratus/create (m/config) "rider_deposits_timestamps")

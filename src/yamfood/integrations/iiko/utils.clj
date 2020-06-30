@@ -42,6 +42,7 @@
 (defn iiko->modifier-group
   [modifier-group]
   {:required  (:required modifier-group)
+   :group_id  (:modifierId modifier-group)
    :modifiers (map :modifierId (:childModifiers modifier-group))})
 
 
