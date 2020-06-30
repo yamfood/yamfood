@@ -159,23 +159,6 @@
     {:return-keys  true}))
 
 
-#_(defn all-products!
-    ([]
-     (->> all-products-query
-          (hs/format)
-          (jdbc/query db/db)
-          (map keywordize-json-fields)))
-    ([kitchen-id]
-     (->> (-> all-products-query
-              (hh/merge-where
-                [:not [:in
-                       :products.id
-                       (disabled-products-query kitchen-id)]]))
-          (hs/format)
-          (jdbc/query db/db)
-          (map keywordize-json-fields))))
-
-
 (defn products-by-bot!
   ([bot-id]
    (->> (-> all-products-query
