@@ -171,6 +171,7 @@
         total (* price (:count product))]
     (-> product
         (assoc :price price)
+        (assoc :stock_price (:price product))
         (assoc :total total))))
 
 
@@ -281,7 +282,7 @@
   ([order-id]
    (order-by-id! order-id order-by-id-options))
   ([order-id options]
-   (let [options (merge options order-by-id-options)
+   (let [options (merge order-by-id-options options)
          order (->> (order-by-id-query order-id)
                     (jdbc/query db/db)
                     (map fmt-order-location)
