@@ -16,7 +16,8 @@
     [yamfood.core.params.core :as params]
     [yamfood.core.products.core :as products]
     [yamfood.integrations.iiko.core :as iiko]
-    [yamfood.telegram.helpers.status :as status]))
+    [yamfood.telegram.helpers.status :as status]
+    [yamfood.api.admin.handlers.products :as api.products]))
 
 
 (defonce open-orders (atom {}))
@@ -222,7 +223,7 @@
       (try
         {:body (->> (products/products-by-bot! (:bot_id order)
                                                (:kitchen_id order))
-                    (map #(update % :name :ru)))}
+                    (map api.products/set-translations))}
         (catch Exception e
           {:body   {:error "Unexpected error"}
            :status 500}))
