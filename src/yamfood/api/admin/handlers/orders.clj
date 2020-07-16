@@ -13,7 +13,9 @@
     [yamfood.core.orders.core :as o]
     [yamfood.core.riders.core :as r]
     [yamfood.core.orders.core :as ord]
+    [yamfood.core.kitchens.core :as k]
     [yamfood.core.params.core :as params]
+    [yamfood.core.clients.core :as clients]
     [yamfood.core.products.core :as products]
     [yamfood.integrations.iiko.core :as iiko]
     [yamfood.telegram.helpers.status :as status]
@@ -105,6 +107,36 @@
           {:body   {:error "Unexpected error"}
            :status 500}))
       {:body   {:error "Can't accept order in this status"}
+       :status 400})))
+
+
+(defn create-order
+  [request]
+  (let [body (select-keys (:body request)
+                          [:id :client_id :notes :latitude :longitude :address])
+        params (params/params!)
+        valid? (s/valid? ::create-order body)]
+    (if valid?
+      (try
+        {:body (let [order-id (o/create-pending-order!
+                                (:client_id body)
+                                (:longitude body)
+                                (:latitude body)
+                                (:address body)
+                                (:id (k/nearest-kitchen!
+                                       (:bot_id (clients/client-with-id! (int (:client_id body))))
+                                       (:longitude body)
+                                       (:latitude body)))
+                                ""
+                                "cash"
+                                (or (:delivery-cost params) 10000))]
+
+                 (order-by-id! order-id))}
+        (catch Exception e
+          (println e)
+          {:body   {:error "Unexpected error"}
+           :status 500}))
+      {:body   {:error "Invalid input or order"}
        :status 400})))
 
 
@@ -251,6 +283,7 @@
 
 
 (s/def ::product_id int?)
+(s/def ::client_id int?)
 (s/def ::count int?)
 (s/def ::comment string?)
 (s/def ::order-products
@@ -260,10 +293,16 @@
 (s/def ::products (s/coll-of ::order-products))
 (s/def ::notes string?)
 (s/def ::address string?)
+(s/def ::longitude float?)
+(s/def ::latitude float?)
 (s/def ::delivery_cost int?)
 
 (s/def ::patch-order
   (s/keys :opt-un [::products ::notes ::address ::delivery_cost]))
+
+
+(s/def ::create-order
+  (s/keys :opt-un [::client_id ::notes ::address ::longitude ::latitude]))
 
 
 (defn patch-order
@@ -271,10 +310,12 @@
   (let [order-id (u/str->int (:id (:params request)))
         order (order-by-id! order-id)
         body (select-keys (:body request)
-                          [:products :notes :address :delivery_cost])
+                          (concat [:products :notes :address :delivery_cost]
+                                  (when (= "pending" (:status order))
+                                    [:payment :is_payed])))
         valid? (and
                  order
-                 (= (:status order) "new")
+                 (some? (#{"new" "pending"} (:status order)))
                  (s/valid? ::patch-order body))]
     (if valid?
       (try
@@ -293,6 +334,7 @@
   (c/GET "/:id{[0-9]+}/" [] order-details)
   (c/PATCH "/:id{[0-9]+}/" [] patch-order)
 
+  (c/POST "/create/" [] create-order)
   (c/POST "/:id{[0-9]+}/accept/" [] accept-order)
   (c/POST "/:id{[0-9]+}/cancel/" [] cancel-order)
   (c/GET "/:id{[0-9]+}/products/" [] order-available-products)

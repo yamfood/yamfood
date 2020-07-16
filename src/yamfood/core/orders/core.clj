@@ -13,6 +13,7 @@
 (def order-statuses
   {:new        "new"
    :on-kitchen "onKitchen"
+   :pending    "pending"
    :on-way     "onWay"
    :finished   "finished"
    :canceled   "canceled"})
@@ -20,6 +21,7 @@
 
 (def active-order-statuses
   [(:new order-statuses)
+   (:pending order-statuses)
    (:on-kitchen order-statuses)
    (:on-way order-statuses)])
 
@@ -233,6 +235,15 @@
        :count))
 
 
+(defn client-last-orders!
+  [client-id]
+  (->>
+    (assoc order-detail-query :where [:= :client_id client-id])
+    (hs/format)
+    (jdbc/query db/db)
+    (map fmt-order-location)))
+
+
 (defn client-canceled-orders!
   [client-id]
   (->> (-> {:with   [[:cte_orders order-detail-query]]
@@ -384,6 +395,25 @@
                                   payment
                                   delivery-cost)]
     (jdbc/execute! db/db query {:return-keys ["id"]})))
+
+
+(defn create-pending-order!
+  ; TODO: Use transaction!
+  [client_id longitude latitude address kitchen-id comment payment default-delivery-cost]
+  (let [order-id (:id (insert-order! client_id
+                                     longitude
+                                     latitude
+                                     address
+                                     comment
+                                     kitchen-id
+                                     payment
+                                     default-delivery-cost))]
+    (jdbc/insert!
+      db/db "order_logs"
+      {:order_id order-id
+       :status   (:pending order-statuses)})
+    order-id))
+
 
 
 (defn create-order!

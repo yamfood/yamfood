@@ -5,7 +5,7 @@ services:
     working_dir: /app
     command: lein trampoline run
     ports:
-      - 7777:3000
+      - 3004:3000
       - 7001:7000
     volumes:
       - ./:/app
