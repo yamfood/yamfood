@@ -374,40 +374,47 @@
 
 
 (defn insert-order-query
-  [client-id lon lat address comment kitchen-id payment delivery_cost]
-  ["insert into orders (client_id, location, address, comment, kitchen_id, payment, delivery_cost) values (?, POINT (?, ?), ?, ?, ?, ?, ?) ;"
-   client-id
-   lon lat
-   address
-   comment
-   kitchen-id
-   payment
-   delivery_cost])
+  ([client-id lon lat address comment kitchen-id payment delivery_cost]
+   (insert-order-query client-id lon lat address comment kitchen-id payment delivery_cost ""))
+  ([client-id lon lat address comment kitchen-id payment delivery_cost notes]
+   ["insert into orders (client_id, location, address, comment, kitchen_id, payment, delivery_cost, notes) values (?, POINT (?, ?), ?, ?, ?, ?, ?, ?) ;"
+    client-id
+    lon lat
+    address
+    comment
+    kitchen-id
+    payment
+    delivery_cost
+    notes]))
 
 
 (defn insert-order!
-  [client-id lon lat address comment kitchen-id payment delivery-cost]
-  (let [query (insert-order-query client-id
-                                  lon lat
-                                  address
-                                  comment
-                                  kitchen-id
-                                  payment
-                                  delivery-cost)]
-    (jdbc/execute! db/db query {:return-keys ["id"]})))
+  ([client-id lon lat address comment kitchen-id payment delivery-cost]
+   (insert-order! client-id lon lat address comment kitchen-id payment delivery-cost ""))
+  ([client-id lon lat address comment kitchen-id payment delivery-cost notes]
+   (let [query (insert-order-query client-id
+                                   lon lat
+                                   address
+                                   comment
+                                   kitchen-id
+                                   payment
+                                   delivery-cost
+                                   notes)]
+     (jdbc/execute! db/db query {:return-keys ["id"]}))))
 
 
 (defn create-pending-order!
   ; TODO: Use transaction!
-  [client_id longitude latitude address kitchen-id comment payment default-delivery-cost]
+  [client_id longitude latitude address kitchen-id notes payment default-delivery-cost]
   (let [order-id (:id (insert-order! client_id
                                      longitude
                                      latitude
                                      address
-                                     comment
+                                     ""
                                      kitchen-id
                                      payment
-                                     default-delivery-cost))]
+                                     default-delivery-cost
+                                     notes))]
     (jdbc/insert!
       db/db "order_logs"
       {:order_id order-id

@@ -95,10 +95,22 @@
         order (order-by-id! order-id)
         params (params/params!)
         send-to-iiko? (:iiko-enabled? params)
-        acceptable? (= (:new o/order-statuses) (:status order))]
-    (if acceptable?
+        acceptable? (some? (get #{(:new o/order-statuses)
+                                  (:pending o/order-statuses)}
+                                (:status order)))]
+
+    (cond
+      (< (count (:products order)) 1)
+      {:body   {:error {:products "Can't accept order with no products"}}
+       :status 400}
+
+      acceptable?
       (try
         (when send-to-iiko? (iiko/create-order! order))
+        (when (and (= (:pending o/order-statuses) (:status order))
+                   ;; TODO move yamfood.telegram.handlers.utils/card-payment to global utils
+                   (= (:payment order) "card"))
+          (o/update! order-id {:is_payed true}))
         (o/accept-order! (:id order) admin-id)
         (status/notify-order-accepted! (:id order))
         {:body (get-active-orders!)}
@@ -106,6 +118,8 @@
           (println e)
           {:body   {:error "Unexpected error"}
            :status 500}))
+
+      :else
       {:body   {:error "Can't accept order in this status"}
        :status 400})))
 
@@ -115,27 +129,34 @@
   (let [body (select-keys (:body request)
                           [:id :client_id :notes :latitude :longitude :address])
         params (params/params!)
-        valid? (s/valid? ::create-order body)]
-    (if valid?
+        valid? (s/valid? ::create-order body)
+        kitchen (k/nearest-kitchen!
+                  (:bot_id (clients/client-with-id! (int (:client_id body))))
+                  (:longitude body)
+                  (:latitude body))]
+    (cond
+      (nil? kitchen)
+      {:body   {:error {:kitchen_id "Not available"}}
+       :status 400}
+
+      valid?
       (try
         {:body (let [order-id (o/create-pending-order!
                                 (:client_id body)
                                 (:longitude body)
                                 (:latitude body)
                                 (:address body)
-                                (:id (k/nearest-kitchen!
-                                       (:bot_id (clients/client-with-id! (int (:client_id body))))
-                                       (:longitude body)
-                                       (:latitude body)))
-                                ""
+                                (:id kitchen)
+                                (:notes body)
                                 "cash"
                                 (or (:delivery-cost params) 10000))]
-
                  (order-by-id! order-id))}
         (catch Exception e
           (println e)
           {:body   {:error "Unexpected error"}
            :status 500}))
+
+      :else
       {:body   {:error "Invalid input or order"}
        :status 400})))
 
