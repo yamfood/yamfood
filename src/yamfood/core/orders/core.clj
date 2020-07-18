@@ -13,6 +13,7 @@
 (def order-statuses
   {:new        "new"
    :on-kitchen "onKitchen"
+   :pending    "pending"
    :on-way     "onWay"
    :finished   "finished"
    :canceled   "canceled"})
@@ -20,6 +21,7 @@
 
 (def active-order-statuses
   [(:new order-statuses)
+   (:pending order-statuses)
    (:on-kitchen order-statuses)
    (:on-way order-statuses)])
 
@@ -233,6 +235,15 @@
        :count))
 
 
+(defn client-last-orders!
+  [client-id]
+  (->>
+    (assoc order-detail-query :where [:= :client_id client-id])
+    (hs/format)
+    (jdbc/query db/db)
+    (map fmt-order-location)))
+
+
 (defn client-canceled-orders!
   [client-id]
   (->> (-> {:with   [[:cte_orders order-detail-query]]
@@ -363,27 +374,53 @@
 
 
 (defn insert-order-query
-  [client-id lon lat address comment kitchen-id payment delivery_cost]
-  ["insert into orders (client_id, location, address, comment, kitchen_id, payment, delivery_cost) values (?, POINT (?, ?), ?, ?, ?, ?, ?) ;"
-   client-id
-   lon lat
-   address
-   comment
-   kitchen-id
-   payment
-   delivery_cost])
+  ([client-id lon lat address comment kitchen-id payment delivery_cost]
+   (insert-order-query client-id lon lat address comment kitchen-id payment delivery_cost ""))
+  ([client-id lon lat address comment kitchen-id payment delivery_cost notes]
+   ["insert into orders (client_id, location, address, comment, kitchen_id, payment, delivery_cost, notes) values (?, POINT (?, ?), ?, ?, ?, ?, ?, ?) ;"
+    client-id
+    lon lat
+    address
+    comment
+    kitchen-id
+    payment
+    delivery_cost
+    notes]))
 
 
 (defn insert-order!
-  [client-id lon lat address comment kitchen-id payment delivery-cost]
-  (let [query (insert-order-query client-id
-                                  lon lat
-                                  address
-                                  comment
-                                  kitchen-id
-                                  payment
-                                  delivery-cost)]
-    (jdbc/execute! db/db query {:return-keys ["id"]})))
+  ([client-id lon lat address comment kitchen-id payment delivery-cost]
+   (insert-order! client-id lon lat address comment kitchen-id payment delivery-cost ""))
+  ([client-id lon lat address comment kitchen-id payment delivery-cost notes]
+   (let [query (insert-order-query client-id
+                                   lon lat
+                                   address
+                                   comment
+                                   kitchen-id
+                                   payment
+                                   delivery-cost
+                                   notes)]
+     (jdbc/execute! db/db query {:return-keys ["id"]}))))
+
+
+(defn create-pending-order!
+  ; TODO: Use transaction!
+  [client_id longitude latitude address kitchen-id notes payment default-delivery-cost]
+  (let [order-id (:id (insert-order! client_id
+                                     longitude
+                                     latitude
+                                     address
+                                     ""
+                                     kitchen-id
+                                     payment
+                                     default-delivery-cost
+                                     notes))]
+    (jdbc/insert!
+      db/db "order_logs"
+      {:order_id order-id
+       :status   (:pending order-statuses)})
+    order-id))
+
 
 
 (defn create-order!

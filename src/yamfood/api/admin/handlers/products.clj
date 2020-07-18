@@ -206,7 +206,6 @@
 
 (defn product-detail
   [request]
-  (prn (:id (:params request)))
   (let [product-id (u/str->int (:id (:params request)))
         product (p/product-by-id! product-id)]
     (if product

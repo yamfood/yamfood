@@ -13,6 +13,7 @@
   [request]
   (let [client-id (u/str->int (:id (:params request)))]
     {:body (-> (clients/client-with-id! client-id)
+               (assoc :last_orders (take 10 (o/client-last-orders! client-id)))
                (assoc :data [{:label "Количество завершенных заказов"
                               :value (o/client-finished-orders! client-id)}
                              {:label "Количество отмененных заказов"
