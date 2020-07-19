@@ -6,18 +6,42 @@
     [yamfood.api.pagination :as p]
     [yamfood.core.specs.core :as cs]
     [yamfood.core.orders.core :as o]
-    [yamfood.core.clients.core :as clients]))
+    [yamfood.core.clients.core :as clients]
+    [clojure.string :as str]))
+
+
+(defn distinct-comp
+  ""
+  {:added  "1.0"
+   :static true}
+  ([f coll]
+   (let [step
+         (fn step [xs seen]
+           (lazy-seq
+             ((fn [[x :as xs] seen]
+                (when-let [s (seq xs)]
+                  (if (some (partial f x) seen)
+                    (recur (rest s) seen)
+                    (cons x (step (rest s) (conj seen x))))))
+              xs seen)))]
+     (step coll #{}))))
 
 
 (defn client-detail
   [request]
   (let [client-id (u/str->int (:id (:params request)))]
     {:body (-> (clients/client-with-id! client-id)
-               (assoc :last_orders (take 10 (o/client-last-orders! client-id)))
                (assoc :data [{:label "Количество завершенных заказов"
                               :value (o/client-finished-orders! client-id)}
                              {:label "Количество отмененных заказов"
-                              :value (o/client-canceled-orders! client-id)}]))}))
+                              :value (o/client-canceled-orders! client-id)}]
+                      :last_orders (->> (o/client-last-orders! client-id)
+                                        (remove (comp empty? :address))
+                                        (distinct-comp
+                                          #(or
+                                             (str/includes? (:address %1) (:address %2))
+                                             (str/includes? (:address %2) (:address %1))))
+                                        (take 10))))}))
 
 
 (s/def ::is_blocked boolean?)
