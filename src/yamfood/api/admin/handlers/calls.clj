@@ -63,5 +63,5 @@
         bot-id (:id (bots/bot-by-destination! destination))
         client (clients/get-or-create-external-client! bot-id phone)
         data {:client_id (:id client) :phone (str phone)}]
-    (println data)
-    (stream/put! socket (json/write-str data))))
+    (when socket
+      (stream/put! socket (json/write-str data)))))
