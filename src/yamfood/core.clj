@@ -15,7 +15,8 @@
     [yamfood.core.params.core :as params]
     [ring.adapter.jetty :refer [run-jetty]]
     [ring.middleware.json :refer [wrap-json-body]]
-    [yamfood.tasks.core])                                   ;; order is important
+    [yamfood.tasks.core]                                    ;; order is important
+    [yamfood.integrations.asterisk.core])                   ;; order is important
   (:gen-class)
   (:import (io.aleph.dirigiste Stats$Metric Executor)
            (java.util.concurrent TimeUnit)
@@ -39,27 +40,27 @@
 
 
 (mount/defstate ^{:on-reload :noop} executor
-  :start (flow/utilization-executor
-           0.9 512
-           {:metrics (EnumSet/of Stats$Metric/UTILIZATION)})
-  :stop (.shutdown executor))
+                :start (flow/utilization-executor
+                         0.9 512
+                         {:metrics (EnumSet/of Stats$Metric/UTILIZATION)})
+                :stop (.shutdown executor))
 
 
 (mount/defstate ^{:on-reload :noop} http-server
-  :start
-  (let [port (Integer. (or (env :port) 666))]
-    (http/start-server #'app {:executor           executor
-                              :port               port
-                              :join?              false
-                              :shutdown-executor? false}))
-  :stop
-  (do
-    (log/info "Waiting for all handlers to return (new requests getting HTTP 503)")
-    (.shutdown executor)
-    (.awaitTermination executor 10 TimeUnit/SECONDS)
-    (.close http-server)
-    (netty/wait-for-close http-server)
-    (log/info "HTTP Server closed")))
+                :start
+                (let [port (Integer. (or (env :port) 666))]
+                  (http/start-server #'app {:executor           executor
+                                            :port               port
+                                            :join?              false
+                                            :shutdown-executor? false}))
+                :stop
+                (do
+                  (log/info "Waiting for all handlers to return (new requests getting HTTP 503)")
+                  (.shutdown executor)
+                  (.awaitTermination executor 10 TimeUnit/SECONDS)
+                  (.close http-server)
+                  (netty/wait-for-close http-server)
+                  (log/info "HTTP Server closed")))
 
 
 (defn stop-app []
