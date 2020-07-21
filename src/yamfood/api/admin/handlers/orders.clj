@@ -100,7 +100,7 @@
                                 (:status order)))]
 
     (cond
-      (< (count (:products order)) 1)
+      (= (count (:products order)) 0)
       {:body   {:error {:products "Can't accept order with no products"}}
        :status 400}
 
@@ -147,7 +147,7 @@
                                 (:latitude body)
                                 (:address body)
                                 (:id kitchen)
-                                (:notes body)
+                                (or (:notes body) "")
                                 "cash"
                                 (or (:delivery-cost params) 10000))]
                  (order-by-id! order-id))}

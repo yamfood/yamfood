@@ -34,6 +34,7 @@
 (def cancelable-order-statuses
   [(:new order-statuses)
    (:on-kitchen order-statuses)
+   (:pending order-statuses)
    (:on-way order-statuses)])
 
 
@@ -238,7 +239,8 @@
 (defn client-last-orders!
   [client-id]
   (->>
-    (assoc order-detail-query :where [:= :client_id client-id])
+    (assoc order-detail-query :where [:= :client_id client-id]
+                              :order-by [[:orders.id :desc]])
     (hs/format)
     (jdbc/query db/db)
     (map fmt-order-location)))
