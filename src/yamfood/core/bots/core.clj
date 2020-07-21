@@ -25,6 +25,15 @@
        (first)))
 
 
+(defn bot-by-destination!
+  [destination]
+  (->> (-> bots-query
+           (hh/merge-where [:= :bots.asterisk_destination (str destination)])
+           (hs/format))
+       (jdbc/query db/db)
+       (first)))
+
+
 (defn bot-by-id!
   [id]
   (->> (-> bots-query
