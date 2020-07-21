@@ -1,6 +1,7 @@
 (ns yamfood.integrations.asterisk.core
   (:require
     [mount.core :as mount]
+    [clojure.core.async :as async]
     [clj-asterisk.events :as events]
     [clj-asterisk.manager :as manager]
     [yamfood.telegram.handlers.utils :as u]
@@ -36,10 +37,9 @@
 
 (defn connect-and-listen-events!
   []
-  (loop [context (get-context!)]
+  (async/go-loop [context (get-context!)]
     (Thread/sleep 5000)
     (let [ok (ping! context)]
-      (println ("Asterisk PING result: " ok))
       (if ok
         (recur context)
         (recur (get-context!))))))
