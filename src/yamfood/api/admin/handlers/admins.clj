@@ -10,6 +10,7 @@
 (s/def ::login string?)
 (s/def ::password string?)
 (s/def ::payload map?)
+(s/def ::number string?)
 
 
 (def permissions
@@ -40,7 +41,7 @@
 
 (s/def ::admin-create
   (s/keys :req-un [::name ::login ::password]
-          :opt-un [::payload]))
+          :opt-un [::payload ::number]))
 
 
 (defn validate-create-admin!
@@ -62,7 +63,7 @@
 
 
 (s/def ::admin-patch
-  (s/keys :opt-un [::name ::login ::password ::payload]))
+  (s/keys :opt-un [::name ::login ::password ::payload ::number]))
 
 
 (defn validate-patch-admin!

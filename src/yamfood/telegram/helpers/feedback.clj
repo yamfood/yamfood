@@ -22,8 +22,9 @@
         bot (bots/bot-by-id! (:bot_id order))
         lang (or (:lang order) :ru)
         chat-id (:tid order)]
-    (t/send-text
-      (:token bot)
-      chat-id
-      {:reply_markup (feedback-request-markup order-id)}
-      (translate lang :request-feedback-message))))
+    (when (:tid order)
+      (t/send-text
+        (:token bot)
+        chat-id
+        {:reply_markup (feedback-request-markup order-id)}
+        (translate lang :request-feedback-message)))))

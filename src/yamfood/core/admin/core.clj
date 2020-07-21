@@ -14,6 +14,7 @@
               :admins.login
               :admins.password
               :admins.token
+              :admins.number
               :admins.payload]
    :from     [:admins]
    :where    [:= :admins.is_active true]

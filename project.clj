@@ -6,6 +6,7 @@
   :dependencies [[org.clojure/clojure "1.10.0"]
                  [org.clojure/data.json "0.2.6"]
 
+                 [kensay/clj-asterisk "0.2.7"]
                  [ring "1.7.1"]
                  [ring/ring-json "0.5.0"]
                  [ring-cors "0.1.13"]

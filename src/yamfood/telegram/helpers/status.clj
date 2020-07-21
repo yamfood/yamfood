@@ -12,11 +12,12 @@
   (let [order (o/order-by-id! order-id)
         bot (bots/bot-by-id! (:bot_id order))
         lang (or (:lang order) :ru)]
-    (t/send-text
-      (:token bot)
-      (:tid order)
-      {:parse_mode "markdown"}
-      (translate lang :status-on-kitchen))))
+    (when (:tid order)
+      (t/send-text
+        (:token bot)
+        (:tid order)
+        {:parse_mode "markdown"}
+        (translate lang :status-on-kitchen)))))
 
 
 (defn notify-order-canceled!
@@ -28,11 +29,12 @@
          lang (or (:lang order) :ru)
          reason (or reason
                     (translate lang :status-canceled))]
-     (t/send-text
-       (:token bot)
-       (:tid order)
-       {:parse_mode "markdown"}
-       reason))))
+     (when (:tid order)
+       (t/send-text
+         (:token bot)
+         (:tid order)
+         {:parse_mode "markdown"}
+         reason)))))
 
 
 (defn notify-order-on-way!
@@ -40,8 +42,9 @@
   (let [order (o/order-by-id! order-id)
         bot (bots/bot-by-id! (:bot_id order))
         lang (or (:lang order) :ru)]
-    (t/send-text
-      (:token bot)
-      (:tid order)
-      {:parse_mode "markdown"}
-      (translate lang :status-on-way))))
+    (when (:tid order)
+      (t/send-text
+        (:token bot)
+        (:tid order)
+        {:parse_mode "markdown"}
+        (translate lang :status-on-way)))))

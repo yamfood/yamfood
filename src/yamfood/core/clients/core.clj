@@ -52,6 +52,17 @@
        (first)))
 
 
+(defn client-with-bot-id-and-phone!
+  [bot-id phone]
+  (->> (-> client-query
+           (hh/merge-where [:= :clients.phone phone])
+           (hh/merge-where [:= :clients.bot_id bot-id])
+           (hs/format))
+       (jdbc/query db/db)
+       (map cu/keywordize-field)
+       (first)))
+
+
 (defn client-with-tid!
   [bot-id tid]
   (->> (-> client-query
@@ -135,6 +146,22 @@
   ([tid bot-id name payload]
    (let [client (insert-client! tid bot-id name payload)]
      (init-basket! (:id client)))))
+
+
+(defn create-external-client!
+  [bot-id phone]
+  (first
+    (jdbc/insert!
+      db/db
+      "clients"
+      {:name "Внешний клиент" :bot_id bot-id :phone phone})))
+
+
+(defn get-or-create-external-client!
+  [bot-id phone]
+  (let [client (client-with-bot-id-and-phone! bot-id phone)]
+    (or client
+        (create-external-client! bot-id phone))))
 
 
 (defn update-location-query
