@@ -12,6 +12,10 @@
   (let [phone (u/parse-int (str "998" (:CallerIDNum event)))
         number (:MemberName event)
         destination (:DestCallerIDNum event)]
+    (println (str "AMI Event Received: \n"
+                  phone "\n"
+                  number "\n"
+                  destination "\n\n"))
     (calls/new-call! phone number destination)))
 
 
@@ -34,14 +38,16 @@
   []
   (loop [context (get-context!)]
     (Thread/sleep 5000)
-    (if (ping! context)
-      (recur context)
-      (recur (get-context!)))))
+    (let [ok (ping! context)]
+      (println ("Asterisk PING result: " ok))
+      (if ok
+        (recur context)
+        (recur (get-context!))))))
 
 
 (mount/defstate
   asterisk-ami
-  :start connect-and-listen-events!
+  :start (connect-and-listen-events!)
   :stop (println "stop"))
 
 
