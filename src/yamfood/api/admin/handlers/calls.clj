@@ -65,5 +65,3 @@
         data {:client_id (:id client) :phone (str phone)}]
     (println data)
     (stream/put! socket (json/write-str data))))
-
-(new-call! 998901234567 1111 1505073)

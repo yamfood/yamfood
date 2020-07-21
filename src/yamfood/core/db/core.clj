@@ -10,8 +10,7 @@
 (mount/defstate db
   :start (pool/make-datasource-spec
            {:classname      "org.postgresql.Driver"
-            :connection-uri (env :jdbc-database-url)
-            :max-connections 2})
+            :connection-uri (env :jdbc-database-url)})
   :stop (.close db))
 
 
