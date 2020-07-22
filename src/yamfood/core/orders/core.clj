@@ -62,7 +62,7 @@
 (defn order-totals-query
   [order-id]
   {:with   [[:order_products_totals (order-products-totals-query order-id)]]
-   :select [[(hs/raw "sum((totals.products_cost + totals.modifiers_cost) * totals.count)::int") :total_cost]]
+   :select [[(hs/raw "coalesce(sum((totals.products_cost + totals.modifiers_cost) * totals.count), 0)::int") :total_cost]]
    :from   [[:order_products_totals :totals]]})
 
 
