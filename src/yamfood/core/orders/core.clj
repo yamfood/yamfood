@@ -47,7 +47,7 @@
 
 (defn order-products-totals-query
   [order-id]
-  {:select    [[(hs/raw "sum(distinct products.price)") :products_cost]
+  {:select    [[(hs/raw "coalesce(sum(distinct products.price), 0)") :products_cost]
                [(hs/raw "coalesce(sum(modifiers.price), 0)") :modifiers_cost]
                [:order_products.count :count]]
    :from      [:order_products]
