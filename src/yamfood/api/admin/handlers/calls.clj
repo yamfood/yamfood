@@ -1,12 +1,12 @@
 (ns yamfood.api.admin.handlers.calls
   (:require
     [aleph.http :as http]
+    [compojure.core :as c]
     [manifold.stream :as stream]
     [clojure.data.json :as json]
     [yamfood.core.admin.core :as a]
     [yamfood.core.bots.core :as bots]
-    [yamfood.core.clients.core :as clients]
-    [compojure.core :as c]))
+    [yamfood.core.clients.core :as clients]))
 
 
 (defonce connected-admins (atom {}))
@@ -68,9 +68,14 @@
       (stream/put! socket (json/write-str data)))))
 
 
+(defn get-connections
+  []
+  (map #(hash-map (first %) (stream/description (second %))) @connected-admins))
+
+
 (defn connected-admins-list
   [_]
-  {:body (or (keys @connected-admins) [])})
+  {:body (or (get-connections) [])})
 
 
 (c/defroutes
