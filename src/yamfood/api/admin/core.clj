@@ -8,6 +8,7 @@
     [yamfood.api.admin.handlers.auth :as auth]
     [yamfood.api.admin.handlers.data :as data]
     [yamfood.api.admin.handlers.bots :as bots]
+    [yamfood.api.admin.handlers.calls :as calls]
     [yamfood.api.admin.handlers.riders :as riders]
     [yamfood.api.admin.handlers.admins :as admins]
     [yamfood.api.admin.handlers.orders :as orders]
@@ -44,6 +45,7 @@
       (c/GET "/sign-s3" [] sign-s3)
       (c/context "/data" [] data/routes)
       (c/context "/bots" [] bots/routes)
+      (c/context "/calls" [] calls/routes)
       (c/context "/terminals" [] terminals/routes)
       (c/context "/admins" [] admins/routes)
       (c/context "/riders" [] riders/routes)

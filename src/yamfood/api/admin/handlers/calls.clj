@@ -5,7 +5,8 @@
     [clojure.data.json :as json]
     [yamfood.core.admin.core :as a]
     [yamfood.core.bots.core :as bots]
-    [yamfood.core.clients.core :as clients]))
+    [yamfood.core.clients.core :as clients]
+    [compojure.core :as c]))
 
 
 (defonce connected-admins (atom {}))
@@ -65,3 +66,13 @@
         data {:client_id (:id client) :phone (str phone)}]
     (when socket
       (stream/put! socket (json/write-str data)))))
+
+
+(defn connected-admins-list
+  [_]
+  {:body (or (keys @connected-admins) [])})
+
+
+(c/defroutes
+  routes
+  (c/GET "/connected/" [] connected-admins-list))
