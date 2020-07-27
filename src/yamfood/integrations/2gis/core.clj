@@ -2,7 +2,8 @@
   (:require
     [environ.core :refer [env]]
     [clj-http.client :as http]
-    [clojure.string :as str]))
+    [clojure.string :as str]
+    [yamfood.core.params.core :as params]))
 
 
 (defn filtered-join
@@ -15,11 +16,13 @@
 
 (defn location-by-address [q]
   (let [request {:as              :json
-                 :url             (str (:2gis-url env) "/3.0/items")
+                 :url             (str (or (:2gis-url (params/params!))
+                                           (:2gis-url env)) "/3.0/items")
                  :conn-timeout    10000
                  :socket-timeout  10000
                  :method          :get
-                 :query-params    {:key       (:2gis-key env)
+                 :query-params    {:key       (or (:2gis-key (params/params!))
+                                                  (:2gis-key env))
                                    :q         q
                                    :fields    "items.point"
                                    :region_id 208}
@@ -36,11 +39,13 @@
 
 (defn address-by-location [lat lon]
   (let [request {:as              :json
-                 :url             (str (:2gis-url env) "/3.0/items")
+                 :url             (str (or (:2gis-url (params/params!))
+                                           (:2gis-url env)) "/3.0/items")
                  :conn-timeout    10000
                  :socket-timeout  10000
                  :method          :get
-                 :query-params    {:key       (:2gis-key env)
+                 :query-params    {:key       (or (:2gis-key (params/params!))
+                                                  (:2gis-key env))
                                    :fields    "items.address"
                                    :lat       lat
                                    :lon       lon
