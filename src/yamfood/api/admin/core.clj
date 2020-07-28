@@ -40,12 +40,12 @@
   routes
   (c/context "/auth" [] auth/routes)
   (c/context "/ws" [] ws/routes)
+  (c/context "/calls" [] calls/routes)
   (wrap-auth
     (c/routes
       (c/GET "/sign-s3" [] sign-s3)
       (c/context "/data" [] data/routes)
       (c/context "/bots" [] bots/routes)
-      (c/context "/calls" [] calls/routes)
       (c/context "/terminals" [] terminals/routes)
       (c/context "/admins" [] admins/routes)
       (c/context "/riders" [] riders/routes)
