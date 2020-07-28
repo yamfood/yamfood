@@ -6,7 +6,9 @@
     [clojure.data.json :as json]
     [yamfood.core.admin.core :as a]
     [yamfood.core.bots.core :as bots]
-    [yamfood.core.clients.core :as clients]))
+    [yamfood.core.clients.core :as clients]
+    [yamfood.telegram.handlers.utils :as u]
+    [clojure.string :as str]))
 
 
 (defonce connected-admins (atom {}))
@@ -78,6 +80,22 @@
   {:body (or (get-connections) [])})
 
 
+(defn new-call-handler
+  [request]
+  (let [params (:params request)
+        phone (get params "number")
+        login (get params "login")
+        caller-name (get params "callername")
+        destination (first (str/split ":" caller-name))]
+    (println (str "\n\n" params "\n\n"))
+    (if (and phone login destination)
+      (let [phone (u/parse-int phone)]
+        (new-call! phone login destination)
+        {:status 200 :body {:result "ok"}})
+      {:status 400 :body {:error "Invalid input"}})))
+
+
 (c/defroutes
   routes
+  (c/GET "/new/" [] new-call-handler)
   (c/GET "/connected/" [] connected-admins-list))

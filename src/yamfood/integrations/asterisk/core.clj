@@ -44,11 +44,3 @@
         (recur context)
         (recur (get-context!))))))
 
-
-(mount/defstate
-  asterisk-ami
-  :start (connect-and-listen-events!)
-  :stop (println "stop"))
-
-
-#_(mount/stop #'sms #'asterisk-ami)
