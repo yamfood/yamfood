@@ -86,8 +86,7 @@
         phone (get params "number")
         login (get params "login")
         caller-name (get params "callername")
-        destination (first (str/split ":" caller-name))]
-    (println (str "\n\n" params "\n\n"))
+        destination (first (str/split caller-name #":"))]
     (if (and phone login destination)
       (let [phone (u/parse-int phone)]
         (new-call! phone login destination)
