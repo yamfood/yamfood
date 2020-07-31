@@ -14,6 +14,7 @@
     [yamfood.api.admin.handlers.orders :as orders]
     [yamfood.api.admin.handlers.params :as params]
     [yamfood.api.admin.handlers.clients :as clients]
+    [yamfood.integrations.2gis.core :as geocoding]
     [yamfood.api.admin.middleware :refer [wrap-auth]]
     [yamfood.api.admin.handlers.kitchens :as kitchens]
     [yamfood.api.admin.handlers.products :as products]
@@ -36,6 +37,25 @@
             :signedRequest (str (s3/generate-presigned-url! key))}}))
 
 
+(defn location [request]
+  (let [address (get-in request [:params "q"])]
+    (if (seq address)
+      {:body (geocoding/location-by-address address)}
+      {:status 400
+       :body   {:error "wrong params"}})))
+
+
+
+
+(defn address [{:keys [params]}]
+  (let [lat (get params "lat")
+        lon (get params "lon")]
+    (if (and (seq lat) (seq lon))
+      {:body {:address (geocoding/address-by-location lat lon)}}
+      {:status 400
+       :body   {:error "wrong params"}})))
+
+
 (c/defroutes
   routes
   (c/context "/auth" [] auth/routes)
@@ -44,6 +64,8 @@
   (wrap-auth
     (c/routes
       (c/GET "/sign-s3" [] sign-s3)
+      (c/GET "/location" [] location)
+      (c/GET "/address" [] address)
       (c/context "/data" [] data/routes)
       (c/context "/bots" [] bots/routes)
       (c/context "/terminals" [] terminals/routes)
