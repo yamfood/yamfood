@@ -8,7 +8,8 @@
     [yamfood.core.bots.core :as bots]
     [yamfood.core.clients.core :as clients]
     [yamfood.telegram.handlers.utils :as u]
-    [clojure.string :as str]))
+    [clojure.string :as str])
+  (:import (java.net URLDecoder)))
 
 
 (defonce connected-admins (atom {}))
@@ -83,9 +84,9 @@
 (defn new-call-handler
   [request]
   (let [params (:params request)
-        phone (get params "number")
-        login (get params "login")
-        caller-name (get params "callername")
+        phone (URLDecoder/decode (get params "number"))
+        login (URLDecoder/decode (get params "login"))
+        caller-name (URLDecoder/decode (get params "callername"))
         destination (first (str/split caller-name #":"))]
     (if (and phone login destination)
       (let [phone (u/parse-int phone)]
