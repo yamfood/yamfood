@@ -47,7 +47,7 @@
             [:= (hs/raw "(order_logs.payload->>'rider_id')::numeric") rider-id]]})
 
 
-(defn current-balance-query
+(defn balance-query
   [rider-id]
   {:select [[(hs/raw "coalesce(sum(rider_balance.amount), 0)::bigint") :sum]]
    :from   [:rider_balance]
@@ -56,11 +56,23 @@
 
 (defn current-balance!
   [rider-id]
-  (->> (-> (current-balance-query rider-id)
+  (->> (-> (balance-query rider-id)
            (hs/format))
        (jdbc/query db/db)
        (first)
        (:sum)))
+
+
+(defn earned-money-today!
+  [rider-id]
+  (let [today (.toLocalDate (LocalDateTime/now))]
+    (->> (-> (balance-query rider-id)
+             (hh/merge-where [:> :rider_balance.amount 0])
+             (hh/merge-where [:> :rider_balance.created_at today])
+             (hs/format))
+         (jdbc/query db/db)
+         (first)
+         (:sum))))
 
 
 (def rider-list-query
@@ -129,11 +141,11 @@
 
 
 (defn menu-state!
-  [rider-id delivery-cost]
+  [rider-id]
   (let [rider (rider-by-id! rider-id)
         finished-orders-today (finished-orders-today-count! rider-id)]
     (merge rider {:finished-orders-today finished-orders-today
-                  :earned-money-today    (* finished-orders-today delivery-cost)})))
+                  :earned-money-today    (earned-money-today! rider-id)})))
 
 
 (defn update!
