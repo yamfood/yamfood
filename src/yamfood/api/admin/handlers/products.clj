@@ -3,9 +3,9 @@
     [yamfood.utils :as u]
     [compojure.core :as c]
     [clojure.spec.alpha :as s]
-    [yamfood.integrations.iiko.core :as i]
-    [yamfood.core.products.core :as p]
     [clojure.tools.logging :as log]
+    [yamfood.core.products.core :as p]
+    [yamfood.integrations.iiko.core :as i]
     [yamfood.integrations.iiko.utils :as utils]))
 
 
@@ -128,6 +128,7 @@
                                            :emoji
                                            :bot_id
                                            :position
+                                           :rider_delivery_cost
                                            :is_delivery_free])
         valid? (and category
                     (s/valid? ::patch-category body))]
