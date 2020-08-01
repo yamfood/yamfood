@@ -141,13 +141,13 @@
          callback_params (u/callback-params (:data query))
          order-id (u/parse-int (first callback_params))]
      {:run {:function   o/order-by-id!
-            :args       [order-id {:products? false :totals? false}]
+            :args       [order-id]
             :next-event :r/finish-order}}))
   ([ctx order]
    (let [update (:update ctx)
          rider (:rider ctx)]
      {:run      {:function r/finish-order!
-                 :args     [(:id order) (:id rider)]}
+                 :args     [order (:id rider)]}
       :dispatch {:args        [:r/menu]
                  :rebuild-ctx {:function c/build-ctx!
                                :update   update}}})))

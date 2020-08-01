@@ -24,14 +24,17 @@
 
 
 (defn deposit-to-balance!
-  [rider-id admin-id amount description]
-  (jdbc/insert!
-    db/db
-    "rider_balance"
-    {:rider_id    rider-id
-     :amount      amount
-     :admin_id    admin-id
-     :description description}))
+  ([rider-id admin-id amount description]
+   (deposit-to-balance!
+     db/db rider-id admin-id amount description))
+  ([db rider-id admin-id amount description]
+   (jdbc/insert!
+     db
+     "rider_balance"
+     {:rider_id    rider-id
+      :amount      amount
+      :admin_id    admin-id
+      :description description})))
 
 
 (defn finished-orders-query
@@ -196,14 +199,22 @@
 
 
 (defn finish-order!
-  [order-id rider-id]
-  (jdbc/with-db-transaction
-    [t-con db/db]
-    (jdbc/insert! t-con "order_logs"
-                  {:order_id order-id
-                   :status   (:finished o/order-statuses)
-                   :payload  (db/map->jsonb {:rider_id rider-id})}))
-  (feedback/send-feedback-request! order-id))
+  [order rider-id]
+  (let [products (:products order)
+        delivery_cost (reduce max (map :rider_delivery_cost products))]
+    (jdbc/with-db-transaction
+      [t-con db/db]
+      (jdbc/insert! t-con "order_logs"
+                    {:order_id (:id order)
+                     :status   (:finished o/order-statuses)
+                     :payload  (db/map->jsonb {:rider_id rider-id})})
+      (deposit-to-balance!
+        t-con
+        rider-id
+        nil
+        delivery_cost
+        (str "Оплата за заказ №" (:id order))))
+    (feedback/send-feedback-request! (:id order))))
 
 
 (defn cancel-order!

@@ -134,7 +134,8 @@
                [(hs/raw "products.payload || order_products.payload") :payload]
                :order_products.comment
                :order_products.count
-               :categories.is_delivery_free]
+               :categories.is_delivery_free
+               :categories.rider_delivery_cost]
    :from      [:order_products :products]
    :left-join [:categories [:= :categories.id :products.category_id]]
    :where     [:= :order_products.product_id :products.id]})
