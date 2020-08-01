@@ -66,7 +66,7 @@
         body (:body request)
         valid? (s/valid? ::make-deposit body)]
     (if valid?
-      {:body (r/make-deposit! rider-id admin-id (:amount body))}
+      {:body (r/withdraw-from-balance! rider-id admin-id (:amount body))}
       {:body {:error "Incorrect input"}
        :code 400})))
 

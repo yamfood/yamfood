@@ -12,7 +12,26 @@
     (java.time LocalDateTime)))
 
 
-(defn make-deposit! [rider-id admin-id amount])
+(defn withdraw-from-balance!
+  [rider-id admin-id amount description]
+  (jdbc/insert!
+    db/db
+    "rider_balance"
+    {:rider_id    rider-id
+     :amount      (- amount)
+     :admin_id    admin-id
+     :description description}))
+
+
+(defn deposit-to-balance!
+  [rider-id admin-id amount description]
+  (jdbc/insert!
+    db/db
+    "rider_balance"
+    {:rider_id    rider-id
+     :amount      amount
+     :admin_id    admin-id
+     :description description}))
 
 
 (defn finished-orders-query
@@ -25,7 +44,20 @@
             [:= (hs/raw "(order_logs.payload->>'rider_id')::numeric") rider-id]]})
 
 
-(defn calculate-balance! [rider-id] 0)
+(defn current-balance-query
+  [rider-id]
+  {:select [[(hs/raw "coalesce(sum(rider_balance.amount), 0)") :sum]]
+   :from   [:rider_balance]
+   :where  [:= :rider_balance.rider_id rider-id]})
+
+
+(defn current-balance!
+  [rider-id]
+  (->> (-> (current-balance-query rider-id)
+           (hs/format))
+       (jdbc/query db/db)
+       (first)
+       (:sum)))
 
 
 (def rider-list-query
@@ -68,7 +100,7 @@
            (hh/merge-where [:= :riders.id id]))
        (hs/format)
        (jdbc/query db/db)
-       (map #(assoc % :balance (calculate-balance! (:id %))))
+       (map #(assoc % :balance (current-balance! (:id %))))
        (first)))
 
 
