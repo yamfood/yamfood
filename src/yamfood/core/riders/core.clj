@@ -49,7 +49,7 @@
 
 (defn current-balance-query
   [rider-id]
-  {:select [[(hs/raw "coalesce(sum(rider_balance.amount), 0)") :sum]]
+  {:select [[(hs/raw "coalesce(sum(rider_balance.amount), 0)::bigint") :sum]]
    :from   [:rider_balance]
    :where  [:= :rider_balance.rider_id rider-id]})
 
