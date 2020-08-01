@@ -49,7 +49,7 @@
         rider (r/rider-by-id! rider-id)]
     (if rider
       {:body (assoc rider :info [{:label "Баланс"
-                                  :value (:deposit rider)}])}
+                                  :value (:balance rider)}])}
       {:body   {:error "Not found"}
        :status 404})))
 

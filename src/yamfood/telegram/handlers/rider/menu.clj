@@ -18,7 +18,7 @@
           (:name state)
           (:finished-orders-today state)
           (u/fmt-values (:earned-money-today state))
-          (u/fmt-values (:deposit state))))
+          (u/fmt-values (:balance state))))
 
 
 (def rider-menu-markup

@@ -12,33 +12,7 @@
     (java.time LocalDateTime)))
 
 
-(defn make-deposit!
-  [rider-id admin-id amount]
-  (first
-    (jdbc/insert!
-      db/db
-      "rider_deposits"
-      {:rider_id rider-id
-       :admin_id admin-id
-       :amount   amount})))
-
-
-(defn deposits-sum-query
-  [rider-id]
-  {:select   [:%sum.rider_deposits.amount]
-   :from     [:rider_deposits]
-   :where    [:= :rider_deposits.rider_id rider-id]
-   :group-by [:rider_deposits.rider_id]})
-
-
-(defn deposits-sum!
-  [rider-id]
-  (or (->> (deposits-sum-query rider-id)
-           (hs/format)
-           (jdbc/query db/db)
-           (first)
-           (:sum))
-      0))
+(defn make-deposit! [rider-id admin-id amount])
 
 
 (defn finished-orders-query
@@ -51,26 +25,7 @@
             [:= (hs/raw "(order_logs.payload->>'rider_id')::numeric") rider-id]]})
 
 
-(defn orders-sum!
-  [rider-id]
-  (or (->> {:select [(hs/raw "coalesce(sum(order_products.count * products.price), 0) as total_cost")]
-            :from   [:order_products :products]
-            :where  [:and
-                     [:in :order_products.order_id (-> (finished-orders-query rider-id)
-                                                       (hh/merge-where [:= :orders.payment u/cash-payment]))]
-                     [:= :products.id :order_products.product_id]]}
-           (hs/format)
-           (jdbc/query db/db)
-           (first)
-           (:total_cost))
-      0))
-
-
-(defn calculate-deposit!
-  [rider-id]
-  (let []
-    (- (deposits-sum! rider-id)
-       (orders-sum! rider-id))))
+(defn calculate-balance! [rider-id] 0)
 
 
 (def rider-list-query
@@ -113,7 +68,7 @@
            (hh/merge-where [:= :riders.id id]))
        (hs/format)
        (jdbc/query db/db)
-       (map #(assoc % :deposit (calculate-deposit! (:id %))))
+       (map #(assoc % :balance (calculate-balance! (:id %))))
        (first)))
 
 
