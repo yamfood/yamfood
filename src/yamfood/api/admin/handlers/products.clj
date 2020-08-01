@@ -26,6 +26,7 @@
 (s/def ::price int?)
 (s/def ::position int?)
 (s/def ::is_free_delivery boolean?)
+(s/def ::rider_delivery_cost int?)
 (s/def ::category_id (s/nilable int?))
 (s/def ::group_id (s/nilable uuid?))
 
@@ -116,7 +117,7 @@
 
 
 (s/def ::patch-category
-  (s/keys :opt-un [::name ::bot_id ::position ::is_delivery_free]))
+  (s/keys :opt-un [::name ::bot_id ::position ::is_delivery_free ::rider_delivery_cost]))
 
 
 (defn patch-category
@@ -144,7 +145,7 @@
 
 
 (s/def ::create-category
-  (s/keys :req-un [::name ::bot_id ::position ::is_delivery_free]))
+  (s/keys :req-un [::name ::bot_id ::position ::is_delivery_free ::rider_delivery_cost]))
 
 
 (defn create-category

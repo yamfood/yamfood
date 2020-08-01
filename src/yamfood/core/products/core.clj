@@ -233,6 +233,7 @@
   {:select    [:categories.id
                :categories.name
                :categories.position
+               :categories.rider_delivery_cost
                [:bots.id :bot_id]
                [:bots.name :bot]
                :categories.emoji
