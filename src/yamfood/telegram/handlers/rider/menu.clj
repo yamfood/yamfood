@@ -13,12 +13,12 @@
                "*Сегодня:*\n"
                "  Завершил: %s заказов\n"
                "  Заработал: %s сум\n\n"
-               "*Депозит:* %s сум")
+               "*Баланс:* %s сум")
           (:id state)
           (:name state)
           (:finished-orders-today state)
           (u/fmt-values (:earned-money-today state))
-          (u/fmt-values (:deposit state))))
+          (u/fmt-values (:balance state))))
 
 
 (def rider-menu-markup
@@ -28,11 +28,10 @@
 
 (defn rider-menu-handler
   ([ctx]
-   (let [rider (:rider ctx)
-         delivery-cost (:delivery-cost (:params ctx))]
+   (let [rider (:rider ctx)]
      (if (:id rider)
        {:run {:function   r/menu-state!
-              :args       [(:id rider) delivery-cost]
+              :args       [(:id rider)]
               :next-event :r/menu}}
        {:dispatch {:args [:r/registration]}})))
   ([ctx menu-state]
@@ -53,10 +52,9 @@
 
 (defn refresh-menu-handler
   ([ctx]
-   (let [delivery-cost (:delivery-cost (:params ctx))]
-     {:run {:function   r/menu-state!
-            :args       [(:id (:rider ctx)) delivery-cost]
-            :next-event :r/refresh-menu}}))
+   {:run {:function   r/menu-state!
+          :args       [(:id (:rider ctx))]
+          :next-event :r/refresh-menu}})
   ([ctx state]
    (let [update (:update ctx)
          chat-id (u/chat-id update)

@@ -3,9 +3,9 @@
     [yamfood.utils :as u]
     [compojure.core :as c]
     [clojure.spec.alpha :as s]
-    [yamfood.integrations.iiko.core :as i]
-    [yamfood.core.products.core :as p]
     [clojure.tools.logging :as log]
+    [yamfood.core.products.core :as p]
+    [yamfood.integrations.iiko.core :as i]
     [yamfood.integrations.iiko.utils :as utils]))
 
 
@@ -26,6 +26,7 @@
 (s/def ::price int?)
 (s/def ::position int?)
 (s/def ::is_free_delivery boolean?)
+(s/def ::rider_delivery_cost int?)
 (s/def ::category_id (s/nilable int?))
 (s/def ::group_id (s/nilable uuid?))
 
@@ -116,7 +117,7 @@
 
 
 (s/def ::patch-category
-  (s/keys :opt-un [::name ::bot_id ::position ::is_delivery_free]))
+  (s/keys :opt-un [::name ::bot_id ::position ::is_delivery_free ::rider_delivery_cost]))
 
 
 (defn patch-category
@@ -127,6 +128,7 @@
                                            :emoji
                                            :bot_id
                                            :position
+                                           :rider_delivery_cost
                                            :is_delivery_free])
         valid? (and category
                     (s/valid? ::patch-category body))]
@@ -144,7 +146,7 @@
 
 
 (s/def ::create-category
-  (s/keys :req-un [::name ::bot_id ::position ::is_delivery_free]))
+  (s/keys :req-un [::name ::bot_id ::position ::is_delivery_free ::rider_delivery_cost]))
 
 
 (defn create-category

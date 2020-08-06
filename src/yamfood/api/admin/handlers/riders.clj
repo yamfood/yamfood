@@ -49,7 +49,7 @@
         rider (r/rider-by-id! rider-id)]
     (if rider
       {:body (assoc rider :info [{:label "Баланс"
-                                  :value (:deposit rider)}])}
+                                  :value (str " " (:balance rider) " сум")}])}
       {:body   {:error "Not found"}
        :status 404})))
 
@@ -59,14 +59,14 @@
   (s/keys :req-un [::amount]))
 
 
-(defn make-deposit
+(defn withdraw-from-balance
   [request]
   (let [rider-id (u/str->int (:id (:params request)))
         admin-id (:id (:admin request))
         body (:body request)
         valid? (s/valid? ::make-deposit body)]
     (if valid?
-      {:body (r/make-deposit! rider-id admin-id (:amount body))}
+      {:body (r/withdraw-from-balance! rider-id admin-id (:amount body) nil)}
       {:body {:error "Incorrect input"}
        :code 400})))
 
@@ -104,4 +104,4 @@
   (c/GET "/" [] riders-list)
   (c/GET "/:id{[0-9]+}/" [] rider-detail)
   (c/PATCH "/:id{[0-9]+}/" [] patch-rider)
-  (c/POST "/:id{[0-9]+}/deposit/" [] make-deposit))
+  (c/POST "/:id{[0-9]+}/withdraw/" [] withdraw-from-balance))
