@@ -156,19 +156,23 @@
     "modifiers"
     modifier
     ["modifiers.id = ?" modifier-id]
-    {:return-keys  true}))
+    {:return-keys true}))
 
 
 (defn products-by-bot!
   ([bot-id]
    (->> (-> all-products-query
-            (hh/merge-where [:= :categories.bot_id bot-id])
+            (hh/merge-where [:or
+                             [:= :categories.bot_id bot-id]
+                             [:= :categories.id nil]])
             (hs/format))
         (jdbc/query db/db)
         (map keywordize-json-fields)))
   ([bot-id kitchen-id]
    (->> (-> all-products-modifiers-query
-            (hh/merge-where [:= :categories.bot_id bot-id])
+            (hh/merge-where [:or
+                             [:= :categories.bot_id bot-id]
+                             [:= :categories.id nil]])
             (hh/merge-where
               [:not [:in
                      :products.id
@@ -282,9 +286,9 @@
                       (update :payload db/map->jsonb)
                       (update :description db/map->jsonb))]
      (when (-> (jdbc/update! db "products"
-                 ;; only price and payload get updated
-                 (select-keys product* [:price :payload])
-                 ["products.payload->>'iiko_id' = ?" (get-in product [:payload :iiko_id])])
+                             ;; only price and payload get updated
+                             (select-keys product* [:price :payload])
+                             ["products.payload->>'iiko_id' = ?" (get-in product [:payload :iiko_id])])
                (first)
                (zero?))
        (first (jdbc/insert! db "products" product*))))))
@@ -295,8 +299,8 @@
    (update-or-create-modifier! modifier db/db))
   ([modifier db]
    (when (-> (jdbc/update! db "modifiers"
-               (select-keys modifier [:price :group_id])
-               ["modifiers.id = ?" (:id modifier)])
+                           (select-keys modifier [:price :group_id])
+                           ["modifiers.id = ?" (:id modifier)])
              (first)
              (zero?))
      (first (jdbc/insert! db "modifiers" modifier)))))
