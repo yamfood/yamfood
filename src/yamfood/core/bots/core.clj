@@ -9,6 +9,7 @@
 (def bots-query
   {:select   [:bots.id
               :bots.token
+              :bots.is_active
               :bots.payments_token
               :bots.name]
    :from     [:bots]

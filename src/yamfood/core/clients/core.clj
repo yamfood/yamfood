@@ -131,8 +131,10 @@
 
 
 (defn insert-client!
-  [tid bot-id name payload]
-  (first (jdbc/insert! db/db "clients" {:tid tid :name name :bot_id bot-id :payload payload})))
+  ([tid bot-id name payload]
+   (first (jdbc/insert! db/db "clients" {:tid tid :name name :bot_id bot-id :payload payload})))
+  ([tid bot-id name payload phone]
+   (first (jdbc/insert! db/db "clients" {:tid tid :name name :bot_id bot-id :payload payload :phone phone}))))
 
 
 (defn init-basket!

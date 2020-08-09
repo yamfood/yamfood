@@ -71,6 +71,7 @@
         phone (get-phone update)
         code (generate-confirmation-code 5)
         bot-name (:name (:bot ctx))]
+    ;; TODO check if already exist
     (if phone
       {:run       [{:function sms/create!
                     :args     [phone (translate lang :confirmation-code bot-name code)]}

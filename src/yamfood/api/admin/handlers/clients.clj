@@ -7,7 +7,10 @@
     [yamfood.core.specs.core :as cs]
     [yamfood.core.orders.core :as o]
     [yamfood.core.clients.core :as clients]
-    [clojure.string :as str]))
+    [clojure.string :as str]
+    [honeysql.helpers :as hh]
+    [yamfood.core.bots.core :as bots]
+    [clojure.tools.logging :as log]))
 
 
 (defn distinct-comp
@@ -81,8 +84,44 @@
                search))}))
 
 
+(defn create-client
+  [request]
+  (let [{:keys [bot_id phone name]} (-> (:body request)
+                                        (update :phone u/str->int))
+        bot (bots/bot-by-id! bot_id)
+        client (clients/client-with-bot-id-and-phone! bot_id phone)
+        errors (cond-> {}
+                       (nil? bot)
+                       (update :bot_id (partial concat ["Не существует"]))
+
+                       (not (:is_active bot))
+                       (update :bot_id (partial concat ["Бот не активирован"]))
+
+                       (some? client)
+                       (update :phone (partial concat ["Уже зарегистрирован для данного бота"]))
+
+                       (empty? name)
+                       (update :phone (partial concat ["Не может быть пустым"]))
+
+                       :finally (not-empty))]
+    (if (some? errors)
+      {:body   {:error                 errors
+                :conflicting_client_id (:id client)}
+       :status 400}
+      (try
+        {:status 200
+         :body   (select-keys
+                   (clients/insert-client! nil bot_id name {} phone)
+                   [:id :name :phone])}
+        (catch Exception e
+          (log/error "Failed to create user from dashboard" e)
+          {:body   {:error "Unexpected error"}
+           :status 500})))))
+
+
 (c/defroutes
   routes
   (c/GET "/" [] clients-list)
+  (c/POST "/create/" [] create-client)
   (c/GET "/:id{[0-9]+}/" [] client-detail)
   (c/PATCH "/:id{[0-9]+}/" [] client-patch))
