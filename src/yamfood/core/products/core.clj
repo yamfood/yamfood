@@ -51,7 +51,8 @@
    :from      [:products]
    :left-join [:product_modifiers [:= :product_modifiers.product_id :products.id]
                :modifiers [:= :product_modifiers.modifier_id :modifiers.id]
-               :categories [:= :categories.id :products.category_id]]})
+               :categories [:= :categories.id :products.category_id]]
+   :where     [:= :products.is_active true]})
 
 
 (defn basket-products-totals-query
@@ -132,12 +133,9 @@
                    (assoc (cu/group-by-prefix product :category) :groupModifiers))))))
 
 
-(defn product-modifiers!
+(defn products-with-modifiers!
   ([]
-   (product-modifiers! nil))
-  ([f]
-   (->> (when (seq f) {:where f})
-        (merge all-products-modifiers-query)
+   (->> all-products-modifiers-query
         (hs/format)
         (jdbc/query db/db)
         (group-product-modifiers))))
@@ -156,7 +154,7 @@
     "modifiers"
     modifier
     ["modifiers.id = ?" modifier-id]
-    {:return-keys  true}))
+    {:return-keys true}))
 
 
 (defn products-by-bot!
@@ -281,9 +279,9 @@
                       (update :payload db/map->jsonb)
                       (update :description db/map->jsonb))]
      (when (-> (jdbc/update! db "products"
-                 ;; only price and payload get updated
-                 (select-keys product* [:price :payload])
-                 ["products.payload->>'iiko_id' = ?" (get-in product [:payload :iiko_id])])
+                             ;; only price and payload get updated
+                             (select-keys product* [:price :payload])
+                             ["products.payload->>'iiko_id' = ?" (get-in product [:payload :iiko_id])])
                (first)
                (zero?))
        (first (jdbc/insert! db "products" product*))))))
@@ -294,8 +292,8 @@
    (update-or-create-modifier! modifier db/db))
   ([modifier db]
    (when (-> (jdbc/update! db "modifiers"
-               (select-keys modifier [:price :group_id])
-               ["modifiers.id = ?" (:id modifier)])
+                           (select-keys modifier [:price :group_id])
+                           ["modifiers.id = ?" (:id modifier)])
              (first)
              (zero?))
      (first (jdbc/insert! db "modifiers" modifier)))))

@@ -45,7 +45,7 @@
 (defn products-list
   [_]
   {:body
-   (->> (p/product-modifiers!)
+   (->> (p/products-with-modifiers!)
         (map set-translations))})
 
 
