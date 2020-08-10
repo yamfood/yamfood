@@ -51,7 +51,8 @@
    :from      [:products]
    :left-join [:product_modifiers [:= :product_modifiers.product_id :products.id]
                :modifiers [:= :product_modifiers.modifier_id :modifiers.id]
-               :categories [:= :categories.id :products.category_id]]})
+               :categories [:= :categories.id :products.category_id]]
+   :where     [:= :products.is_active true]})
 
 
 (defn basket-products-totals-query
@@ -132,12 +133,9 @@
                    (assoc (cu/group-by-prefix product :category) :groupModifiers))))))
 
 
-(defn product-modifiers!
+(defn products-with-modifiers!
   ([]
-   (product-modifiers! nil))
-  ([f]
-   (->> (when (seq f) {:where f})
-        (merge all-products-modifiers-query)
+   (->> all-products-modifiers-query
         (hs/format)
         (jdbc/query db/db)
         (group-product-modifiers))))
