@@ -55,7 +55,8 @@
         :product-menu-button             (str e/back-emoji " Назад")
         :product-caption                 (str e/food-emoji " *{name}* \n\n"
                                               "{description}"
-                                              e/money-emoji "{price} сум")
+                                              e/money-emoji "{price} сум   "
+                                              e/energy-emoji "{energy} кКал")
 
         ; Basket
         :basket-message                  (str "Ваша корзина:\n\n"
