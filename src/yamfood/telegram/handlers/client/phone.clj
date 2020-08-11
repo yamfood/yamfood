@@ -161,9 +161,7 @@
        ;; if conflicting-client is same as current
        (= (:id conflicting-client) (:id client))
        ;; then confirm
-       {:run       {:function clients/update-phone!
-                    :args     [(:id client) phone]}
-        :send-text {:chat-id chat-id
+       {:send-text {:chat-id chat-id
                     :text    (translate lang :phone-confirmed-message)}
         :dispatch  {:args [:c/menu]}}
 
