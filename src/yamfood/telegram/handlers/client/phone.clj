@@ -145,11 +145,13 @@
 
        ;; if conflicting-client is external
        (nil? (:tid conflicting-client))
-       ;; then swap tids and change baskets owner to conflicting-client, and confirm
+       ;; then swap tids, change external payload and current basket owner to conflicting-client, and confirm
        {:run       [{:function clients/update-tid!
                      :args     [(:id client) nil]}
                     {:function clients/update-tid!
                      :args     [(:id conflicting-client) (:tid client)]}
+                    {:function clients/update-payload!
+                     :args     [(:id conflicting-client) (:payload client)]}
                     {:function baskets/update-owner!
                      :args     [(:basket_id (:client ctx)) (:id conflicting-client)]}]
         :send-text {:chat-id chat-id
