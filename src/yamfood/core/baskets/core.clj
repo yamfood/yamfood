@@ -172,3 +172,8 @@
   (->> (disabled-products-query basket-id kitchen-id)
        (jdbc/query db/db)
        (map #(cu/keywordize-field % :name))))
+
+
+(defn update-owner!
+  [busket-id client-id]
+  (jdbc/update! db/db "baskets" {:client_id client-id} ["id = ?" busket-id]))

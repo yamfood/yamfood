@@ -7,7 +7,8 @@
     [yamfood.telegram.dispatcher :as d]
     [yamfood.core.clients.core :as clients]
     [yamfood.telegram.handlers.utils :as u]
-    [yamfood.telegram.translation.core :refer [translate]]))
+    [yamfood.telegram.translation.core :refer [translate]]
+    [yamfood.core.baskets.core :as baskets]))
 
 
 (defn generate-confirmation-code
@@ -63,53 +64,117 @@
 
 
 (defn phone-handler
-  [ctx]
-  (let [update (:update ctx)
-        lang (:lang ctx)
-        client (:client ctx)
-        chat-id (u/chat-id update)
-        phone (get-phone update)
-        code (generate-confirmation-code 5)
-        bot-name (:name (:bot ctx))]
-    ;; TODO check if already exist
-    (if phone
-      {:run       [{:function sms/create!
-                    :args     [phone (translate lang :confirmation-code bot-name code)]}
-                   {:function clients/update-payload!
-                    :args     [(:id client) (-> (:payload client)
-                                                (assoc :unconfirmed-phone phone)
-                                                (assoc :step u/phone-confirmation-step)
-                                                (assoc :code code))]}]
-       :send-text [{:chat-id chat-id
-                    :options {:parse_mode   "markdown"
-                              :reply_markup {:remove_keyboard true}}
-                    :text    (translate lang :accepted)}
-                   {:chat-id chat-id
-                    :options {:parse_mode   "markdown"
-                              :reply_markup (phone-confirmation-markup (:lang ctx))}
-                    :text    (translate lang :request-code-message phone)}]}
-      {:send-text {:chat-id chat-id
-                   :text    (translate lang :invalid-phone-message)}})))
+  ([ctx]
+   {:run {:function   clients/client-with-bot-id-and-phone!
+          :args       [(-> ctx :bot :id)
+                       (get-phone (:update ctx))]
+          :next-event :c/phone}})
+  ([ctx conflicting-client]
+   (let [update (:update ctx)
+         lang (:lang ctx)
+         client (:client ctx)
+         bot (:bot ctx)
+         chat-id (u/chat-id update)
+         phone (get-phone update)
+         code (generate-confirmation-code 5)
+         bot-name (:name bot)]
+     (cond
+       (not phone)
+       {:send-text {:chat-id chat-id
+                    :text    (translate lang :invalid-phone-message)}}
+
+       ;; If the conflicting-client is non-existent or external or the same
+       (or (nil? (:tid conflicting-client)) (= (:id conflicting-client) (:id client)))
+       ;; then proceed with confirmation
+       {:run       [{:function sms/create!
+                     :args     [phone (translate lang :confirmation-code bot-name code)]}
+                    {:function clients/update-payload!
+                     :args     [(:id client) (-> (:payload client)
+                                                 (assoc :unconfirmed-phone phone)
+                                                 (assoc :step u/phone-confirmation-step)
+                                                 (assoc :code code))]}]
+        :send-text [{:chat-id chat-id
+                     :options {:parse_mode   "markdown"
+                               :reply_markup {:remove_keyboard true}}
+                     :text    (translate lang :accepted)}
+                    {:chat-id chat-id
+                     :options {:parse_mode   "markdown"
+                               :reply_markup (phone-confirmation-markup (:lang ctx))}
+                     :text    (translate lang :request-code-message phone)}]}
+
+       ;; If conflicting-client is not external
+       (some? (:tid conflicting-client))
+       ;; then phone cannot be registered
+       {:send-text {:chat-id chat-id
+                    :text    (translate lang :already-registered-message)}}
+
+       :else (throw (ex-info
+                      "Unexpected input, in phone-handler"
+                      {:conflicting_client_id (:id conflicting-client)
+                       :client_id             (:id client)}))))))
 
 
 (defn confirm-phone-handler
-  [ctx]
-  (let [update (:update ctx)
-        lang (:lang ctx)
-        chat-id (u/chat-id update)
-        text (:text (:message update))
-        client (:client ctx)
-        phone (:unconfirmed-phone (:payload client))
-        code (get-in client [:payload :code])
-        valid? (= text code)]
-    (if valid?
-      {:run       {:function clients/update-phone!
-                   :args     [(:id client) phone]}
-       :send-text {:chat-id chat-id
-                   :text    (translate lang :phone-confirmed-message)}
-       :dispatch  {:args [:c/menu]}}
-      {:send-text {:chat-id chat-id
-                   :text    (translate lang :incorrect-code-message)}})))
+  ([ctx]
+   {:run {:function   clients/client-with-bot-id-and-phone!
+          :args       [(get-in ctx [:bot :id])
+                       (get-in ctx [:client :payload :unconfirmed-phone])]
+          :next-event :c/confirm-phone}})
+  ([ctx conflicting-client]
+   (let [update (:update ctx)
+         lang (:lang ctx)
+         chat-id (u/chat-id update)
+         client (:client ctx)
+         phone (:unconfirmed-phone (:payload client))
+         code (get-in client [:payload :code])
+         text (:text (:message update))
+         valid? (= text code)]
+     (cond
+       (not valid?)
+       {:send-text {:chat-id chat-id
+                    :text    (translate lang :incorrect-code-message)}}
+
+       ;; If no conflicting-client
+       (nil? conflicting-client)
+       ;; then confirm
+       {:run       {:function clients/update-phone!
+                    :args     [(:id client) phone]}
+        :send-text {:chat-id chat-id
+                    :text    (translate lang :phone-confirmed-message)}
+        :dispatch  {:args [:c/menu]}}
+
+       ;; if conflicting-client is external
+       (nil? (:tid conflicting-client))
+       ;; then swap tids and change baskets owner to conflicting-client, and confirm
+       {:run       [{:function clients/update-tid!
+                     :args     [(:id client) nil]}
+                    {:function clients/update-tid!
+                     :args     [(:id conflicting-client) (:tid client)]}
+                    {:function baskets/update-owner!
+                     :args     [(:basket_id (:client ctx)) (:id conflicting-client)]}]
+        :send-text {:chat-id chat-id
+                    :text    (translate lang :phone-confirmed-message)}
+        :dispatch  {:args [:c/menu]}}
+
+       ;; if conflicting-client is same as current
+       (= (:id conflicting-client) (:id client))
+       ;; then confirm
+       {:run       {:function clients/update-phone!
+                    :args     [(:id client) phone]}
+        :send-text {:chat-id chat-id
+                    :text    (translate lang :phone-confirmed-message)}
+        :dispatch  {:args [:c/menu]}}
+
+
+       ;; If conflicting-client is not external
+       (some? (:tid conflicting-client))
+       ;; then phone cannot be registered
+       {:send-text {:chat-id chat-id
+                    :text    (translate lang :already-registered-message)}}
+       :else (throw (ex-info
+                      "Unexpected input, in confirm-phone-handler"
+                      {:conflicting_client_id (:id conflicting-client)
+                       :client_id             (:id client)}))))))
 
 
 (defn contact-handler

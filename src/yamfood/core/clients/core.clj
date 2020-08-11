@@ -191,6 +191,11 @@
   (jdbc/update! db/db "clients" {:phone phone} ["id = ?" client-id]))
 
 
+(defn update-tid!
+  [client-id tid]
+  (jdbc/update! db/db "clients" {:tid tid} ["id = ?" client-id]))
+
+
 (defn update-payload!
   [client-id payload]
   (jdbc/update! db/db "clients" {:payload payload} ["id = ?" client-id]))
