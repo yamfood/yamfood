@@ -415,7 +415,7 @@
   (jdbc/update!
     db/db
     "products"
-    {:is_active false}
+    {:is_active false :payload {}}
     ["products.id = ?" product-id]))
 
 
