@@ -93,7 +93,7 @@
         :invoice-title                   "Оплатить заказ №{1}"
 
         ; Statuses
-        :status-on-kitchen               "Ваш заказ готовится, курьер приедет через 60 минут или раньше!"
+        :status-on-kitchen               "Ваш заказ готовится, курьер приедет через {1} минут или раньше!"
         :status-canceled                 "Заказ отменен :("
         :status-on-way                   "Курьер уже в пути!"
 
@@ -205,7 +205,7 @@
         :invoice-title                   "Pay order №{1}"
 
         ; Statuses
-        :status-on-kitchen               "Your order is preparing, rider will arrive in 60 minutes or earlier"
+        :status-on-kitchen               "Your order is preparing, rider will arrive in {1} minutes or earlier"
         :status-canceled                 "The order has been cancelled :("
         :status-on-way                   "Rider is on its way!"
 
@@ -318,7 +318,7 @@
         :invoice-title                   "Buyurtmani to'lash №{1}"
 
         ; Statuses
-        :status-on-kitchen               "Sizning buyurtmangiz tayyorlanyapti, kuryer 60 daqiqada yoki undan oldin keladi!"
+        :status-on-kitchen               "Sizning buyurtmangiz tayyorlanyapti, kuryer {1} daqiqada yoki undan oldin keladi!"
         :status-canceled                 "Buyurtma bekor qilindi :("
         :status-on-way                   "Kuryer yo'lda!"
 

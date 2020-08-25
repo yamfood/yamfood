@@ -65,7 +65,11 @@
    :feedback-chat-id    {:name    "ID чата отзывов"
                          :docs    "ID чата в который бот будет слать отзывы клиентов"
                          :default -1
-                         :adapter read-string}})
+                         :adapter read-string}
+   :delivery-time    {:name    "Время доставки"
+                      :docs    "Время доставки в минутах, которое отображается для клиента при принятии заказа"
+                      :default 60
+                      :adapter read-string}})
 
 
 (defn params-detail-list!
