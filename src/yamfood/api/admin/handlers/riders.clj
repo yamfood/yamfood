@@ -54,6 +54,21 @@
        :status 404})))
 
 
+(defn rider-balance-logs
+  [request]
+  (let [rider-id (u/str->int (:id (:params request)))
+        params (->> [:offset :limit]
+                    (select-keys (->> (:query-params request)
+                                      (medley.core/map-keys keyword)))
+                    (medley.core/map-vals u/str->int))
+        offset (or (:offset params) 0)
+        limit (or (:limit params) 10)
+        logs (r/balance-logs! rider-id limit offset)
+        total (r/count-balance-logs! rider-id)]
+    {:body {:logs   logs
+            :total  total}}))
+
+
 (s/def ::amount int?)
 (s/def ::make-deposit
   (s/keys :req-un [::amount]))
@@ -103,5 +118,6 @@
   (c/POST "/" [] add-rider)
   (c/GET "/" [] riders-list)
   (c/GET "/:id{[0-9]+}/" [] rider-detail)
+  (c/GET "/:id{[0-9]+}/balance-logs" [] rider-balance-logs)
   (c/PATCH "/:id{[0-9]+}/" [] patch-rider)
   (c/POST "/:id{[0-9]+}/withdraw/" [] withdraw-from-balance))
