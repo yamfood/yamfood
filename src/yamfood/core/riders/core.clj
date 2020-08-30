@@ -54,6 +54,40 @@
    :where  [:= :rider_balance.rider_id rider-id]})
 
 
+(defn balance-log-query
+  [rider-id]
+  {:select    [:rider_balance.*
+               [:admins.name :admin_name]
+               [:admins.login :admin_login]]
+   :from      [:rider_balance]
+   :left-join [:admins [:= :rider_balance.admin_id :admins.id]]
+   :where     [:= :rider_balance.rider_id rider-id]
+   :order-by  [[:created_at :desc]]})
+
+
+(defn total-balance-logs
+  [rider-id]
+  {:select [:%count.id]
+   :from   [:rider_balance]
+   :where  [:= :rider_balance.rider_id rider-id]})
+
+
+(defn balance-logs! [rider-id limit offset]
+  (->> (-> (balance-log-query rider-id)
+           (assoc :limit limit
+                  :offset offset)
+           (hs/format))
+       (jdbc/query db/db)))
+
+
+(defn count-balance-logs! [rider-id]
+  (->> (-> (total-balance-logs rider-id)
+           (hs/format))
+       (jdbc/query db/db)
+       (first)
+       :count))
+
+
 (defn current-balance!
   [rider-id]
   (->> (-> (balance-query rider-id)
