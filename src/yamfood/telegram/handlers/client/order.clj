@@ -1,6 +1,7 @@
 (ns yamfood.telegram.handlers.client.order
   (:require
     [clojure.string :as str]
+    [environ.core :refer [env]]
     [yamfood.core.orders.core :as o]
     [yamfood.core.orders.core :as ord]
     [yamfood.core.kitchens.core :as k]
@@ -63,7 +64,7 @@
     {:inline_keyboard
      [(payment-buttons lang payment)
       [{:text (translate lang :oc-location-button) :callback_data "request-location"}]
-      [{:text (translate lang :oc-comment-button) :callback_data "change-comment"}]
+      [{:text (translate lang :oc-comment-button) :callback_data "send-last-comments"}]
       [{:text (translate lang :oc-basket-button) :callback_data "basket"}]
       [{:text (translate lang :oc-create-order-button) :callback_data "create-order"}]]}))
 
@@ -196,18 +197,80 @@
                           :text              (translate lang :all-kitchens-closed)}}))))
 
 
-(def write-comment-text "Напишите свой комментарий к заказу")
+(defn send-last-comments-handler
+  ([ctx]
+   {:run {:function   ord/last-n-order-comments-by-client-id!
+          :args       [(:id (:client ctx)) (or (:number-last-comments env) 5)]
+          :next-event :c/send-last-comments}})
+  ([ctx last-orders]
+   (let [update (:update ctx)
+         query (:callback_query update)
+         chat-id (:id (:from query))
+         client (:client ctx)
+         lang (:lang ctx)
+         message-id (:message_id (:message query))]
+     {:run            {:function clients/update-payload!
+                       :args     [(:id client) (assoc (:payload client) :step u/comment-step)]}
+      :send-text      {:chat-id    chat-id
+                       :text       (translate lang :oc-write-comment-text)
+                       :options    {:reply_markup
+                                    {:inline_keyboard (conj
+                                                        (mapv (fn [order]
+                                                                [{:text          (:comment order)
+                                                                  :callback_data (str "set-comment-from-order/"
+                                                                                      (:id order))}])
+                                                              last-orders)
+                                                        [{:text          (translate lang :oc-comment-back-button)
+                                                          :callback_data "to-order"}])}}
+                       :next-event :c/pre-save-message-id}
+      :delete-message {:chat-id    chat-id
+                       :message-id message-id}})))
+
+
+(defn set-comment-from-order
+  ([ctx]
+   (let [update (:update ctx)
+         query (:callback_query update)
+         params (u/callback-params (:data query))
+         order-id (u/parse-int (first params))]
+     {:run {:function   ord/order-by-id!
+            :args       [order-id]
+            :next-event :c/set-comment-from-order}}))
+  ([ctx order]
+   (let [update (:update ctx)
+         query (:callback_query update)
+         client (:client ctx)
+         chat-id (:id (:from query))
+         message-id (:message_id (:message query))]
+     {:run            {:function clients/update-payload!
+                       :args     [(:id client) (assoc (:payload client)
+                                                 :step :order-confirmation
+                                                 :comment (:comment order))]}
+      :dispatch       {:args [:c/order-confirmation-state]}
+      :delete-message {:chat-id    chat-id
+                       :message-id message-id}})))
+
+
+
+
 (defn change-comment-handler
-  [ctx]
-  (let [update (:update ctx)
-        query (:callback_query update)
-        chat-id (:id (:from query))
-        message-id (:message_id (:message query))]
-    {:send-text      {:chat-id chat-id
-                      :text    write-comment-text
-                      :options {:reply_markup {:force_reply true}}}
-     :delete-message {:chat-id    chat-id
-                      :message-id message-id}}))
+  ([ctx]
+   (let [update (:update ctx)
+         message (:message update)
+         message-id (:message_id message)
+         text (:text message)
+         client (:client ctx)
+         last-message-id (:last_message_id (:payload (:client ctx)))]
+     {:run             {:function clients/update-payload!
+                        :args     [(:id client) (assoc
+                                                  (:payload client)
+                                                  :comment
+                                                  text)]}
+      :dispatch        {:args [:c/order-confirmation-state]}
+      :delete-message [{:chat-id    (:tid client)
+                        :message-id last-message-id}
+                       {:chat-id    (:tid client)
+                        :message-id message-id}]})))
 
 
 (defn active-order-text
@@ -316,6 +379,16 @@
 (d/register-event-handler!
   :c/create-order
   create-order-handler)
+
+
+(d/register-event-handler!
+  :c/send-last-comments
+  send-last-comments-handler)
+
+
+(d/register-event-handler!
+  :c/set-comment-from-order
+  set-comment-from-order)
 
 
 (d/register-event-handler!
