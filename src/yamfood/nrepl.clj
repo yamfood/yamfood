@@ -18,7 +18,7 @@
   (alter-var-root #'*err* (fn [_] *err*)))
 
 
-(rebind-output)
+(comment (rebind-output))
 
 (mount/defstate ^{:on-reload :noop} server
   :start
