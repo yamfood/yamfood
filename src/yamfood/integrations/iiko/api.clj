@@ -15,6 +15,7 @@
 (def check-order-url (str iiko-host "/api/0/orders/checkCreate?access_token=%s"))
 (def order-info-url (str iiko-host "/api/0/orders/info?access_token=%s&organization=%s&order=%s"))
 (def create-order-url (str iiko-host "/api/0/orders/add?access_token=%s"))
+(def stop-list-url (str iiko-host "/api/0/stopLists/getDeliveryStopList?access_token=%s&organization=%s"))
 
 
 (defn get-access-token!
@@ -94,6 +95,16 @@
                     access-token
                     organization-id
                     order-id)
+        response (http/get url)]
+    (if (http/success? response)
+      (json/read-str (:body response) :key-fn keyword))))
+
+
+(defn stop-list!
+  [access-token organization-id]
+  (let [url (format stop-list-url
+                    access-token
+                    organization-id)
         response (http/get url)]
     (if (http/success? response)
       (json/read-str (:body response) :key-fn keyword))))

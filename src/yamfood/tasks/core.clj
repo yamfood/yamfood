@@ -3,8 +3,8 @@
     [mount.core :as mount]
     [overtone.at-at :as at]
     [yamfood.tasks.sms :as sms]
-    [yamfood.tasks.announcements :as a]))
-
+    [yamfood.tasks.announcements :as a]
+    [yamfood.tasks.iiko :as i]))
 
 (mount/defstate pool
   :start (at/mk-pool)
@@ -21,3 +21,8 @@
   :stop (at/stop sms))
 
 #_(mount/stop #'sms #'anouncements)
+
+
+(mount/defstate disabled-products
+  :start (at/every 10000 #(i/disabled-products-daemon!) pool)
+  :stop (at/stop disabled-products))
