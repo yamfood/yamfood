@@ -25,7 +25,7 @@
                                                        :from   [:products]
                                                        :where  [:str-in
                                                                 (hs/call :->> :payload "iiko_id")
-                                                                ;; TODO partition
+                                                                ;; TODO partition for big array
                                                                 (vec iiko-ids)]}
                                                       (hs/format)
                                                       (jdbc/query db/db)
