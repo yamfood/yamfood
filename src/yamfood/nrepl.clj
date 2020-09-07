@@ -18,6 +18,8 @@
   (alter-var-root #'*err* (fn [_] *err*)))
 
 
+(comment (rebind-output))
+
 (mount/defstate ^{:on-reload :noop} server
   :start
   (when (env :nrepl-port)

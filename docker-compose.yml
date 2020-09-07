@@ -3,7 +3,7 @@ services:
   bot:
     image: clojure:openjdk-8-lein-slim-buster
     working_dir: /app
-    command: lein trampoline run
+    command: bash -c "lein clean && lein trampoline run"
     ports:
       - 3004:3000
       - 7001:7000

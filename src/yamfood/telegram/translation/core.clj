@@ -68,6 +68,7 @@
         :oc-basket-button                (str e/back-emoji " Корзина")
         :oc-location-button              (str e/location-emoji " Изменить локацию")
         :oc-comment-button               (str e/comment-emoji " Комментарий")
+        :oc-comment-back-button          (str e/back-emoji " Назад")
         :oc-create-order-button          "✅ Все проверил, заказываю"
         :oc-empty-comment-text           "Укажите комментарий к адресу или к заказу"
         :oc-message                      (str "*Детали вашего заказа:* \n\n"
@@ -78,6 +79,7 @@
                                               e/location-emoji " *{address}* \n\n"
                                               " _❗️Пожалуйста, проверьте адрес_\n\n"
                                               "_\uD83D\uDD15 Больше не звоним для подтверждения заказа_")
+        :oc-write-comment-text           "Напишите свой комментарий к заказу или выберите из предыдущих"
 
         ; Active Order
         :active-order-message            (str "*Заказ №{1}:*\n\n"
@@ -180,6 +182,7 @@
         :oc-basket-button                (str e/back-emoji " Cart")
         :oc-location-button              (str e/location-emoji " Change location")
         :oc-comment-button               (str e/comment-emoji " Comment")
+        :oc-comment-back-button          (str e/back-emoji " Back")
         :oc-create-order-button          "✅ All checked, order"
         :oc-empty-comment-text           "Enter a comment to the address or order"
         :oc-message                      (str "*Details of your order:* \n\n"
@@ -190,6 +193,7 @@
                                               e/location-emoji " *{address}* \n\n"
                                               " _❗️Please check the address_ \n\n"
                                               "_\uD83D\uDD15 We no longer call to confirm the order_")
+        :oc-write-comment-text           "Write your comment on the order or choose from the previous ones"
 
         ; Active Order
         :active-order-message            (str "*Order №{1}:*\n\n"
@@ -293,6 +297,7 @@
         :oc-basket-button                (str e/back-emoji " Savat")
         :oc-location-button              (str e/location-emoji " Manzilni o'zgartirish")
         :oc-comment-button               (str e/comment-emoji " Izoh")
+        :oc-comment-back-button          (str e/back-emoji " Orqaga")
         :oc-create-order-button          "✅ Tekshirdim, tasdiqlayman"
         :oc-empty-comment-text           "Manzilga yoki buyurtmaga izoh kiriting"
         :oc-message                      (str "*Buyurtmaning tafsilotlari:* \n\n"
@@ -303,6 +308,8 @@
                                               e/location-emoji " *{address}* \n\n"
                                               " _❗️Iltimos, manzilni tekshiring_\n\n"
                                               "_\uD83D\uDD15 Buyurtmani tasdiqlash uchun endi qo'ng'iroq qilmaymiz_")
+        :oc-write-comment-text           "Buyurtma uchun sharhingizni yozing yoki avvalgisidan tanlang"
+
 
         ; Active Order
         :active-order-message            (str "*Buyurtma №{1}:*\n\n"

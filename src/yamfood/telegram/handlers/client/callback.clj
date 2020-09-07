@@ -26,7 +26,8 @@
       "request-location" {:dispatch {:args [:c/request-location]}}
       "request-phone" {:dispatch {:args [:c/request-phone]}}
       "switch-payment-type" {:dispatch {:args [:c/switch-payment-type]}}
-      "change-comment" {:dispatch {:args [:c/change-comment]}}
+      "send-last-comments" {:dispatch {:args [:c/send-last-comments]}}
+      "set-comment-from-order" {:dispatch {:args [:c/set-comment-from-order]}}
       "create-order" {:dispatch {:args [:c/create-order]}}
       "cancel-invoice" {:dispatch {:args [:c/cancel-invoice]}}
       "feedback" {:dispatch {:args [:c/feedback]}}

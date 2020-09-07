@@ -72,3 +72,28 @@
           (d/dispatch! ctx [:c/callback])))
       (d/dispatch! ctx [:c/blocked]))))
 
+
+(defn pre-save-message-id-handler [ctx result]
+  {:dispatch {:args        [:c/save-message-id result]
+              :rebuild-ctx {:function build-ctx!
+                            :update   (:update ctx)
+                            :token    (:token ctx)}}})
+
+
+(defn save-message-id-handler [ctx result]
+  (let [client (:client ctx)]
+    (clients/update-payload!
+      (:id client)
+      (assoc (:payload client)
+        :last_message_id (:message_id result)))
+    {}))
+
+
+(d/register-event-handler!
+  :c/pre-save-message-id
+  pre-save-message-id-handler)
+
+
+(d/register-event-handler!
+  :c/save-message-id
+  save-message-id-handler)

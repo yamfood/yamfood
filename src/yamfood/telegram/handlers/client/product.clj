@@ -90,11 +90,14 @@
 (defn product-detail-handler
   ([ctx]
    (let [update (:update ctx)
-         message (:message update)]
-     {:run {:function   products/state-for-product-detail!
-            :args       [(:basket_id (:client ctx))
-                         (u/parse-int (:text message))]
-            :next-event :c/text}}))
+         message (:message update)
+         step (:step (:payload (:client ctx)))]
+     (if (= step u/comment-step)
+       {:dispatch {:args [:c/no-product-text]}}
+       {:run {:function   products/state-for-product-detail!
+              :args       [(:basket_id (:client ctx))
+                           (u/parse-int (:text message))]
+              :next-event :c/text}})))
   ([ctx product-detail-state]
    (let [update (:update ctx)
          lang (:lang ctx)

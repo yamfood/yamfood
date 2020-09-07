@@ -56,11 +56,16 @@
 (d/register-effect-handler!
   :send-text
   (fn [ctx effect]
-    (t/send-text
-      (:token ctx)
-      (:chat-id effect)
-      (:options effect)
-      (:text effect))))
+    (let [result (:result (t/send-text
+                            (:token ctx)
+                            (:chat-id effect)
+                            (:options effect)
+                            (:text effect)))
+          next-event (:next-event effect)]
+      (if next-event
+        (d/dispatch! ctx [next-event result])
+        result))))
+
 
 
 (d/register-effect-handler!

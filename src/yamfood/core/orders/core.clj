@@ -93,6 +93,9 @@
    :from     [:order_logs]
    :order-by [:order_logs.order_id [:order_logs.id :desc]]})
 
+(def order-query
+  {:select [:*]
+   :from   [:orders]})
 
 (def order-detail-query
   {:select    [:orders.id
@@ -338,6 +341,16 @@
        (map fmt-order-location)))
 
 
+(defn last-n-order-comments-by-client-id! [client-id n]
+  (jdbc/query db/db
+              (-> order-query
+                  (assoc :where [:= :client_id client-id]
+                         :modifiers ["distinct on (comment)"]
+                         :limit n)
+                  (hs/format))))
+
+
+
 (defn accept-order!
   [order-id admin-id]
   (jdbc/insert!
@@ -449,6 +462,9 @@
              (map #(select-keys % [:product_id :payload :count]))
              (map #(assoc % :order_id order-id))
              (jdbc/insert-multi! db/db "order_products"))
+        (clients/update-payload!
+          (:id client)
+          (dissoc (:payload client) :comment))
         (when (= payment u/cash-payment)
           (jdbc/insert!
             db/db "order_logs"

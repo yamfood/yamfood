@@ -13,6 +13,7 @@
 (def basket-step "basket")
 (def order-confirmation-step "order-confirmation")
 (def feedback-step "feedback")
+(def comment-step "comment")
 
 (def cash-payment "cash")
 (def card-payment "card")

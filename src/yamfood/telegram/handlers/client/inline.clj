@@ -5,7 +5,8 @@
     [yamfood.core.products.core :as p]
     [yamfood.telegram.dispatcher :as d]
     [yamfood.telegram.handlers.utils :as u]
-    [yamfood.telegram.translation.core :refer [translate]]))
+    [yamfood.telegram.translation.core :refer [translate]]
+    [clojure.tools.logging :as log]))
 
 
 (defn product-description
@@ -20,7 +21,11 @@
     {:type                  "article"
      :id                    (:id product)
      :input_message_content {:message_text (str (:id product))}
-     :title                 (u/translated lang (:name product))
+     :title                 (if-let [title (u/translated lang (:name product))]
+                              title
+                              (do (log/warn (format "Product #%s has no %s translation" (:id product) lang)
+                                            (:name product))
+                                  (val (first (:name product)))))
      :description           (product-description product)
      :thumb_url             (:thumbnail product)}))
 
