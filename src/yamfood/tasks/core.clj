@@ -24,5 +24,5 @@
 
 
 (mount/defstate disabled-products
-  :start (at/every (* 24 3600) #(i/disabled-products-daemon!) pool)
+  :start (at/every (* 3600 1000) #(i/disabled-products-daemon!) pool)
   :stop (at/stop disabled-products))
