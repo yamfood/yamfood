@@ -14,9 +14,9 @@
     (let [;; new yamfood disabled products grouped -by-terminal
           disabled-products-by-terminal (->> (iiko/stop-list!)
                                              (map (fn [{:keys [deliveryTerminalId items]}]
-                                                    {deliveryTerminalId (set (map :productId items))}))
-                                             ;; [{"terminal-uuid-1" #{"product-uuid-1", "product-uuid-2", ...}}, {"terminal-uuid-2" #{"product-uuid-3", ...}}, ...]
-                                             (apply merge-with set/union)
+                                                    {deliveryTerminalId (map :productId items)}))
+                                             ;; [{"terminal-uuid-1" ["product-uuid-1", "product-uuid-2", ...]}, {"terminal-uuid-2" ["product-uuid-3", ...]}, ...]
+                                             (apply merge-with concat)
 
                                              ;; override iiko-ids with yamfood product-ids, removing not existent
                                              (medley.core/map-vals
@@ -26,9 +26,9 @@
                                                        :where  [:str-in
                                                                 (hs/call :->> :payload "iiko_id")
                                                                 ;; TODO partition for big array
-                                                                (vec iiko-ids)]}
+                                                                (vec (distinct iiko-ids))]}
                                                       (hs/format)
-                                                      (jdbc/query db/db)
+                                                      (jdbc/query t-con)
                                                       (map :id))))
                                              ;; remove empty terminals
                                              (medley.core/filter-vals seq))
@@ -40,7 +40,7 @@
                                                     ;; TODO partition for big array
                                                     (keys disabled-products-by-terminal)]]}
                                     (hs/format)
-                                    (jdbc/query db/db)
+                                    (jdbc/query t-con)
                                     (group-by :terminal_id)
                                     (medley.core/map-vals (partial map :id)))]
 
@@ -59,7 +59,7 @@
                          {:product_id pid
                           :kitchen_id kid})))
                    [])
-           (jdbc/insert-multi! db/db :disabled_products)))))
+           (jdbc/insert-multi! t-con :disabled_products)))))
 
 
 (defn disabled-products-daemon!
