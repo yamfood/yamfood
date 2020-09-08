@@ -344,8 +344,11 @@
 (defn last-n-order-comments-by-client-id! [client-id n]
   (jdbc/query db/db
               (-> order-query
-                  (assoc :where [:= :client_id client-id]
-                         :modifiers ["distinct on (comment)"]
+                  (assoc :where [:and
+                                 [:= :client_id client-id]
+                                 [:> (hs/call :length
+                                              (hs/call :trim :comment)) 3]]
+                         :modifiers ["distinct on (trim(comment))"]
                          :limit n)
                   (hs/format))))
 
