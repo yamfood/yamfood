@@ -88,3 +88,23 @@
                             :id)]
     (api/delivery-terminals! access-token organization-id)))
 
+
+(defn stop-list! []
+  (let [params (p/params!)
+        access-token (api/get-access-token! (:iiko-user-id params)
+                                            (:iiko-user-secret params))
+        organization-id (-> (api/organizations! access-token)
+                            (first)
+                            :id)]
+    (->> (api/stop-list! access-token organization-id)
+         :stopList
+         (filter (comp #{organization-id} :organizationId)))))
+
+
+
+(comment
+  (->> (stop-list!)
+       (map (fn [{:keys [deliveryTerminalId items]}]
+              {deliveryTerminalId (set (map :productId items))}))
+       ;; [{"terminal-uuid-1" ["product-uuid-1", "product-uuid-2", ...]}, {"terminal-uuid-2" ["product-uuid-3", ...]}, ...]
+       (apply merge-with set/union)))
