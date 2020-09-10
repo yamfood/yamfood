@@ -32,17 +32,23 @@
         token (:token data)
         admin (a/admin-by-token! token)
         admin-number (:number admin)]
-    (swap! connected-admins assoc (str admin-number) socket)))
+    (swap! connected-admins
+           update (str admin-number)
+           (partial cons socket))))
 
 
 (defn close-fn!
-  [message]
+  [socket message]
   (fn []
     (let [data (message->clj message)
           token (:token data)
           admin (a/admin-by-token! token)
           admin-number (:number admin)]
-      (swap! connected-admins dissoc (str admin-number)))))
+      (swap! connected-admins
+             (fn [admins]
+               (->> (update admins (str admin-number)
+                            (partial remove #{socket}))
+                    (medley.core/filter-vals seq)))))))
 
 
 (defn ws-handler
@@ -56,14 +62,15 @@
         (consumer! socket message)
         (stream/on-closed
           socket
-          (close-fn! message)))
+          (close-fn! socket message)))
       nil)
     non-websocket-request))
 
 
 (defn new-call!
   [phone admin-number destination]
-  (let [socket (get @connected-admins (str admin-number))
+  (let [;; Takes latest socket connection of this admin
+        socket (first (get @connected-admins (str admin-number)))
         bot-id (:id (bots/bot-by-destination! destination))
         client (clients/get-or-create-external-client! bot-id phone)
         data {:client_id (:id client) :phone (str phone)}]
@@ -73,7 +80,9 @@
 
 (defn get-connections
   []
-  (map #(hash-map (first %) (stream/description (second %))) @connected-admins))
+  (map (fn [[k conns]]
+         (hash-map k (stream/description (first conns))))
+       @connected-admins))
 
 
 (defn connected-admins-list
