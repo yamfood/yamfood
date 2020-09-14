@@ -25,7 +25,7 @@
                               title
                               (do (log/warn (format "Product #%s has no %s translation" (:id product) lang)
                                             (:name product))
-                                  (val (first (:name product)))))
+                                  (second (first (:name product)))))
      :description           (product-description product)
      :thumb_url             (:thumbnail product)}))
 

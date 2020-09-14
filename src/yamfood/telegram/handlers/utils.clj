@@ -38,7 +38,7 @@
 (defn translated
   [lang map]
   (or (get map lang)
-      (val (first map))))
+      (second (first map))))
 
 
 (defn more-button
