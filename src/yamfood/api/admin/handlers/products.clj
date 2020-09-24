@@ -11,7 +11,7 @@
 
 (s/def ::photo string?)
 (s/def ::thumbnail string?)
-
+(s/def ::payload map?)
 (s/def ::ru string?)
 (s/def ::uz string?)
 (s/def ::en string?)
