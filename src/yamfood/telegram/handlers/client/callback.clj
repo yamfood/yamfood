@@ -23,6 +23,7 @@
       "basket+" {:dispatch {:args [:c/inc-basket-product]}}
       "basket-" {:dispatch {:args [:c/dec-basket-product]}}
       "to-order" {:dispatch {:args [:c/to-order]}}
+      "to-order-confirmation" {:dispatch {:args [:c/order-confirmation-state]}}
       "request-location" {:dispatch {:args [:c/request-location]}}
       "request-phone" {:dispatch {:args [:c/request-phone]}}
       "switch-payment-type" {:dispatch {:args [:c/switch-payment-type]}}

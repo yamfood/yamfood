@@ -36,11 +36,29 @@
                         :args     [(:id client)
                                    (assoc (:payload client) :step u/order-confirmation-step)]}}
       (cond
-        (:location (:payload client)) {:dispatch {:args [:c/order-confirmation-state]}}
+        (:location (:payload client)) {:dispatch {:args [:c/confirm-location]}}
         :else {:dispatch {:args        [:c/request-location]
                           :rebuild-ctx {:function c/build-ctx!
                                         :update   (:update ctx)
                                         :token    (:token ctx)}}}))))
+
+(defn confirm-location
+  [ctx]
+  (let [update (:update ctx)
+        query (:callback_query update)
+        chat-id (:id (:from query))
+        client (:client ctx)
+        lang (:lang ctx)
+        address (u/text-from-address
+                  (get-in client [:payload :location :address]))]
+    {:send-text {:chat-id chat-id
+                 :text    (translate lang :lc-message-text address)
+                 :options {:parse_mode   "markdown"
+                           :reply_markup {:inline_keyboard
+                                          [[{:text          (translate lang :lc-yes)
+                                             :callback_data "to-order-confirmation"}
+                                            {:text          (translate lang :lc-no)
+                                             :callback_data "request-location"}]]}}}}))
 
 
 (defn payment-buttons
@@ -261,12 +279,12 @@
          text (:text message)
          client (:client ctx)
          last-message-id (:last_message_id (:payload (:client ctx)))]
-     {:run             {:function clients/update-payload!
-                        :args     [(:id client) (assoc
-                                                  (:payload client)
-                                                  :comment
-                                                  text)]}
-      :dispatch        {:args [:c/order-confirmation-state]}
+     {:run            {:function clients/update-payload!
+                       :args     [(:id client) (assoc
+                                                 (:payload client)
+                                                 :comment
+                                                 text)]}
+      :dispatch       {:args [:c/order-confirmation-state]}
       :delete-message [{:chat-id    (:tid client)
                         :message-id last-message-id}
                        {:chat-id    (:tid client)
@@ -364,6 +382,11 @@
 (d/register-event-handler!
   :c/to-order
   to-order-handler)
+
+
+(d/register-event-handler!
+  :c/confirm-location
+  confirm-location)
 
 
 (d/register-event-handler!

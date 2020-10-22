@@ -64,6 +64,11 @@
         :basket-menu-button              (str e/back-emoji " В меню")
         :to-order-button                 "Далее ➡️"
 
+        ; Location Confirmation
+        :lc-message-text                 (str e/location-emoji "*Ваш адрес?*\n\n{1}")
+        :lc-yes                          "✅ Да"
+        :lc-no                           (str e/location-emoji " Нет, изменить")
+
         ; Order Confirmation
         :oc-basket-button                (str e/back-emoji " Корзина")
         :oc-location-button              (str e/location-emoji " Изменить локацию")
@@ -177,6 +182,11 @@
         :empty-basket-text               "Unfortunately, your Cart is still empty :("
         :basket-menu-button              (str e/back-emoji " Into menu")
         :to-order-button                 "Further ➡️"
+
+        ; Location Confirmation
+        :lc-message-text                 (str e/location-emoji "*Your address?*\n\n{1}")
+        :lc-yes                          "✅ Yes"
+        :lc-no                           (str e/location-emoji " No, change")
 
         ; Order Confirmation
         :oc-basket-button                (str e/back-emoji " Cart")
@@ -292,6 +302,11 @@
         :empty-basket-text               "Afsuski, sizning savatingiz hali bo'sh :("
         :basket-menu-button              (str e/back-emoji " Menyuga")
         :to-order-button                 "Keyingi ➡️"
+
+        ; Location Confirmation
+        :lc-message-text                 (str e/location-emoji "*Sizning manzilingiz?*\n\n{1}")
+        :lc-yes                          "✅ Ha"
+        :lc-no                           (str e/location-emoji " Yo'q, o'zgartirish")
 
         ; Order Confirmation
         :oc-basket-button                (str e/back-emoji " Savat")
