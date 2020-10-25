@@ -22,6 +22,7 @@
       "basket-product-info" {:dispatch {:args [:c/basket-product-info]}}
       "basket+" {:dispatch {:args [:c/inc-basket-product]}}
       "basket-" {:dispatch {:args [:c/dec-basket-product]}}
+      "confirm-location" {:dispatch {:args [:c/confirm-location]}}
       "to-order" {:dispatch {:args [:c/to-order]}}
       "to-order-confirmation" {:dispatch {:args [:c/order-confirmation-state]}}
       "request-location" {:dispatch {:args [:c/request-location]}}

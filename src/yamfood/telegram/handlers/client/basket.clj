@@ -83,7 +83,7 @@
                                     (u/fmt-values total_cost))
              :callback_data "nothing"}]
            (if (not (empty? (:products basket-state)))
-             [{:text (translate lang :to-order-button) :callback_data "to-order"}]
+             [{:text (translate lang :to-order-button) :callback_data "confirm-location"}]
              []))}))
 
 

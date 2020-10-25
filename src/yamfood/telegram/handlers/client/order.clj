@@ -36,7 +36,7 @@
                         :args     [(:id client)
                                    (assoc (:payload client) :step u/order-confirmation-step)]}}
       (cond
-        (:location (:payload client)) {:dispatch {:args [:c/confirm-location]}}
+        (:location (:payload client)) {:dispatch {:args [:c/order-confirmation-state]}}
         :else {:dispatch {:args        [:c/request-location]
                           :rebuild-ctx {:function c/build-ctx!
                                         :update   (:update ctx)
@@ -56,7 +56,7 @@
                  :options {:parse_mode   "markdown"
                            :reply_markup {:inline_keyboard
                                           [[{:text          (translate lang :lc-yes)
-                                             :callback_data "to-order-confirmation"}
+                                             :callback_data "to-order"}
                                             {:text          (translate lang :lc-no)
                                              :callback_data "request-location"}]]}}}}))
 
