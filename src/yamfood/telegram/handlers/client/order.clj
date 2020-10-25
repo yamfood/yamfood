@@ -58,7 +58,10 @@
                                           [[{:text          (translate lang :lc-yes)
                                              :callback_data "to-order"}
                                             {:text          (translate lang :lc-no)
-                                             :callback_data "request-location"}]]}}}}))
+                                             :callback_data "request-location"}]]}}}
+     :run       {:function clients/update-payload!
+                 :args     [(:id client)
+                            (assoc (:payload client) :step u/order-confirmation-step)]}}))
 
 
 (defn payment-buttons
