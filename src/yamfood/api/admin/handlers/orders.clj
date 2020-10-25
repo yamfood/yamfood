@@ -42,11 +42,11 @@
     (assoc order :latency latency)))
 
 
-(defn add-viewer!
+(defn add-viewers!
   [order]
   (let [order-id (:id order)
-        viewer ((keyword (str order-id)) @open-orders)]
-    (assoc order :viewer viewer)))
+        viewers ((keyword (str order-id)) @open-orders)]
+    (assoc order :viewers (->> viewers (map :name) (distinct)))))
 
 
 (defn empty-structure
@@ -64,7 +64,7 @@
     reduce-active-orders
     (empty-structure)
     (->> (ord/active-orders!)
-         (map add-viewer!)
+         (map add-viewers!)
          (map add-latency))))
 
 
@@ -236,20 +236,28 @@
 
 
 (defn consumer!
-  [message]
+  [socket message]
   (let [data (message->clj message)
         order-id (:order data)
         token (:token data)
-        admin (a/admin-by-token! token)]
-    (swap! open-orders assoc (keyword (str order-id)) (:name admin))))
+        admin-name (:name (a/admin-by-token! token))]
+    (swap! open-orders
+           update (keyword (str order-id))
+           (partial cons {:socket socket
+                          :name   admin-name}))))
 
 
 (defn close-fn!
-  [message]
+  [socket message]
   (fn []
     (let [data (message->clj message)
           order-id (:order data)]
-      (swap! open-orders dissoc (keyword (str order-id))))))
+      (swap! open-orders
+             (fn [orders]
+               (->> (update orders (keyword (str order-id))
+                            (partial remove
+                                     (comp #{socket} :socket)))
+                    (medley.core/filter-vals seq)))))))
 
 
 (defn ws-handler
@@ -260,10 +268,10 @@
                       nil))]
     (do
       (let [message @(stream/take! socket)]
-        (consumer! message)
+        (consumer! socket message)
         (stream/on-closed
           socket
-          (close-fn! message)))
+          (close-fn! socket message)))
       nil)
     non-websocket-request))
 
