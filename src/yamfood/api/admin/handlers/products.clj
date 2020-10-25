@@ -155,6 +155,7 @@
                                            :emoji
                                            :bot_id
                                            :position
+                                           :rider_delivery_cost
                                            :is_delivery_free])
         valid? (s/valid? ::create-category body)]
     (if valid?
