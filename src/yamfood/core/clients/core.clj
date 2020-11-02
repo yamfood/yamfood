@@ -130,6 +130,20 @@
         (map cu/keywordize-field))))
 
 
+(defn clients-tids-list!
+  ([]
+   (clients-tids-list! 0 100))
+  ([offset limit]
+   (clients-tids-list! offset limit nil))
+  ([offset limit where]
+   (->> (-> (clients-list-query offset limit)
+            (assoc :select [:clients.tid])
+            (hh/merge-where where))
+        (hs/format)
+        (#(jdbc/query db/db % {:auto-commit? false
+                               :fetch-size 100})))))
+
+
 (defn insert-client!
   ([tid bot-id name payload]
    (first (jdbc/insert! db/db "clients" {:tid tid :name name :bot_id bot-id :payload payload})))
