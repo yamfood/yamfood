@@ -29,7 +29,7 @@
     (a/update! announcement-id {:status (:sending a/announcement-statuses)})
     (doall
       (pmap #(send-announcement-to-client! (:token bot) % photo text)
-            (pmap #(select-keys % [:tid]) (c/clients-tids-list! 0 999999999 [:= :clients.bot_id (:id bot)]))))
+            (c/clients-tids-list! 0 1 [:= :clients.bot_id (:id bot)])))
     (a/update! announcement-id {:status (:sent a/announcement-statuses)})))
 
 
