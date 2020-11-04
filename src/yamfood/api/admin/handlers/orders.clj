@@ -19,7 +19,8 @@
     [yamfood.core.products.core :as products]
     [yamfood.integrations.iiko.core :as iiko]
     [yamfood.telegram.helpers.status :as status]
-    [yamfood.api.admin.handlers.products :as api.products]))
+    [yamfood.api.admin.handlers.products :as api.products])
+  (:import (clojure.lang ExceptionInfo)))
 
 
 (defonce open-orders (atom {}))
@@ -114,6 +115,10 @@
         (o/accept-order! (:id order) admin-id)
         (status/notify-order-accepted! (:id order))
         {:body (get-active-orders!)}
+        (catch ExceptionInfo e
+          (println e)
+          {:body   {:error "Iiko error"}
+           :status 500})
         (catch Exception e
           (println e)
           {:body   {:error "Unexpected error"}
