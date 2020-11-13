@@ -14,6 +14,8 @@
         :incorrect-code-message          "Неверный код, попробуйте еще раз"
         :request-contact-message         (str "Отправь свой контакт или номер телефона в формате _998901234567_\n\n"
                                               "Мы отправим СМС с кодом для подтверждения")
+        :already-registered-message      (str "Пользователь с данным номером телефона уже зарегистрирован в системе. "
+                                              "При необходимости смены аккаунта, позвоните в службу поддержки \uD83D\uDE0B")
 
         ; Start
         :hello-message                   "С чего начнем?"
@@ -134,6 +136,9 @@
         :incorrect-code-message          "Invalid code, try again"
         :request-contact-message         (str "Send your contact or phone number in the format _998901234567_\n\n"
                                               "We will send an SMS with a confirmation code")
+        :already-registered-message      (str "The user with this phone number is already registered in the system. "
+                                              "If you need to change your account, call the support service \uD83D\uDE0B")
+
 
         ; Start
         :hello-message                   "Where do we start?"
@@ -253,6 +258,8 @@
         :incorrect-code-message          "Noto'g'ri kod, yana urinib ko'ring"
         :request-contact-message         (str "Kontaktingizni yoki telefon raqamingizni formatda yuboring _998901234567_\n\n"
                                               "Tasdiqlash uchun kod bilan SMS yuboramiz")
+        :already-registered-message      (str "Ushbu telefon raqamiga ega foydalanuvchi tizimda ro'yxatdan o'tgan. "
+                                              "Agar o'zgartirish kerak bo'lsa, qo'llab-quvvatlash xizmatiga qo'ng'iroq qiling \uD83D\uDE0B")
 
         ; Start
         :hello-message                   "Nimadan boshlaymiz?"
