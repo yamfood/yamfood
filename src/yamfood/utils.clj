@@ -35,3 +35,8 @@
   (if (contains? m k)
     (assoc m k (f (get m k)))
     m))
+
+
+(defn log-error
+  [request e]
+  (clojure.pprint/pprint {:update (:body request) :error e}))

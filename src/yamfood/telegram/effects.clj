@@ -3,7 +3,8 @@
     [morse.api :as t]
     [environ.core :refer [env]]
     [yamfood.telegram.methods :as -t]
-    [yamfood.telegram.dispatcher :as d]))
+    [yamfood.telegram.dispatcher :as d]
+    [yamfood.utils :as utils]))
 
 
 (d/register-effect-handler!
@@ -102,10 +103,13 @@
 (d/register-effect-handler!
   :delete-message
   (fn [ctx effect]
-    (t/delete-text
-      (:token ctx)
-      (:chat-id effect)
-      (:message-id effect))))
+    (try
+      (t/delete-text
+        (:token ctx)
+        (:chat-id effect)
+        (:message-id effect))
+      (catch Exception e
+        (utils/log-error (:request ctx) e)))))
 
 
 (d/register-effect-handler!

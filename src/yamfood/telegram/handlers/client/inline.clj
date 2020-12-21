@@ -58,10 +58,12 @@
          kitchen-id (:id (k/nearest-kitchen! (:id (:bot ctx))
                                              (:longitude location)
                                              (:latitude location)))]
-     (when (seq (:query query))
-       {:run {:function   p/products-by-category-emoji!
-              :args       [(:id (:bot ctx)) kitchen-id (:query query)]
-              :next-event :c/inline}})))
+     (if (:phone (:client ctx))
+       (when (seq (:query query))
+         {:run {:function   p/products-by-category-emoji!
+                :args       [(:id (:bot ctx)) kitchen-id (:query query)]
+                :next-event :c/inline}})
+       {:dispatch {:args [:c/start]}})))
   ([ctx products]
    (let [update (:update ctx)
          lang (:lang ctx)

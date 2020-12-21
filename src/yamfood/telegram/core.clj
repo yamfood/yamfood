@@ -5,15 +5,8 @@
     [yamfood.telegram.effects]
     [environ.core :refer [env]]
     [yamfood.telegram.handlers.rider.core :as rider]
-    [yamfood.telegram.handlers.client.core :as client]))
-
-
-(defn log-error
-  [request e]
-  (println
-    (format
-      "\n\n %s \n\n"
-      {:update (:body request) :error e})))
+    [yamfood.telegram.handlers.client.core :as client]
+    [yamfood.utils :as utils]))
 
 
 (defn log-debug
@@ -28,7 +21,7 @@
     (try
       (client/client-update-handler! token (:body request))
       (catch Exception e
-        (log-error request e)))
+        (utils/log-error request e)))
     {:body "OK"}))
 
 
@@ -38,7 +31,7 @@
   (try
     (rider/rider-update-handler! (:body request))
     (catch Exception e
-      (log-error request e)))
+      (utils/log-error request e)))
   {:body "OK"})
 
 

@@ -120,6 +120,18 @@
       query (:id (:from query)))))
 
 
+(defn from
+  "Use when you don't know input update type"
+  [update]
+  (let [message (:message update)
+        inline (:inline_query update)
+        query (:callback_query update)]
+    (cond
+      message (:from message)
+      inline (:from inline)
+      query (:from query))))
+
+
 (defn update-type
   [update]
   (let [message (:message update)
@@ -180,4 +192,4 @@
   [update]
   (let [message (:message update)
         text (:text message)]
-    (second (str/split text #" "))))
+    (when text (second (str/split text #" ")))))

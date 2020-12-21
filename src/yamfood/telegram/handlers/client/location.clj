@@ -59,11 +59,13 @@
    (let [update (:update ctx)
          message (:message update)
          location (:location message)]
-     {:run {:function   regions/location-info!
-            :args       [(:id (:bot ctx))
-                         (:longitude location)
-                         (:latitude location)]
-            :next-event :c/location}}))
+     (if (:phone (:client ctx))
+       {:run {:function   regions/location-info!
+              :args       [(:id (:bot ctx))
+                           (:longitude location)
+                           (:latitude location)]
+              :next-event :c/location}}
+       {:dispatch {:args [:c/start]}})))
   ([ctx location-info]
    (let [client (:client ctx)
          update (:update ctx)

@@ -50,8 +50,11 @@
         client (:client ctx)
         lang (:lang ctx)
         address (u/text-from-address
-                  (get-in client [:payload :location :address]))]
-    {:send-text {:chat-id chat-id
+                  (get-in client [:payload :location :address]))
+        message-id (:message_id (:message query))]
+    {:delete-message {:chat-id    chat-id
+                      :message-id message-id}
+     :send-text {:chat-id chat-id
                  :text    (translate lang :lc-message-text address)
                  :options {:parse_mode   "markdown"
                            :reply_markup {:inline_keyboard
