@@ -65,11 +65,6 @@
 
 (defn phone-handler
   ([ctx]
-   {:run {:function   clients/client-with-bot-id-and-phone!
-          :args       [(-> ctx :bot :id)
-                       (get-phone (:update ctx))]
-          :next-event :c/phone}})
-  ([ctx conflicting-client]
    (let [update (:update ctx)
          lang (:lang ctx)
          client (:client ctx)
@@ -83,8 +78,7 @@
        {:send-text {:chat-id chat-id
                     :text    (translate lang :invalid-phone-message)}}
 
-       ;; If the conflicting-client is non-existent or external or the same
-       (or (nil? (:tid conflicting-client)) (= (:id conflicting-client) (:id client)))
+       :else
        ;; then proceed with confirmation
        {:run       [{:function sms/create!
                      :args     [phone (translate lang :confirmation-code bot-name code)]}
@@ -100,18 +94,8 @@
                     {:chat-id chat-id
                      :options {:parse_mode   "markdown"
                                :reply_markup (phone-confirmation-markup (:lang ctx))}
-                     :text    (translate lang :request-code-message phone)}]}
+                     :text    (translate lang :request-code-message phone)}]}))))
 
-       ;; If conflicting-client is not external
-       (some? (:tid conflicting-client))
-       ;; then phone cannot be registered
-       {:send-text {:chat-id chat-id
-                    :text    (translate lang :already-registered-message)}}
-
-       :else (throw (ex-info
-                      "Unexpected input, in phone-handler"
-                      {:conflicting_client_id (:id conflicting-client)
-                       :client_id             (:id client)}))))))
 
 
 (defn confirm-phone-handler
@@ -168,9 +152,15 @@
 
        ;; If conflicting-client is not external
        (some? (:tid conflicting-client))
-       ;; then phone cannot be registered
-       {:send-text {:chat-id chat-id
-                    :text    (translate lang :already-registered-message)}}
+       ;; then unconfirm external phone and confirm current
+       {:run       [{:function clients/update-phone!
+                     :args     [(:id conflicting-client) nil]}
+                    {:function clients/update-phone!
+                     :args     [(:id client) phone]}]
+        :send-text {:chat-id chat-id
+                    :text    (translate lang :phone-confirmed-message)}
+        :dispatch  {:args [:c/menu]}}
+
        :else (throw (ex-info
                       "Unexpected input, in confirm-phone-handler"
                       {:conflicting_client_id (:id conflicting-client)

@@ -94,7 +94,7 @@
   (let [update (:update ctx)
         tid (u/chat-id update)
         bot-id (get-in ctx [:bot :id])
-        from (:from (:message update))
+        from (u/from update)
         name (str (:first_name from) " " (:last_name from))
         lang (:language_code from)
         utm (u/utm update)]
