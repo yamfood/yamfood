@@ -1,1 +1,1 @@
-web: java $JVM_OPTS -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -javaagent:newrelic/newrelic.jar -cp target/yamfood.jar clojure.main -m yamfood.core
+web: java $JVM_OPTS -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -cp target/yamfood.jar clojure.main -m yamfood.core
