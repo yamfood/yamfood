@@ -34,9 +34,7 @@
 (defn invalid-location-markup
   [lang]
   {:inline_keyboard
-   [[{:text (translate lang :invalid-location-regions-button)
-      :url  u/map-url}]
-    [{:text          (translate lang :invalid-location-menu-button)
+   [[{:text          (translate lang :invalid-location-menu-button)
       :callback_data "menu"}]
     [{:text          (translate lang :invalid-location-basket-button)
       :callback_data "basket"}]]})
